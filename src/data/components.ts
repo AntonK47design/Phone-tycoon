@@ -1,7 +1,4 @@
-// Hardware components. In Phase 1 the player uses the "garage kit": a mid-range parts
-// bundle that tracks the current year. Individual component tiers arrive in M2.
-
-import { expectedTech, inflation } from './eras';
+// Hardware categories and company-level constants. The part catalogue lives in parts.ts.
 
 export type TechCategory = 'chip' | 'display' | 'battery' | 'camera' | 'storage' | 'ram';
 
@@ -17,38 +14,6 @@ export const TECH_WEIGHTS: Record<TechCategory, number> = {
   ram: 0.1,
 };
 
-export interface KitDef {
-  year: number;
-  /** Tech index per category. */
-  ti: Record<TechCategory, number>;
-  /** Unit cost per category in $ (display cost is for a 3.5" panel; scales with area). */
-  cost: Record<TechCategory, number>;
-  /** Development points per type. */
-  dev: { design: number; tech: number; software: number };
-}
-
-/** Mid-range share of the flagship expectation. */
-const KIT_TIER = 0.6;
-
-export function garageKit(year: number): KitDef {
-  const y = Math.floor(year);
-  const ti = KIT_TIER * expectedTech(y);
-  const inf = inflation(y);
-  return {
-    year: y,
-    ti: { chip: ti, display: ti, battery: ti, camera: ti, storage: ti, ram: ti },
-    cost: {
-      chip: 34 * inf,
-      display: 28 * inf,
-      battery: 8 * inf,
-      camera: 9 * inf,
-      storage: 10 * inf,
-      ram: 8 * inf,
-    },
-    dev: { design: 6, tech: 6, software: 4 },
-  };
-}
-
 /** Assembly cost per unit in the garage (hand assembly). */
 export const GARAGE_ASSEMBLY_COST = 18;
 /** Garage capacity in units per week. */
@@ -60,4 +25,34 @@ export const DEV_COST_PER_POINT = 40;
 
 export const LICENSED_OS = {
   leafline: { score: 5, feePerUnit: 0 },
+  mosaic: { score: 7, feePerUnit: 8 },
 } as const;
+
+/** Office (Phase 2) – rent, research output and contract manufacturing. */
+export const OFFICE_PRICE = 25_000;
+export const OFFICE_RENT_WEEK = 3_000;
+export const OFFICE_REACH = 0.0025;
+/** Share of the shelf price kept by sales channels: online shop, retail, carriers. */
+export const CHANNEL_CUT = { online: 0.1, retail: 0.25, carrier: 0.3 } as const;
+export const FOUNDER_RP_PER_DAY = 4;
+/** Contract manufacturer: markup on unit cost, lead time for re-orders, minimum batch. */
+export const OEM_MARKUP = 1.2;
+export const OEM_ASSEMBLY_COST = 12;
+export const OEM_LEAD_DAYS = 14;
+export const OEM_MIN_BATCH = 100;
+/** Storage cost per unit in stock per week, as a share of unit cost. */
+export const STORAGE_RATE = 0.005;
+/** Presentation stages: cost (2007 $) and hype. */
+export const PRESENTATIONS = [
+  { level: 0, cost: 0, hype: 0 },
+  { level: 1, cost: 8_000, hype: 15 },
+  { level: 2, cost: 40_000, hype: 28 },
+];
+/** Bank loan whenever cash runs dry (GDD §24.3 bankruptcy protection). */
+export const LOAN_BUFFER = 15_000;
+/** Weekly interest on debt and share of a positive week's profit used for repayment. */
+export const LOAN_INTEREST_WEEK = 0.002;
+export const LOAN_REPAY_SHARE = 0.25;
+/** Credit line for production batches: base + share of last year's revenue. */
+export const CREDIT_BASE = 40_000;
+export const CREDIT_REVENUE_SHARE = 0.1;

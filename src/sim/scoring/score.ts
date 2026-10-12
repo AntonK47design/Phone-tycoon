@@ -8,7 +8,8 @@ import {
   expectedThickness,
   trendColors,
 } from '../../data/eras';
-import { garageKit, LICENSED_OS, TECH_CATEGORIES, TECH_WEIGHTS, type TechCategory } from '../../data/components';
+import { LICENSED_OS, TECH_CATEGORIES, TECH_WEIGHTS, type TechCategory } from '../../data/components';
+import { FEATURES, featureById, partById } from '../../data/parts';
 import { finishById, materialById, PACKAGING } from '../../data/design';
 import { SEGMENTS } from '../../data/market';
 import { phoneDims } from '../phoneSpec';
@@ -28,17 +29,22 @@ export interface TechBreakdown {
 
 /** Relative battery drain of a design (1 = 3.5" reference). */
 export function batteryDrain(design: PhoneDesign): number {
-  return Math.pow(design.displaySize / 3.5, 2);
+  let drain = Math.pow(design.displaySize / 3.5, 2);
+  for (const id of design.features) drain *= featureById(id)?.drain ?? 1;
+  return drain;
+}
+
+export function partTi(design: PhoneDesign, category: TechCategory): number {
+  return partById(design.parts[category])?.ti ?? 0;
 }
 
 export function techScore(design: PhoneDesign, year: number): TechBreakdown {
   const seg = SEGMENTS[design.segment];
-  const kit = garageKit(design.kitYear);
   const expected = seg.sigma * expectedTech(year);
   const categories = {} as Record<TechCategory, number>;
   let score = 0;
   for (const k of TECH_CATEGORIES) {
-    let ti = kit.ti[k];
+    let ti = partTi(design, k);
     if (k === 'battery') ti /= batteryDrain(design);
     const s = ratingFromRatio(ti / expected);
     categories[k] = s;
@@ -115,15 +121,43 @@ export interface Rating {
   p: number;
   design: DesignBreakdown;
   tech: TechBreakdown;
+  features: FeatureCheck;
 }
 
-/** Overall rating P (GDD §5.7). Features (F) arrive with the extras editor in M2. */
+export interface FeatureCheck {
+  missing: string[];
+  innovative: string[];
+  adjustment: number;
+}
+
+/** Feature adjustment F (GDD §5.5): expected but missing costs, early adoption pays. */
+export function featureAdjustment(design: PhoneDesign, year: number): FeatureCheck {
+  const missing: string[] = [];
+  const innovative: string[] = [];
+  let malus = 0;
+  let bonus = 0;
+  for (const f of FEATURES) {
+    const expected = f.expected[design.segment];
+    const has = design.features.includes(f.id);
+    if (!has && year >= expected) {
+      missing.push(f.id);
+      malus += 0.4;
+    } else if (has && year < expected) {
+      innovative.push(f.id);
+      bonus += 0.35 * clamp((expected - year) / 2, 0, 1);
+    }
+  }
+  return { missing, innovative, adjustment: Math.min(1.5, bonus) - Math.min(2, malus) };
+}
+
+/** Overall rating P (GDD §5.7). */
 export function overallRating(design: PhoneDesign, year: number): Rating {
   const d = designScore(design, year);
   const t = techScore(design, year);
   const a = alphaFor(design, year);
-  const p = clamp(a * d.score + (1 - a) * t.score + osAdjustment(design), 0, 10);
-  return { p, design: d, tech: t };
+  const f = featureAdjustment(design, year);
+  const p = clamp(a * d.score + (1 - a) * t.score + f.adjustment + osAdjustment(design), 0, 10);
+  return { p, design: d, tech: t, features: f };
 }
 
 /** Segment price anchor including inflation. */
@@ -149,6 +183,11 @@ export function roundPrice(x: number): number {
 export function suggestedPrice(design: PhoneDesign, year: number): number {
   const { p } = overallRating(design, year);
   return roundPrice(0.85 * fairPrice(design, p, year));
+}
+
+/** Effective shelf price: the player's own price if set, otherwise the suggestion. */
+export function effectivePrice(design: PhoneDesign, year: number): number {
+  return design.customPrice ?? suggestedPrice(design, year);
 }
 
 export interface ReviewEstimate {

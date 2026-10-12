@@ -2,6 +2,7 @@
 
 import { GOALS, VISIBLE_GOALS, type GoalDef } from '../data/goals';
 import type { SimEvent } from './events';
+import { valuation } from './game';
 import type { GameState } from './state';
 
 export function goalProgress(state: GameState, goal: GoalDef): number {
@@ -16,6 +17,18 @@ export function goalProgress(state: GameState, goal: GoalDef): number {
       return state.stats.unitsTotal;
     case 'fans':
       return state.company.fans;
+    case 'phase':
+      return state.phase;
+    case 'research':
+      return state.research.done.length;
+    case 'hypeLaunch':
+      return state.stats.bestLaunchHype;
+    case 'revenueTotal':
+      return state.stats.revenueTotal;
+    case 'valuation':
+      return valuation(state);
+    case 'brand':
+      return state.company.brand;
   }
 }
 
@@ -40,9 +53,13 @@ export function checkGoals(state: GameState): SimEvent[] {
         state.unlockedColors.push(color);
         events.push({ type: 'colorUnlocked', colorId: color });
       }
-      if (goal.gate && !state.officeReady) {
+      if (goal.gate === 'office' && !state.officeReady) {
         state.officeReady = true;
         events.push({ type: 'officeReady' });
+      }
+      if (goal.gate === 'phase3' && !state.phase3Ready) {
+        state.phase3Ready = true;
+        events.push({ type: 'phase3Ready' });
       }
       changed = true;
     }

@@ -1,13 +1,16 @@
 // Serializable game state. Plain JSON only (no classes, Maps or Dates).
 
+import type { TechCategory } from '../data/components';
 import type { Segment } from '../data/market';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 export interface PhoneDesign {
   name: string;
   segment: Segment;
   price: number;
+  /** Player-set price (Phase 2+). null = use the suggested fair price. */
+  customPrice: number | null;
   /** null = unpainted prototype. */
   colorId: string | null;
   shapeId: string;
@@ -15,8 +18,12 @@ export interface PhoneDesign {
   materialId: string;
   finishId: string;
   osId: string;
-  /** Year of the parts kit used (tech values are frozen at this year). */
+  /** Design year (drives display aspect ratio). */
   kitYear: number;
+  /** Component id per tech category. */
+  parts: Record<TechCategory, string>;
+  /** Extra feature ids (wifi, net3g, gps, …). */
+  features: string[];
 }
 
 export interface ReviewCard {
@@ -36,6 +43,11 @@ export interface ReviewResult {
   cards: ReviewCard[];
 }
 
+export interface ProductionOrder {
+  units: number;
+  arriveDay: number;
+}
+
 export interface Product {
   id: number;
   design: PhoneDesign;
@@ -49,11 +61,23 @@ export interface Product {
   lastWeekUnits: number;
   /** Units sold in the current (running) week. */
   weekUnits: number;
+  /** Demand (wanted units, sold or not) this week and last week. */
+  weekDemand: number;
+  lastWeekDemand: number;
   /** Fractional units carried between days (determinism without rounding drift). */
   carry: number;
   active: boolean;
-  /** Was the demand capped by capacity during the last week? */
+  /** Was the demand capped by capacity/stock during the last week? */
   capped: boolean;
+  /** Garage products are built to order; office products come from batches. */
+  madeToOrder: boolean;
+  stock: number;
+  /** Customers waiting for stock (GDD §7.6). */
+  backlog: number;
+  orders: ProductionOrder[];
+  /** Current hype 0–100 (decays weekly). */
+  hype: number;
+  launchHype: number;
 }
 
 export interface Development {
@@ -78,10 +102,15 @@ export interface GameState {
     cash: number;
     brand: number;
     fans: number;
+    /** Outstanding bank loan. */
+    debt: number;
   };
+  /** 1 = garage, 2 = startup office. */
   phase: number;
   /** Phase-2 gate reached (office purchasable). */
   officeReady: boolean;
+  /** Phase-3 gate reached (studio & factory – next update). */
+  phase3Ready: boolean;
   tutorial: TutorialStep;
   draft: PhoneDesign;
   dev: Development | null;
@@ -89,13 +118,27 @@ export interface GameState {
   nextProductId: number;
   unlockedColors: string[];
   completedGoals: string[];
+  research: {
+    done: string[];
+    current: { id: string; progress: number } | null;
+  };
   stats: {
     launches: number;
     unitsTotal: number;
     revenueTotal: number;
     profitTotal: number;
     bestReview: number;
+    bestLaunchHype: number;
   };
-  /** Weekly cash history (last 104 weeks) for charts. */
-  cashHistory: number[];
+  /** Weekly history (last 52 weeks). */
+  history: {
+    cash: number[];
+    revenue: number[];
+    profit: number[];
+    playerUnits: number[];
+    /** Competitor id → weekly units. "_rest" = no-name / feature phones. */
+    compUnits: Record<string, number[]>;
+  };
+  /** Running week accumulators. */
+  week: { revenue: number; profit: number; units: number };
 }

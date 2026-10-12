@@ -1,5 +1,6 @@
 // Save serialization with versioning and migrations (PLAN §3).
 
+import { defaultParts, LAST_GEN } from '../../data/parts';
 import { SAVE_VERSION, type GameState } from '../state';
 
 export interface SaveFile {
@@ -11,11 +12,44 @@ export interface SaveFile {
 
 type Migration = (state: Record<string, unknown>) => Record<string, unknown>;
 
-/**
- * MIGRATIONS[n] upgrades a save from version n to n + 1.
- * Version 1 is the first public schema, so the list is still empty.
- */
-export const MIGRATIONS: Record<number, Migration> = {};
+type Obj = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+/** v1 designs used a "garage kit" instead of explicit parts. */
+function upgradeDesign(d: Obj | null | undefined) {
+  if (!d) return;
+  const gen = Math.min(LAST_GEN, Math.max(2007, d.kitYear ?? 2007));
+  d.parts ??= defaultParts('std', gen);
+  d.features ??= ['wifi'];
+  d.customPrice ??= null;
+}
+
+/** MIGRATIONS[n] upgrades a save from version n to n + 1. */
+export const MIGRATIONS: Record<number, Migration> = {
+  1: (s: Obj) => {
+    upgradeDesign(s.draft);
+    upgradeDesign(s.dev?.design);
+    for (const p of s.products ?? []) {
+      upgradeDesign(p.design);
+      p.madeToOrder ??= true;
+      p.stock ??= 0;
+      p.backlog ??= 0;
+      p.orders ??= [];
+      p.hype ??= 0;
+      p.weekDemand ??= 0;
+      p.lastWeekDemand ??= p.lastWeekUnits ?? 0;
+      p.launchHype ??= 0;
+    }
+    s.company.debt ??= 0;
+    delete s.company.loanUsed;
+    s.phase3Ready ??= false;
+    s.research ??= { done: [], current: null };
+    s.stats.bestLaunchHype ??= 0;
+    s.history ??= { cash: (s.cashHistory ?? []).slice(-52), revenue: [], profit: [], playerUnits: [], compUnits: {} };
+    delete s.cashHistory;
+    s.week ??= { revenue: 0, profit: 0, units: 0 };
+    return s;
+  },
+};
 
 export function serialize(state: GameState, now: number): string {
   const file: SaveFile = { version: SAVE_VERSION, savedAt: now, state };

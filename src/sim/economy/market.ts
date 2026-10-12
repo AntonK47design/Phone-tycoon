@@ -1,11 +1,18 @@
-// Market & sales formulas (GDD §6.1, §7).
+// Market & sales formulas (GDD §6, §7).
 
-import { garageKit, GARAGE_ASSEMBLY_COST, LICENSED_OS, DEV_COST_PER_POINT } from '../../data/components';
+import {
+  DEV_COST_PER_POINT,
+  GARAGE_ASSEMBLY_COST,
+  LICENSED_OS,
+  OEM_ASSEMBLY_COST,
+  OEM_MARKUP,
+} from '../../data/components';
 import { finishById, materialById, PACKAGING, shapeById } from '../../data/design';
 import { inflation } from '../../data/eras';
 import { COMPETITORS, SEGMENT_SHARES, SEGMENTS, restMarketAttractiveness, type Segment } from '../../data/market';
+import { featureById, partById, partCostAt } from '../../data/parts';
 import { clamp, fairPrice, overallRating } from '../scoring/score';
-import type { PhoneDesign, Product } from '../state';
+import type { PhoneDesign } from '../state';
 
 /** Total smartphone market in units per week (GDD §7.1). */
 export function marketSize(year: number): number {
@@ -31,37 +38,46 @@ export function brandFactor(brand: number): number {
   return 0.4 + (1.2 * clamp(brand, 0, 100)) / 100;
 }
 
-/** Unit cost of a design at production time (GDD §6.1). */
-export function unitCost(design: PhoneDesign): number {
-  const kit = garageKit(design.kitYear);
+export type BuildMode = 'garage' | 'oem';
+
+/** Unit cost of a design built in `year` (GDD §6.1). */
+export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'garage'): number {
+  const inf = inflation(Math.floor(year));
   const area = Math.pow(design.displaySize / 3.5, 2);
-  const parts =
-    kit.cost.chip + kit.cost.battery + kit.cost.camera + kit.cost.storage + kit.cost.ram + kit.cost.display * area;
-  const inf = inflation(design.kitYear);
-  const shape = shapeById(design.shapeId);
+  let parts = 0;
+  for (const [category, id] of Object.entries(design.parts)) {
+    const part = partById(id);
+    if (!part) continue;
+    parts += partCostAt(part, year) * (category === 'display' ? area : 1);
+  }
+  const extras = design.features.reduce((a, f) => a + (featureById(f)?.cost ?? 0), 0);
   const os = LICENSED_OS[design.osId as keyof typeof LICENSED_OS] ?? LICENSED_OS.leafline;
-  return (
-    parts +
-    (materialById(design.materialId).cost + finishById(design.finishId).cost + shape.cost + PACKAGING.basic.cost) * inf +
-    GARAGE_ASSEMBLY_COST * inf +
-    os.feePerUnit
-  );
+  const body =
+    (materialById(design.materialId).cost + finishById(design.finishId).cost + shapeById(design.shapeId).cost + PACKAGING.basic.cost + extras) * inf;
+  if (mode === 'garage') return parts + body + GARAGE_ASSEMBLY_COST * inf + os.feePerUnit;
+  return (parts + body + OEM_ASSEMBLY_COST * inf) * OEM_MARKUP + os.feePerUnit;
 }
 
-/** Unit cost of an existing product today: parts get cheaper over time. */
-export function currentUnitCost(product: Product, year: number): number {
-  const age = Math.max(0, year - (2007 + product.launchDay / 364));
-  return product.unitCost * (0.3 + 0.7 * Math.max(0.25, Math.exp(-0.25 * age)));
+/** Volume discount on a production batch (GDD §6.1). */
+export function volumeDiscount(units: number): number {
+  return clamp(1 - 0.08 * Math.log10(Math.max(1, units) / 1000), 0.75, 1);
 }
 
 export function devPoints(design: PhoneDesign): { design: number; tech: number; software: number } {
-  const kit = garageKit(design.kitYear);
   const shape = shapeById(design.shapeId);
-  return {
-    design: kit.dev.design + shape.devPoints,
-    tech: kit.dev.tech + (design.displaySize > 3.5 ? 1 : 0),
-    software: kit.dev.software,
-  };
+  const mat = design.materialId === 'plastic' ? 0 : design.materialId === 'aluminium' ? 2 : 3;
+  let tech = 0;
+  let software = 2;
+  for (const id of Object.values(design.parts)) {
+    const part = partById(id);
+    if (!part) continue;
+    if (part.dev.type === 'tech') tech += part.dev.points;
+    else software += part.dev.points;
+  }
+  for (const f of design.features) tech += featureById(f)?.devPoints ?? 0;
+  if (design.osId !== 'leafline') software += 1;
+  if (design.displaySize > 3.5) tech += Math.round((design.displaySize - 3.5) * 2);
+  return { design: 6 + shape.devPoints + mat + (design.finishId !== 'gloss' ? 1 : 0), tech, software };
 }
 
 export function devCost(design: PhoneDesign): number {
@@ -69,7 +85,7 @@ export function devCost(design: PhoneDesign): number {
   return (p.design + p.tech + p.software) * DEV_COST_PER_POINT * inflation(design.kitYear);
 }
 
-/** Founder output per day in the garage. */
+/** Founder output per day (staff arrive in M3). */
 export const FOUNDER_POINTS_PER_DAY = 2;
 
 export function devDays(design: PhoneDesign): number {
@@ -77,21 +93,13 @@ export function devDays(design: PhoneDesign): number {
   return Math.ceil(Math.max(p.design, p.tech, p.software) / FOUNDER_POINTS_PER_DAY);
 }
 
-/** Competitor rating in steady state (GDD §12; static line-up in M1). */
+/** Competitor rating in steady state (GDD §12; static line-up until M5). */
 export function competitorReview(tau: number, designBias: number): number {
   return clamp(7 + 3 * Math.log2(tau) + 0.4 * designBias + 0.2, 0, 10);
 }
 
-/** Sum of reach-weighted competitor attractiveness in a segment. */
-export function competitorPressure(segment: Segment): number {
-  let sum = 0;
-  for (const c of COMPETITORS) {
-    if (!c.segments.includes(segment)) continue;
-    const r = competitorReview(c.tau, c.designBias);
-    sum += Math.pow(r / 10, 3) * brandFactor(c.brand) * c.reach;
-  }
-  return sum;
-}
+export const KAPPA = 3;
+export const LIFE_TAU_WEEKS = 40;
 
 export interface AttractivenessInput {
   design: PhoneDesign;
@@ -102,28 +110,44 @@ export interface AttractivenessInput {
   hype?: number;
 }
 
-export const KAPPA = 3;
-export const LIFE_TAU_WEEKS = 40;
-
 /** Attractiveness A_i (GDD §7.3). */
 export function attractiveness(input: AttractivenessInput, year: number): number {
   const seg = SEGMENTS[input.design.segment];
   const p = overallRating(input.design, year).p;
   const pRef = fairPrice(input.design, p, year);
-  const priceF = clamp(Math.pow(pRef / input.design.price, seg.elasticity), 0.05, 3);
-  const h = (1.5 * (input.hype ?? 0)) / 100;
-  const life = (1 + h * Math.exp(-input.weeksSinceLaunch / 2)) * Math.exp(-input.weeksSinceLaunch / LIFE_TAU_WEEKS);
-  return Math.pow(clamp(input.review, 0, 10) / 10, KAPPA) * priceF * brandFactor(input.brand) * life;
+  const priceF = clamp(Math.pow(pRef / Math.max(1, input.design.price), seg.elasticity), 0.03, 3);
+  const hype = input.hype ?? 0;
+  const spike = ((1.5 * hype) / 100) * Math.exp(-input.weeksSinceLaunch / 2);
+  const life = (1 + spike) * Math.exp(-input.weeksSinceLaunch / LIFE_TAU_WEEKS);
+  const mkt = 1 + (0.6 * hype) / 100;
+  return Math.pow(clamp(input.review, 0, 10) / 10, KAPPA) * priceF * brandFactor(input.brand) * life * mkt;
 }
 
-/** Weekly demand for a set of player products in one segment. */
-export function weeklyDemand(
-  playerA: number[],
-  segment: Segment,
-  year: number,
-  reach: number,
-): number[] {
-  const denom = restMarketAttractiveness(year) + competitorPressure(segment) + playerA.reduce((a, b) => a + b, 0);
-  const segMarket = marketSize(year) * segmentShare(segment, year) * reach;
-  return playerA.map((a) => (segMarket * a) / denom);
+export interface SegmentResult {
+  /** Weekly units for each player entry. */
+  player: number[];
+  /** Weekly units per competitor id, plus "_rest" (no-name / feature phones). */
+  comps: Record<string, number>;
+}
+
+/**
+ * Splits a segment's weekly demand between player products, competitors and the rest of
+ * the market. Every product competes with its effective attractiveness A × reach.
+ */
+export function segmentDemand(players: { a: number; reach: number }[], segment: Segment, year: number): SegmentResult {
+  const total = marketSize(year) * segmentShare(segment, year);
+  const comps: Record<string, number> = {};
+  let denom = restMarketAttractiveness(year);
+  const compE: [string, number][] = [];
+  for (const c of COMPETITORS) {
+    if (!c.segments.includes(segment)) continue;
+    const r = competitorReview(c.tau, c.designBias);
+    const e = Math.pow(r / 10, KAPPA) * brandFactor(c.brand) * c.reach;
+    compE.push([c.id, e]);
+    denom += e;
+  }
+  for (const p of players) denom += p.a * p.reach;
+  for (const [id, e] of compE) comps[id] = (total * e) / denom;
+  comps._rest = (total * restMarketAttractiveness(year)) / denom;
+  return { player: players.map((p) => (total * p.a * p.reach) / denom), comps };
 }

@@ -12,6 +12,9 @@ export type SimEvent =
       preorderRevenue: number;
       review: ReviewResult;
       brandDelta: number;
+      hype: number;
+      /** Extra launch spend (marketing + presentation + first batch). */
+      spend: number;
     }
   | { type: 'goalCompleted'; goalId: string; reward: GoalReward }
   | { type: 'colorUnlocked'; colorId: string }
@@ -21,4 +24,12 @@ export type SimEvent =
   | { type: 'weekEnd'; week: number }
   | { type: 'productRetired'; productId: number }
   | { type: 'officeReady' }
+  | { type: 'officeRented' }
+  | { type: 'phase3Ready' }
+  | { type: 'researchStarted'; id: string }
+  | { type: 'researchDone'; id: string }
+  | { type: 'orderPlaced'; productId: number; units: number; cost: number }
+  | { type: 'orderArrived'; productId: number; units: number }
+  | { type: 'soldOut'; productId: number }
+  | { type: 'loan'; amount: number }
   | { type: 'rejected'; reason: 'noCash' | 'busy' | 'notReady' };

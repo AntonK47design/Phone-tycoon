@@ -33,7 +33,7 @@ export const SEGMENT_SHARES: { year: number; budget: number; mid: number; flagsh
 /** Attractiveness of the rest of the market (no-name / feature phones), A_0. */
 export function restMarketAttractiveness(year: number): number {
   const t = Math.min(1, Math.max(0, (year - 2007) / 8));
-  return 1.8 + (0.4 - 1.8) * t;
+  return 1.8 + (1.0 - 1.8) * t;
 }
 
 /** Distribution reach ρ in the garage (online shop only). */

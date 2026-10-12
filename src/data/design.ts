@@ -38,19 +38,22 @@ export interface ShapeDef {
   cost: number;
   /** Additional design development points. */
   devPoints: number;
+  /** Available without research. */
+  starter?: boolean;
 }
 
 export const SHAPES: ShapeDef[] = [
-  { id: 'round', bezelSide: 5, bezelTop: 15, bezelBottom: 15, corner: 11, thickness: 12.5, cost: 0, devPoints: 0 },
-  { id: 'boxy', bezelSide: 4, bezelTop: 13, bezelBottom: 13, corner: 4.5, thickness: 11.5, cost: 3, devPoints: 1 },
-  { id: 'slim', bezelSide: 3.5, bezelTop: 12, bezelBottom: 12, corner: 8, thickness: 9.8, cost: 12, devPoints: 3 },
+  { id: 'round', bezelSide: 5, bezelTop: 15, bezelBottom: 15, corner: 11, thickness: 12.5, cost: 0, devPoints: 0, starter: true },
+  { id: 'boxy', bezelSide: 4, bezelTop: 13, bezelBottom: 13, corner: 4.5, thickness: 11.5, cost: 3, devPoints: 1, starter: true },
+  { id: 'slim', bezelSide: 3.5, bezelTop: 12, bezelBottom: 12, corner: 8, thickness: 9.8, cost: 12, devPoints: 3, starter: true },
+  { id: 'blade', bezelSide: 2.8, bezelTop: 10, bezelBottom: 10, corner: 7, thickness: 8.4, cost: 22, devPoints: 5 },
 ];
 
 export function shapeById(id: string): ShapeDef {
   return SHAPES.find((s) => s.id === id) ?? SHAPES[0];
 }
 
-/** Display diagonals offered in the Phase-1 editor (inches). */
+/** Display diagonals offered from the start (inches); bigger ones come from research. */
 export const DISPLAY_SIZES = [3.0, 3.5, 4.0];
 
 export interface MaterialDef {
@@ -67,6 +70,7 @@ export interface MaterialDef {
 export const MATERIALS: MaterialDef[] = [
   { id: 'plastic', design: 6, year: 2007, cost: 6, metalness: 0, roughness: 0.35 },
   { id: 'aluminium', design: 8, year: 2010, cost: 22, metalness: 0.9, roughness: 0.35 },
+  { id: 'glass', design: 8.6, year: 2012, cost: 30, metalness: 0.1, roughness: 0.08 },
 ];
 
 export function materialById(id: string): MaterialDef {

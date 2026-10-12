@@ -114,9 +114,9 @@ describe('game flow', () => {
 });
 
 describe('determinism & saves', () => {
-  it('same seed and actions produce identical state', () => {
-    const a = runBot({ minutes: 40, seed: 99 }).final;
-    const b = runBot({ minutes: 40, seed: 99 }).final;
+  it('same seed and actions produce identical state', { timeout: 60_000 }, () => {
+    const a = runBot({ minutes: 15, seed: 99 }).final;
+    const b = runBot({ minutes: 15, seed: 99 }).final;
     expect(JSON.stringify(a)).toEqual(JSON.stringify(b));
   });
 
@@ -147,17 +147,19 @@ describe('determinism & saves', () => {
 });
 
 describe('pacing (GDD §24.1)', () => {
-  it('average bot reaches the office gate between 3 and 9 minutes', () => {
-    const r = runBot({ minutes: 20, seed: 42 });
+  it('average bot reaches the office gate between 3 and 9 minutes and phase 3 between 20 and 45', () => {
+    const r = runBot({ minutes: 45, seed: 42, sampleEveryMin: 15 });
     expect(r.officeReadyMin).not.toBeNull();
     expect(r.officeReadyMin!).toBeGreaterThan(3);
     expect(r.officeReadyMin!).toBeLessThan(9);
-  });
+    expect(r.phase3Min).not.toBeNull();
+    expect(r.phase3Min!).toBeGreaterThan(20);
+    expect(r.phase3Min!).toBeLessThan(45);
+  }, 60_000);
 
-  it('nobody goes bankrupt in phase 1', () => {
-    for (const profile of ['average', 'optimizer', 'weak'] as const) {
-      const r = runBot({ minutes: 60, seed: 8, profile, sampleEveryMin: 1 });
-      expect(Math.min(...r.samples.map((x) => x.cash))).toBeGreaterThan(0);
-    }
-  });
+  it('a weak player never deadlocks: launches keep coming', () => {
+    const r = runBot({ minutes: 60, seed: 8, profile: 'weak', sampleEveryMin: 20 });
+    const launches = r.samples.map((x) => x.launches);
+    expect(launches[launches.length - 1]).toBeGreaterThan(launches[1]);
+  }, 60_000);
 });

@@ -1,6 +1,17 @@
-// Phase-1 goal chain (GDD §18.1). Conditions are evaluated in sim/goals.ts.
+// Goal chain for Phases 1–2 (GDD §18.1). Conditions are evaluated in sim/goals.ts.
 
-export type GoalKind = 'launches' | 'cash' | 'review' | 'unitsTotal' | 'fans';
+export type GoalKind =
+  | 'launches'
+  | 'cash'
+  | 'review'
+  | 'unitsTotal'
+  | 'fans'
+  | 'phase'
+  | 'research'
+  | 'hypeLaunch'
+  | 'revenueTotal'
+  | 'valuation'
+  | 'brand';
 
 export interface GoalReward {
   cash?: number;
@@ -12,20 +23,30 @@ export interface GoalDef {
   kind: GoalKind;
   target: number;
   reward: GoalReward;
-  /** Goal that marks the Phase-2 gate. */
-  gate?: boolean;
+  /** Goal that opens a phase gate. */
+  gate?: 'office' | 'phase3';
   /** Goals that must be completed before this one can complete. */
   requires?: string[];
 }
 
 export const GOALS: GoalDef[] = [
+  // Phase 1 – garage.
   { id: 'firstLaunch', kind: 'launches', target: 1, reward: { unlockColor: 'midnight' } },
   { id: 'earn10k', kind: 'cash', target: 10_000, reward: { unlockColor: 'coral' } },
   { id: 'secondLaunch', kind: 'launches', target: 2, reward: { cash: 2_500 } },
   { id: 'sell500', kind: 'unitsTotal', target: 500, reward: { unlockColor: 'mint' } },
-  { id: 'office', kind: 'cash', target: 25_000, reward: {}, gate: true, requires: ['secondLaunch'] },
-  { id: 'review8', kind: 'review', target: 8, reward: { unlockColor: 'gold' } },
-  { id: 'fans100', kind: 'fans', target: 100, reward: { cash: 5_000 } },
+  { id: 'office', kind: 'cash', target: 25_000, reward: {}, gate: 'office', requires: ['secondLaunch'] },
+  // Phase 2 – startup office.
+  { id: 'rentOffice', kind: 'phase', target: 2, reward: { cash: 5_000 } },
+  { id: 'firstResearch', kind: 'research', target: 1, reward: { unlockColor: 'gold' } },
+  { id: 'hypeLaunch', kind: 'hypeLaunch', target: 20, reward: { cash: 10_000 } },
+  { id: 'review8', kind: 'review', target: 8, reward: { cash: 15_000 } },
+  { id: 'research5', kind: 'research', target: 5, reward: { cash: 20_000 } },
+  { id: 'sell5k', kind: 'unitsTotal', target: 5_000, reward: { cash: 25_000 } },
+  { id: 'fans500', kind: 'fans', target: 500, reward: { cash: 20_000 } },
+  { id: 'revenue1m', kind: 'revenueTotal', target: 1_000_000, reward: { cash: 50_000 } },
+  { id: 'brand35', kind: 'brand', target: 35, reward: {} },
+  { id: 'valuation10m', kind: 'valuation', target: 10_000_000, reward: {}, gate: 'phase3', requires: ['brand35'] },
 ];
 
 /** How many goals are visible at once. */
