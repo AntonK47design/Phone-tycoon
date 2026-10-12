@@ -12,6 +12,8 @@ import { decimal, money, shortNum } from '../format';
 import { mark } from '../funnel';
 import { cashOverride, game, launchData, mode, speed, useGameState } from '../game';
 import { lang, t } from '../i18n';
+import { nextResearchTeaser } from '../../sim/research';
+import { researchName } from '../labels';
 import { flushDeferred, flyCoins } from '../juice';
 import { useRolling } from '../hud/Hud';
 import { scoreClass } from '../hud/Panels';
@@ -35,7 +37,15 @@ export function LaunchSequence() {
   useEffect(() => {
     cashOverride.value = startCash.current;
     const doLaunch = () => {
-      const ev = store.dispatch({ type: 'launch' });
+      const ev = store.dispatch({ type: 'launch', options: data.options });
+      if (!ev.some((e) => e.type === 'launched')) {
+        // Rejected (e.g. cash changed meanwhile): back to the garage, nothing happened.
+        cashOverride.value = null;
+        launchData.value = null;
+        mode.value = 'free';
+        engine.setNight(false);
+        return;
+      }
       setEvents(ev);
       save();
       setPhase('show');
@@ -235,6 +245,14 @@ function ResultSummary(props: {
 
 function nextTeaser(state: ReturnType<typeof useGameState>): string | null {
   const l = lang.value;
+  if (state.phase >= 2) {
+    if (!state.research.current) {
+      const n = nextResearchTeaser(state);
+      if (n) return t('teaser.research', { name: researchName(n) });
+    }
+    const gate = GOALS.find((g) => g.gate === 'phase3')!;
+    if (!state.phase3Ready) return t('teaser.phase3', { amount: money(Math.max(0, gate.target - goalProgress(state, gate)), l) });
+  }
   if (state.officeReady) return t('teaser.officeReady');
   const office = GOALS.find((g) => g.id === 'office')!;
   if (state.completedGoals.includes('secondLaunch')) {

@@ -5,8 +5,11 @@ import { goalProgress, visibleGoals } from '../../sim/goals';
 import { decimal, money, shortNum } from '../format';
 import { game, mode, sayBark, bark, toVisual, toasts, useGameState } from '../game';
 import { lang, t, tList } from '../i18n';
-import { startLaunch } from '../launch/flow';
-import { IconPencil, IconRocket, IconWrench, ToastIconView } from '../icons';
+import { openLaunchSetup } from '../launch/LaunchSetup';
+import { IconBuilding, IconPencil, IconRocket, IconWrench, ToastIconView } from '../icons';
+import { OFFICE_PRICE } from '../../data/components';
+import { inflation } from '../../data/eras';
+import { calendar } from '../../sim/time';
 
 export function scoreClass(score: number) {
   return score >= 8 ? 'good' : score >= 6.5 ? 'ok' : 'bad';
@@ -57,7 +60,10 @@ export function Products() {
             <div class="sub">
               {p.active ? t('products.perWeek', { n: shortNum(p.lastWeekUnits || p.weekUnits, l) }) : t('products.retired')} ·{' '}
               {t('products.sold', { n: shortNum(p.unitsSold, l) })}
-              {p.active && p.capped && <div class="capped">{t('products.capped')}</div>}
+              {p.active && p.madeToOrder && p.capped && <div class="capped">{t('products.capped')}</div>}
+              {p.active && !p.madeToOrder && (
+                <div class={p.stock > 0 ? '' : 'capped'}>{p.stock > 0 ? `${t('company.stock')} ${shortNum(p.stock, l)}` : t('company.soldOut')}</div>
+              )}
             </div>
           </div>
           <span class={`score-pill ${scoreClass(p.review.score)}`}>{decimal(p.review.score, l)}</span>
@@ -69,7 +75,7 @@ export function Products() {
 
 export function ActionBar() {
   const state = useGameState();
-  const { engine } = game();
+  const { engine, store } = game();
   const dev = state.dev;
   if (dev && !dev.done) {
     const r = dev.required;
@@ -94,7 +100,7 @@ export function ActionBar() {
   if (dev?.done) {
     return (
       <div class="action-bar">
-        <button class="btn-primary btn-launch pulse" onClick={() => startLaunch()}>
+        <button class="btn-primary btn-launch pulse" onClick={openLaunchSetup}>
           <IconRocket size={24} /> {t('action.ready', { name: dev.design.name })}
         </button>
       </div>
@@ -106,8 +112,18 @@ export function ActionBar() {
     engine.goToView('editor', 1.1);
     engine.setPhone(toVisual(state.draft));
   };
+  const officePrice = OFFICE_PRICE * inflation(calendar(state.day).year);
+  const rent = () => {
+    const ev = store.dispatch({ type: 'rentOffice' });
+    if (ev.some((e) => e.type === 'officeRented')) sfx.fanfare();
+  };
   return (
     <div class="action-bar">
+      {state.phase < 2 && state.officeReady && (
+        <button class="btn-primary btn-office" disabled={state.company.cash < officePrice} onClick={rent}>
+          <IconBuilding /> {t('office.rent', { price: money(officePrice, lang.value) })}
+        </button>
+      )}
       <button class="btn-primary" onClick={open}><IconPencil /> {t('action.newPhone')}</button>
     </div>
   );

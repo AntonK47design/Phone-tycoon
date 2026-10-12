@@ -28,7 +28,22 @@ export interface PhoneVisual {
   displaySize: number;
   kitYear: number;
   finishId: string;
+  materialId?: string;
   lenses: number;
+}
+
+/** Target paint roughness / metalness for a material + finish combination. */
+function surface(v: PhoneVisual): { roughness: number; metalness: number; clearcoat: number } {
+  if (!v.colorHex) return { roughness: 0.65, metalness: 0.05, clearcoat: 0.1 };
+  const matte = v.finishId === 'matte';
+  switch (v.materialId) {
+    case 'aluminium':
+      return { roughness: matte ? 0.5 : 0.3, metalness: 0.85, clearcoat: matte ? 0 : 0.4 };
+    case 'glass':
+      return { roughness: matte ? 0.35 : 0.06, metalness: 0.1, clearcoat: 1 };
+    default:
+      return { roughness: matte ? 0.55 : 0.26, metalness: 0.05, clearcoat: matte ? 0.2 : 1 };
+  }
 }
 
 const PRIMER = new Color('#6f7378');
@@ -233,11 +248,20 @@ export class PhoneModel {
       this.to = phoneDims(next);
       this.morphT = 0;
     }
+    const surfaceChanged = prev.materialId !== next.materialId || prev.finishId !== next.finishId;
+    if (surfaceChanged && prev.colorHex === next.colorHex) {
+      // Re-run the paint sweep in the same colour to show the new surface.
+      this.paintUniforms.uOld.value.copy(this.currentColor());
+      this.paintFromRough = this.bodyMat.roughness;
+      this.paintToRough = surface(next).roughness;
+      this.paintT = 0;
+    }
+    this.bodyMat.metalness = surface(next).metalness;
     if (prev.colorHex !== next.colorHex) {
       this.paintUniforms.uOld.value.copy(this.currentColor());
       this.paintUniforms.uNew.value.set(next.colorHex ?? PRIMER.getHex());
       this.paintFromRough = this.bodyMat.roughness;
-      this.paintToRough = next.colorHex ? (next.finishId === 'matte' ? 0.55 : 0.26) : 0.65;
+      this.paintToRough = surface(next).roughness;
       this.paintT = 0;
       this.onPaintDone = onPaintDone ?? null;
       drawPhoneScreen(this.screenCanvas, next.colorHex);
@@ -269,7 +293,7 @@ export class PhoneModel {
       this.paintUniforms.uSweep.value = -h + 2 * h * k;
       this.paintUniforms.uGlow.value = Math.sin(Math.PI * this.paintT) * 1.2;
       this.bodyMat.roughness = this.paintFromRough + (this.paintToRough - this.paintFromRough) * k;
-      this.bodyMat.clearcoat = this.visual.colorHex ? (this.visual.finishId === 'matte' ? 0.2 : 1) * k + (1 - k) * this.bodyMat.clearcoat : 0.1;
+      this.bodyMat.clearcoat = surface(this.visual).clearcoat * k + (1 - k) * this.bodyMat.clearcoat;
       if (this.paintT >= 1) {
         this.paintUniforms.uOld.value.copy(this.paintUniforms.uNew.value);
         this.paintUniforms.uSweep.value = 1e4;

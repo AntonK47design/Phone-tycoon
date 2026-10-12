@@ -11,7 +11,8 @@ import { createStore } from './sim/store';
 import { App } from './ui/App';
 import { startClock } from './ui/clock';
 import { mark } from './ui/funnel';
-import { game, mode, setGame, settingsOpen, toVisual } from './ui/game';
+import { game, mode, setGame, settingsOpen, storeRev, toVisual, welcomeReport } from './ui/game';
+import { applyOffline } from './sim/offline';
 import { setLang, lang } from './ui/i18n';
 import { installJuice } from './ui/juice';
 import { installAutosave, loadSave, SAVE_KEY, writeSave } from './ui/persistence';
@@ -38,6 +39,8 @@ async function boot() {
 
   const saved = loadSave(platform);
   const state = saved?.state ?? newGame((Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0);
+  // Offline progress (GDD §20.1) before anything renders.
+  const offline = saved ? applyOffline(state, Math.max(0, (Date.now() - saved.savedAt) / 1000)) : null;
   const store = createStore(state);
   const save = () => writeSave(platform, store.getState());
   setGame({
@@ -53,6 +56,7 @@ async function boot() {
     },
   });
 
+  store.subscribe(() => (storeRev.value = store.revision()));
   installTooltips();
   installJuice();
   render(h(App, {}), document.getElementById('ui')!);
@@ -71,6 +75,7 @@ async function boot() {
     // Intro camera move: straight to the turntable for new players.
     engine.goToView(inTutorial ? 'editor' : 'overview', 2.4, () => {
       mode.value = inTutorial ? 'tutorial' : 'free';
+      if (offline && (offline.cashDelta !== 0 || offline.researchDone.length || offline.devDone)) welcomeReport.value = offline;
       gameplay.start();
     });
   });

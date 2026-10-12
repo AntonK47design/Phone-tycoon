@@ -1,5 +1,8 @@
 {
-  "app": { "title": "Phone Empire 3D", "loading": "Sweeping the garage floor…" },
+  "app": {
+    "title": "Phone Empire 3D",
+    "loading": "Sweeping the garage floor…"
+  },
   "hud": {
     "date": "Week {week} · {year}",
     "cash": "Cash",
@@ -7,7 +10,9 @@
     "fans": "Fans",
     "pause": "Pause",
     "settings": "Settings",
-    "rename": "Rename your company"
+    "rename": "Rename your company",
+    "research": "Research",
+    "debt": "Debt"
   },
   "tip": {
     "cash": "Money in the bank. Sales minus parts, rent and late-night development.",
@@ -33,8 +38,16 @@
     "skip": "Skip intro"
   },
   "editor": {
-    "cat": { "color": "Paint", "shape": "Shape", "display": "Screen" },
-    "shape": { "round": "Pebble", "boxy": "Brick", "slim": "Wafer" },
+    "cat": {
+      "color": "Paint",
+      "shape": "Shape",
+      "display": "Screen"
+    },
+    "shape": {
+      "round": "Pebble",
+      "boxy": "Brick",
+      "slim": "Wafer"
+    },
     "trend": "HOT",
     "new": "NEW",
     "design": "Design",
@@ -55,11 +68,25 @@
     "thinner": "thinner",
     "pricier": "pricier",
     "sheet": "Spec sheet",
-    "forecast": "Forecast"
+    "forecast": "Forecast",
+    "expectedMissing": "Expected but missing: {list}",
+    "innovative": "Ahead of its time: {list}",
+    "rating": "Rating vs. segment",
+    "channel": "Shops keep {pct}",
+    "locked": "Research more to unlock",
+    "newPart": "NEW"
   },
   "color": {
-    "graphite": "Graphite", "snow": "Snow", "silver": "Silver", "crimson": "Crimson", "ocean": "Ocean",
-    "lime": "Lime", "midnight": "Midnight", "coral": "Coral", "mint": "Mint", "gold": "Champagne"
+    "graphite": "Graphite",
+    "snow": "Snow",
+    "silver": "Silver",
+    "crimson": "Crimson",
+    "ocean": "Ocean",
+    "lime": "Lime",
+    "midnight": "Midnight",
+    "coral": "Coral",
+    "mint": "Mint",
+    "gold": "Champagne"
   },
   "launch": {
     "overnight": "Coffee number seven. Soldering. Questionable decisions.",
@@ -155,13 +182,24 @@
     "review8": "Get an 8.0 review",
     "fans100": "Find 100 fans",
     "rewardCash": "+{amount}",
-    "rewardColor": "new paint"
+    "rewardColor": "new paint",
+    "rentOffice": "Move into a real office",
+    "firstResearch": "Finish your first research",
+    "hypeLaunch": "Launch with 20+ hype",
+    "research5": "Finish 5 research projects",
+    "sell5k": "Sell 5,000 phones",
+    "fans500": "Win 500 fans",
+    "revenue1m": "Reach $1M revenue",
+    "brand35": "Grow your brand to 35",
+    "valuation10m": "Reach a $10M valuation"
   },
   "teaser": {
     "office": "{amount} more and you can stop working in a garage.",
     "secondLaunch": "One phone is a fluke. Two is a company. Build the next one.",
-    "officeReady": "You can afford a real office. Hiring and research arrive in the next update.",
-    "generic": "Next goal: {goal}"
+    "officeReady": "Your office is ready. Move in to unlock research, marketing and real production.",
+    "generic": "Next goal: {goal}",
+    "research": "{name} is waiting in the lab.",
+    "phase3": "Valuation {amount} to go until the next big step."
   },
   "action": {
     "newPhone": "New phone",
@@ -179,7 +217,13 @@
     "noCash": "Not enough cash for the prototype parts.",
     "devDone": "Prototype works. Mostly. Ready to launch!",
     "officeReady": "You can afford a real office now!",
-    "retired": "{name} has quietly left the shelves."
+    "retired": "{name} has quietly left the shelves.",
+    "researchDone": "Research done: {name}",
+    "orderArrived": "Delivery: {n} × {name}",
+    "soldOut": "{name} is sold out!",
+    "loan": "The bank stepped in: {amount} loan.",
+    "phase3": "Valuation milestone! Design studio & factory arrive in the next update.",
+    "researchStarted": "The lab is on it."
   },
   "barks": {
     "idle": [
@@ -218,5 +262,204 @@
     "reset": "Burn it all down (new game)",
     "resetConfirm": "Really? Your company will be gone.",
     "close": "Done"
+  },
+  "tabs": {
+    "company": "Company",
+    "research": "Research",
+    "market": "Market"
+  },
+  "office": {
+    "rent": "Move into an office · {price}",
+    "rented": "Welcome to the office! Research, marketing and real production are open.",
+    "label": "Startup office"
+  },
+  "segment": {
+    "title": "Position",
+    "budget": "Budget",
+    "mid": "Mid-range",
+    "flagship": "Flagship",
+    "anchor": "Typical price {price}"
+  },
+  "price": {
+    "title": "Price",
+    "fair": "Fair price {price}",
+    "auto": "Auto",
+    "custom": "Custom"
+  },
+  "tier": {
+    "lite": "Lite",
+    "std": "Std",
+    "pro": "Pro"
+  },
+  "cat": {
+    "chip": "Chip",
+    "display": "Panel",
+    "battery": "Battery",
+    "camera": "Camera",
+    "storage": "Storage",
+    "ram": "Memory",
+    "body": "Body",
+    "extras": "Extras",
+    "software": "Software",
+    "finish": "Finish",
+    "material": "Material",
+    "size": "Size"
+  },
+  "material": {
+    "plastic": "Plastic",
+    "aluminium": "Aluminium",
+    "glass": "Glass"
+  },
+  "finish": {
+    "gloss": "Gloss",
+    "matte": "Matte"
+  },
+  "feature": {
+    "wifi": "Wi-Fi",
+    "net3g": "3G",
+    "gps": "GPS",
+    "frontCam": "Selfie cam",
+    "net4g": "4G",
+    "fingerprint": "Fingerprint"
+  },
+  "os": {
+    "leafline": "Leafline (free)",
+    "mosaic": "Mosaic (+$8/unit)"
+  },
+  "shapeName": {
+    "blade": "Blade"
+  },
+  "research": {
+    "title": "Research lab",
+    "rpDay": "{n} RP/day",
+    "current": "Now researching",
+    "none": "Nothing in the lab. Pick something below – it keeps running while you’re away.",
+    "start": "Research",
+    "done": "Done",
+    "locked": "Needs: {list}",
+    "tooEarly": "Available from {year}",
+    "pioneer": "Pioneer: {pct} more expensive",
+    "daysLeft": "{days} days left",
+    "partName": "{cat} ’{yy}",
+    "unlock": {
+      "part": "New {cat} generation (Lite/Std/Pro)",
+      "material": "New material: {name}",
+      "finish": "New finish: {name}",
+      "feature": "New extra: {name}",
+      "shape": "New body shape: {name}",
+      "sizes": "Bigger screens: {list}",
+      "reach": "More shops sell your phones (reach ×{mul})",
+      "marketing": "Unlocks marketing budgets at launch",
+      "presentation": "Launch events level {n}",
+      "os": "Licence a better OS: {name}"
+    },
+    "branch": {
+      "chip": "Chips",
+      "display": "Screens",
+      "battery": "Batteries",
+      "camera": "Cameras",
+      "storage": "Storage",
+      "ram": "Memory",
+      "body": "Body & materials",
+      "connectivity": "Extras",
+      "business": "Business"
+    },
+    "names": {
+      "matte": "Matte finish",
+      "aluminium": "Aluminium unibody",
+      "blade": "Blade profile",
+      "glass": "Glass back",
+      "screen45": "4.5″ screens",
+      "screen50": "5″ screens",
+      "screen55": "5.5″ screens",
+      "net3g": "3G modem",
+      "gps": "GPS",
+      "frontCam": "Selfie camera",
+      "net4g": "4G modem",
+      "fingerprint": "Fingerprint reader",
+      "marketing": "Marketing 101",
+      "retail": "Retail partners",
+      "launchEvent": "Launch events",
+      "carrier": "Carrier deals",
+      "mosaic": "Mosaic OS licence",
+      "bigStage": "The big stage",
+      "national": "National distribution"
+    }
+  },
+  "market": {
+    "title": "The market",
+    "size": "Phones sold per week (worldwide)",
+    "share": "Your market share (52 wks)",
+    "ranking": "Who sells the most (last 52 weeks)",
+    "you": "You",
+    "rest": "No-name & button phones",
+    "expect": "What buyers expect in {year}",
+    "techIdx": "Tech level",
+    "thickness": "Thickness",
+    "screen": "Screen size",
+    "features": "Must-haves",
+    "none": "nothing special yet",
+    "segments": "Segments"
+  },
+  "company": {
+    "title": "Company",
+    "valuation": "Valuation",
+    "cash": "Cash",
+    "debt": "Bank loan",
+    "reach": "Reach",
+    "revenue": "Revenue / week",
+    "profit": "Profit / week",
+    "history": "Last weeks",
+    "products": "Phones on sale",
+    "stock": "Stock",
+    "demand": "Demand",
+    "backlog": "Waiting",
+    "incoming": "Incoming",
+    "reorder": "Order {n}",
+    "discontinue": "Stop selling",
+    "soldOut": "SOLD OUT",
+    "none": "Nothing on sale right now.",
+    "credit": "Credit line left",
+    "phase3": "Next step: {goal}",
+    "channel": "Shops keep"
+  },
+  "launchSetup": {
+    "title": "Launch setup",
+    "batch": "First production run",
+    "weeks": "≈ {n} weeks of sales",
+    "marketing": "Marketing budget",
+    "noMarketing": "Research “Marketing 101” to buy ads.",
+    "stage": "Launch event",
+    "stage0": "Just put it online",
+    "stage1": "Rented hall",
+    "stage2": "Big stage",
+    "hype": "Hype",
+    "total": "Total today",
+    "credit": "The bank finances {amount} of the production run.",
+    "go": "Launch it",
+    "cancel": "Not yet",
+    "tooPoor": "Not enough cash – lower marketing or the event.",
+    "overhype": "Careful: hype above what the phone delivers costs fans."
+  },
+  "welcome": {
+    "title": "While you were away…",
+    "time": "{h} h {m} min passed · {days} game days",
+    "cash": "Cash",
+    "sold": "Phones sold",
+    "research": "Research finished",
+    "dev": "Prototype finished!",
+    "orders": "Deliveries arrived",
+    "go": "Back to work"
+  },
+  "era": {
+    "touch": "The touch era",
+    "apps": "App boom",
+    "phablet": "Phablets",
+    "bezelless": "Bezel-less",
+    "connected": "Connected",
+    "smartai": "Smart AI",
+    "rollable": "Rollables",
+    "holo": "Holo age",
+    "neural": "Neural age"
   }
 }

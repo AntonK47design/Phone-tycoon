@@ -7,6 +7,7 @@ import type { SimEvent } from '../sim/events';
 import { money } from './format';
 import { game, launchData, sayBark, toast } from './game';
 import { lang, t, tList } from './i18n';
+import { researchNameById } from './labels';
 
 let lastCoin = 0;
 const deferred: (() => void)[] = [];
@@ -122,6 +123,37 @@ export function installJuice() {
           if (p) toast(t('toast.retired', { name: p.design.name }), 'box');
           break;
         }
+        case 'officeRented':
+          toast(t('office.rented'), 'building', true);
+          engine.confettiAt('bench');
+          platform.happytime();
+          break;
+        case 'researchDone':
+          later(() => {
+            toast(t('toast.researchDone', { name: researchNameById(e.id) }), 'spark', true);
+            sfx.unlock2();
+          });
+          break;
+        case 'orderArrived': {
+          const p = store.getState().products.find((x) => x.id === e.productId);
+          if (p) toast(t('toast.orderArrived', { n: e.units, name: p.design.name }), 'box');
+          break;
+        }
+        case 'soldOut': {
+          const p = store.getState().products.find((x) => x.id === e.productId);
+          if (p && p.orders.length === 0) toast(t('toast.soldOut', { name: p.design.name }), 'warn');
+          break;
+        }
+        case 'loan':
+          toast(t('toast.loan', { amount: money(e.amount, lang.value) }), 'warn');
+          break;
+        case 'phase3Ready':
+          later(() => {
+            toast(t('toast.phase3'), 'trophy', true);
+            sfx.fanfare();
+            platform.happytime();
+          });
+          break;
         case 'rejected':
           if (e.reason === 'noCash') toast(t('toast.noCash'), 'warn');
           break;

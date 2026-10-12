@@ -387,8 +387,10 @@ Units_i,r(t) = M(y) · m_s · m_r · ρ_i,r · share_i
 | Stufe | ρ |
 |---|---|
 | Garage (Onlineshop) | 0,0025 |
-| Büro + Händlervertrag | 0,04 |
-| Nationaler Vertrieb | 0,10 |
+| Startup-Büro | 0,0025 |
+| + Händlerpartner (Forschung) | 0,0035 |
+| + Mobilfunker-Deals | 0,0055 |
+| + Landesweiter Vertrieb | 0,008 |
 | Region erschlossen | 0,25 |
 | + eigene Stores | +0,05 je Store, max 0,75 |
 | Global (Phase 5) | bis 1,0 |
@@ -439,6 +441,17 @@ Lagerkosten/Woche = Bestand · Stückkosten · 0,005 + Überlauf · Stückkosten
 Abverkauf (Produkt vom Markt nehmen): Restbestand zu 40 % der Stückkosten
 ```
 UI-Signal „Ausverkauft!" mit 1-Klick-Nachproduktion.
+
+### 7.6b Händleranteil, Kredit (seit M2)
+
+```
+Erlös je Einheit = Preis · (1 − Händleranteil)     Onlineshop 10 %, Händler 25 %, Mobilfunker 30 %
+Bankkredit: fällt Kapital < 0, springt die Bank ein (Puffer 15K $); Zinsen 0,2 %/Woche,
+            Tilgung automatisch mit 25 % jedes positiven Wochengewinns.
+Kreditrahmen für Produktion = 40K $ · Inflation + 10 % des Jahresumsatzes − Schulden.
+            Eine Mindest-Charge (100 Stück) wird immer finanziert → kein Deadlock.
+Auftragsfertiger: Stückkosten · 1,2 + Montage 12 $, Lieferzeit 14 Tage, Mindestcharge 100.
+```
 
 ### 7.7 Marktanteil & Rangliste
 Marktanteil = verkaufte Einheiten der letzten 52 Wochen / Gesamtmarkt der letzten 52 Wochen.
@@ -723,6 +736,7 @@ Siehe §12. Übernommene Firma → wird Sub-Marke (eigene Segment-Linie mit dere
 | **2 Startup-Büro** | 5–30 min | 2 Launches **und** 25 000 $ → Büro mieten | Team, Forschung, Marketing, Präsentation, Editor: Material, Hardware-Tiers, Auftragsfertiger, Segmentwahl |
 | **3 Designstudio + Fabrik** | 30–90 min | Valuation 1 M$ **und** Marke ≥ 25 | Designstudio, Labor, eigene Fabrik, Lager, Qualität vs. Tempo, Extras, Finish, volle Zeitsteuerung-Ziele |
 | **4 Expansion** | 2–5 h | kumulierter Umsatz 25 M$ **und** 10 Launches | Regionen, Stores, Auftragsarbeiten, Events voll, Senioren-/Gaming-Segment |
+| **3-Gate (M2)** | – | Firmenwert 10 M$ **und** Marke ≥ 35 (ersetzt 1 M$/25 nach Bot-Balancing) | – |
 | **5 Tech-Gigant** | 5–15 h | Valuation 1 Mrd $ **oder** Marktanteil 10 % | Campus, eigener Chip, eigenes OS, Nebenprodukte, Übernahmen |
 | **6 Endgame** | 15 h+ | Marktanteil 20 % **oder** Jahr ≥ 2035 **und** Valuation 50 Mrd $ | Zukunftstech, Ruhmeshalle, Prestige, Szenarien |
 

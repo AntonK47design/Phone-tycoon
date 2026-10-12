@@ -1,5 +1,8 @@
 {
-  "app": { "title": "Phone Empire 3D", "loading": "Die Garage wird gefegt…" },
+  "app": {
+    "title": "Phone Empire 3D",
+    "loading": "Die Garage wird gefegt…"
+  },
   "hud": {
     "date": "Woche {week} · {year}",
     "cash": "Kapital",
@@ -7,7 +10,9 @@
     "fans": "Fans",
     "pause": "Pause",
     "settings": "Einstellungen",
-    "rename": "Firma umbenennen"
+    "rename": "Firma umbenennen",
+    "research": "Forschung",
+    "debt": "Schulden"
   },
   "tip": {
     "cash": "Geld auf dem Konto. Verkäufe minus Bauteile, Miete und Nachtschichten.",
@@ -33,8 +38,16 @@
     "skip": "Intro überspringen"
   },
   "editor": {
-    "cat": { "color": "Lack", "shape": "Form", "display": "Display" },
-    "shape": { "round": "Kiesel", "boxy": "Ziegel", "slim": "Waffel" },
+    "cat": {
+      "color": "Lack",
+      "shape": "Form",
+      "display": "Display"
+    },
+    "shape": {
+      "round": "Kiesel",
+      "boxy": "Ziegel",
+      "slim": "Waffel"
+    },
     "trend": "HEISS",
     "new": "NEU",
     "design": "Design",
@@ -55,11 +68,25 @@
     "thinner": "dünner",
     "pricier": "teurer",
     "sheet": "Datenblatt",
-    "forecast": "Prognose"
+    "forecast": "Prognose",
+    "expectedMissing": "Erwartet, aber fehlt: {list}",
+    "innovative": "Seiner Zeit voraus: {list}",
+    "rating": "Wertung im Segment",
+    "channel": "Händler behalten {pct}",
+    "locked": "Mehr forschen zum Freischalten",
+    "newPart": "NEU"
   },
   "color": {
-    "graphite": "Graphit", "snow": "Schnee", "silver": "Silber", "crimson": "Karmesin", "ocean": "Ozean",
-    "lime": "Limette", "midnight": "Mitternacht", "coral": "Koralle", "mint": "Mint", "gold": "Champagner"
+    "graphite": "Graphit",
+    "snow": "Schnee",
+    "silver": "Silber",
+    "crimson": "Karmesin",
+    "ocean": "Ozean",
+    "lime": "Limette",
+    "midnight": "Mitternacht",
+    "coral": "Koralle",
+    "mint": "Mint",
+    "gold": "Champagner"
   },
   "launch": {
     "overnight": "Kaffee Nummer sieben. Löten. Fragwürdige Entscheidungen.",
@@ -155,13 +182,24 @@
     "review8": "Hol dir eine 8,0 im Review",
     "fans100": "Finde 100 Fans",
     "rewardCash": "+{amount}",
-    "rewardColor": "neuer Lack"
+    "rewardColor": "neuer Lack",
+    "rentOffice": "Zieh in ein echtes Büro",
+    "firstResearch": "Schließe deine erste Forschung ab",
+    "hypeLaunch": "Launche mit 20+ Hype",
+    "research5": "Schließe 5 Forschungen ab",
+    "sell5k": "Verkaufe 5.000 Handys",
+    "fans500": "Gewinne 500 Fans",
+    "revenue1m": "Erreiche 1 Mio. $ Umsatz",
+    "brand35": "Bau deine Marke auf 35 aus",
+    "valuation10m": "Erreiche 10 Mio. $ Firmenwert"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
     "secondLaunch": "Ein Handy ist ein Zufall. Zwei sind eine Firma. Bau das nächste.",
-    "officeReady": "Ein echtes Büro ist drin. Team und Forschung kommen im nächsten Update.",
-    "generic": "Nächstes Ziel: {goal}"
+    "officeReady": "Dein Büro ist bereit. Zieh ein, um Forschung, Marketing und echte Produktion freizuschalten.",
+    "generic": "Nächstes Ziel: {goal}",
+    "research": "{name} wartet im Labor.",
+    "phase3": "Noch {amount} Firmenwert bis zum nächsten großen Schritt."
   },
   "action": {
     "newPhone": "Neues Handy",
@@ -179,7 +217,13 @@
     "noCash": "Zu wenig Geld für die Prototyp-Teile.",
     "devDone": "Der Prototyp läuft. Meistens. Bereit zum Launch!",
     "officeReady": "Ein echtes Büro ist jetzt drin!",
-    "retired": "{name} hat leise die Regale verlassen."
+    "retired": "{name} hat leise die Regale verlassen.",
+    "researchDone": "Forschung fertig: {name}",
+    "orderArrived": "Lieferung: {n} × {name}",
+    "soldOut": "{name} ist ausverkauft!",
+    "loan": "Die Bank springt ein: {amount} Kredit.",
+    "phase3": "Firmenwert-Meilenstein! Designstudio & Fabrik kommen im nächsten Update.",
+    "researchStarted": "Das Labor legt los."
   },
   "barks": {
     "idle": [
@@ -218,5 +262,204 @@
     "reset": "Alles abfackeln (neues Spiel)",
     "resetConfirm": "Wirklich? Deine Firma ist dann weg.",
     "close": "Fertig"
+  },
+  "tabs": {
+    "company": "Firma",
+    "research": "Forschung",
+    "market": "Markt"
+  },
+  "office": {
+    "rent": "Ins Büro ziehen · {price}",
+    "rented": "Willkommen im Büro! Forschung, Marketing und echte Produktion sind offen.",
+    "label": "Startup-Büro"
+  },
+  "segment": {
+    "title": "Positionierung",
+    "budget": "Budget",
+    "mid": "Mittelklasse",
+    "flagship": "Flaggschiff",
+    "anchor": "Üblicher Preis {price}"
+  },
+  "price": {
+    "title": "Preis",
+    "fair": "Fairer Preis {price}",
+    "auto": "Auto",
+    "custom": "Eigener"
+  },
+  "tier": {
+    "lite": "Lite",
+    "std": "Std",
+    "pro": "Pro"
+  },
+  "cat": {
+    "chip": "Chip",
+    "display": "Panel",
+    "battery": "Akku",
+    "camera": "Kamera",
+    "storage": "Speicher",
+    "ram": "Arbeitsspeicher",
+    "body": "Gehäuse",
+    "extras": "Extras",
+    "software": "Software",
+    "finish": "Oberfläche",
+    "material": "Material",
+    "size": "Größe"
+  },
+  "material": {
+    "plastic": "Kunststoff",
+    "aluminium": "Aluminium",
+    "glass": "Glas"
+  },
+  "finish": {
+    "gloss": "Glänzend",
+    "matte": "Matt"
+  },
+  "feature": {
+    "wifi": "WLAN",
+    "net3g": "3G",
+    "gps": "GPS",
+    "frontCam": "Selfie-Kamera",
+    "net4g": "4G",
+    "fingerprint": "Fingerabdruck"
+  },
+  "os": {
+    "leafline": "Leafline (gratis)",
+    "mosaic": "Mosaic (+8 $/Stück)"
+  },
+  "shapeName": {
+    "blade": "Klinge"
+  },
+  "research": {
+    "title": "Forschungslabor",
+    "rpDay": "{n} FP/Tag",
+    "current": "Wird erforscht",
+    "none": "Das Labor ist leer. Such dir etwas aus – es läuft weiter, während du weg bist.",
+    "start": "Erforschen",
+    "done": "Fertig",
+    "locked": "Braucht: {list}",
+    "tooEarly": "Verfügbar ab {year}",
+    "pioneer": "Pionier: {pct} teurer",
+    "daysLeft": "noch {days} Tage",
+    "partName": "{cat} ’{yy}",
+    "unlock": {
+      "part": "Neue {cat}-Generation (Lite/Std/Pro)",
+      "material": "Neues Material: {name}",
+      "finish": "Neue Oberfläche: {name}",
+      "feature": "Neues Extra: {name}",
+      "shape": "Neue Gehäuseform: {name}",
+      "sizes": "Größere Displays: {list}",
+      "reach": "Mehr Läden verkaufen deine Handys (Reichweite ×{mul})",
+      "marketing": "Schaltet Marketingbudgets beim Launch frei",
+      "presentation": "Launch-Events Stufe {n}",
+      "os": "Besseres OS lizenzieren: {name}"
+    },
+    "branch": {
+      "chip": "Chips",
+      "display": "Displays",
+      "battery": "Akkus",
+      "camera": "Kameras",
+      "storage": "Speicher",
+      "ram": "Arbeitsspeicher",
+      "body": "Gehäuse & Material",
+      "connectivity": "Extras",
+      "business": "Geschäft"
+    },
+    "names": {
+      "matte": "Matte Oberfläche",
+      "aluminium": "Alu-Unibody",
+      "blade": "Klingen-Profil",
+      "glass": "Glasrücken",
+      "screen45": "4,5″-Displays",
+      "screen50": "5″-Displays",
+      "screen55": "5,5″-Displays",
+      "net3g": "3G-Modem",
+      "gps": "GPS",
+      "frontCam": "Selfie-Kamera",
+      "net4g": "4G-Modem",
+      "fingerprint": "Fingerabdrucksensor",
+      "marketing": "Marketing 101",
+      "retail": "Händlerpartner",
+      "launchEvent": "Launch-Events",
+      "carrier": "Mobilfunker-Deals",
+      "mosaic": "Mosaic-OS-Lizenz",
+      "bigStage": "Die große Bühne",
+      "national": "Landesweiter Vertrieb"
+    }
+  },
+  "market": {
+    "title": "Der Markt",
+    "size": "Verkaufte Handys pro Woche (weltweit)",
+    "share": "Dein Marktanteil (52 Wo.)",
+    "ranking": "Wer am meisten verkauft (letzte 52 Wochen)",
+    "you": "Du",
+    "rest": "No-Name & Tastenhandys",
+    "expect": "Was Käufer {year} erwarten",
+    "techIdx": "Technik-Level",
+    "thickness": "Dicke",
+    "screen": "Displaygröße",
+    "features": "Pflicht-Extras",
+    "none": "noch nichts Besonderes",
+    "segments": "Segmente"
+  },
+  "company": {
+    "title": "Firma",
+    "valuation": "Firmenwert",
+    "cash": "Kapital",
+    "debt": "Bankkredit",
+    "reach": "Reichweite",
+    "revenue": "Umsatz / Woche",
+    "profit": "Gewinn / Woche",
+    "history": "Letzte Wochen",
+    "products": "Im Verkauf",
+    "stock": "Lager",
+    "demand": "Nachfrage",
+    "backlog": "Wartend",
+    "incoming": "Unterwegs",
+    "reorder": "{n} bestellen",
+    "discontinue": "Aus dem Verkauf",
+    "soldOut": "AUSVERKAUFT",
+    "none": "Gerade ist nichts im Verkauf.",
+    "credit": "Kreditrahmen frei",
+    "phase3": "Nächster Schritt: {goal}",
+    "channel": "Händleranteil"
+  },
+  "launchSetup": {
+    "title": "Launch planen",
+    "batch": "Erste Produktion",
+    "weeks": "≈ {n} Wochen Verkauf",
+    "marketing": "Marketingbudget",
+    "noMarketing": "Erforsche „Marketing 101“, um Werbung zu kaufen.",
+    "stage": "Launch-Event",
+    "stage0": "Einfach online stellen",
+    "stage1": "Gemieteter Saal",
+    "stage2": "Große Bühne",
+    "hype": "Hype",
+    "total": "Heute fällig",
+    "credit": "Die Bank finanziert {amount} der Produktion.",
+    "go": "Launchen",
+    "cancel": "Noch nicht",
+    "tooPoor": "Zu wenig Geld – weniger Marketing oder kleineres Event.",
+    "overhype": "Vorsicht: Hype über dem, was das Handy kann, kostet Fans."
+  },
+  "welcome": {
+    "title": "Während du weg warst…",
+    "time": "{h} Std. {m} Min. vergangen · {days} Spieltage",
+    "cash": "Kapital",
+    "sold": "Verkaufte Handys",
+    "research": "Forschung fertig",
+    "dev": "Prototyp fertig!",
+    "orders": "Lieferungen angekommen",
+    "go": "Zurück an die Arbeit"
+  },
+  "era": {
+    "touch": "Touch-Ära",
+    "apps": "App-Boom",
+    "phablet": "Phablets",
+    "bezelless": "Randlos",
+    "connected": "Vernetzt",
+    "smartai": "Smart-KI",
+    "rollable": "Rollbar",
+    "holo": "Holo-Zeit",
+    "neural": "Neural-Zeit"
   }
 }

@@ -1,13 +1,15 @@
 // UI-side context: store, engine, platform plus transient UI signals.
 
 import { signal } from '@preact/signals';
-import { useEffect, useState } from 'preact/hooks';
 import type { Engine } from '../render/engine';
 import type { PhoneVisual } from '../render/phone/PhoneModel';
 import type { Platform } from '../platform/platform';
 import { colorById } from '../data/design';
+import { partById } from '../data/parts';
 import type { ToastIcon } from './icons';
 import type { SimEvent } from '../sim/events';
+import type { LaunchOptions } from '../sim/game';
+import type { OfflineReport } from '../sim/offline';
 import type { PhoneDesign } from '../sim/state';
 import type { Store } from '../sim/store';
 import type { Speed } from '../sim/time';
@@ -44,7 +46,16 @@ export const cashOverride = signal<number | null>(null);
 export interface LaunchData {
   firstLaunch: boolean;
   events: SimEvent[];
+  options?: LaunchOptions;
 }
+
+export type DrawerTab = 'company' | 'research' | 'market';
+/** Open side panel (Phase 2+). */
+export const drawer = signal<DrawerTab | null>(null);
+/** Launch setup dialog open (Phase 2+). */
+export const launchSetupOpen = signal(false);
+/** "While you were away" report shown after loading. */
+export const welcomeReport = signal<OfflineReport | null>(null);
 export const launchData = signal<LaunchData | null>(null);
 
 /** Founder thought bubble shown above the workbench. */
@@ -77,12 +88,13 @@ export function toast(text: string, icon?: ToastIcon, gold?: boolean) {
   setTimeout(() => (toasts.value = toasts.value.filter((x) => x.id !== t.id)), 4000);
 }
 
+/** Bumped on every store change (see main.ts). Components re-render through it. */
+export const storeRev = signal(0);
+
 /** Re-render on every store change. Returns the current state. */
 export function useGameState() {
-  const { store } = game();
-  const [, setRev] = useState(0);
-  useEffect(() => store.subscribe(() => setRev(store.revision())), [store]);
-  return store.getState();
+  void storeRev.value;
+  return game().store.getState();
 }
 
 export function toVisual(d: PhoneDesign): PhoneVisual {
@@ -90,8 +102,9 @@ export function toVisual(d: PhoneDesign): PhoneVisual {
     colorHex: d.colorId ? colorById(d.colorId)?.hex ?? null : null,
     shapeId: d.shapeId,
     displaySize: d.displaySize,
-    kitYear: 2007,
+    kitYear: d.kitYear,
     finishId: d.finishId,
-    lenses: 1,
+    materialId: d.materialId,
+    lenses: d.parts && partById(d.parts.camera)?.tier === 'pro' && d.kitYear >= 2010 ? 2 : 1,
   };
 }

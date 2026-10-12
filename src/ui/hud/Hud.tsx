@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { sfx } from '../../audio/sfx';
 import { calendar, type Speed } from '../../sim/time';
 import { decimal, money, moneyFull, shortNum } from '../format';
-import { cashOverride, dayFraction, game, mode, settingsOpen, speed, useGameState } from '../game';
+import { cashOverride, dayFraction, drawer, game, mode, settingsOpen, speed, useGameState } from '../game';
+import { researchProgress } from '../../sim/research';
+import { researchName } from '../labels';
 import { lang, t } from '../i18n';
 
 /** Smoothly rolls a displayed number towards `target`. */
@@ -95,6 +97,15 @@ export function Hud() {
       )}
 
       <div class="hud-right" style={state.clockStarted ? undefined : { marginLeft: 'auto' }}>
+        {state.phase >= 2 && (() => {
+          const rp = researchProgress(state);
+          return (
+            <button class={`glass stat-chip research ${rp ? '' : 'idle'}`} data-tip={rp ? researchName(rp.node) : t('research.none')} onClick={() => (drawer.value = 'research')}>
+              <span class="label">{t('hud.research')}</span>
+              <span class="val">{rp ? `${Math.floor((rp.progress / rp.need) * 100)}%` : '—'}</span>
+            </button>
+          );
+        })()}
         <div class="glass stat-chip brand" data-tip={t('tip.brand')}>
           <span class="label">{t('hud.brand')}</span>
           <span class="val">{decimal(state.company.brand, l, 0)}</span>
@@ -105,6 +116,7 @@ export function Hud() {
         </div>
         <div class="glass stat-chip cash" data-tip={`${t('tip.cash')} (${moneyFull(state.company.cash, l)})`}>
           <span class="val">{money(cash, l)}</span>
+          {state.company.debt > 0 && <span class="debt">−{money(state.company.debt, l)}</span>}
         </div>
         <button class="glass icon-btn" aria-label={t('hud.settings')} onClick={() => ((settingsOpen.value = true), sfx.click())}>
           <GearIcon />

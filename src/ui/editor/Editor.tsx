@@ -1,19 +1,20 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { sfx } from '../../audio/sfx';
 import { COLORS, DISPLAY_SIZES, SHAPES } from '../../data/design';
-import { forecast, isFirstLaunch, type Forecast } from '../../sim/game';
+import { forecast, isFirstLaunch, type DraftPatch, type Forecast } from '../../sim/game';
 import { isTrendColor } from '../../sim/scoring/score';
-import type { PhoneDesign, TutorialStep } from '../../sim/state';
+import type { TutorialStep } from '../../sim/state';
 import { yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
 import { mark } from '../funnel';
 import { game, mode, toVisual, useGameState } from '../game';
 import { lang, t } from '../i18n';
 import { startLaunch } from '../launch/flow';
+import { AdvancedEditor } from './AdvancedEditor';
+import { availableShapes } from '../../sim/research';
 import { IconClose, IconRocket, IconWrench } from '../icons';
 
 const STEPS: TutorialStep[] = ['color', 'shape', 'display', 'launch'];
-type Category = 'color' | 'shape' | 'display';
 
 function ShapeIcon({ id }: { id: string }) {
   const s = SHAPES.find((x) => x.id === id)!;
@@ -112,10 +113,21 @@ function Stats({ fc, full, free }: { fc: Forecast; full: boolean; free: boolean 
             <span class="k">{t('editor.margin')}</span>
             <span class="v" style={{ color: fc.margin > 0 ? 'var(--good)' : 'var(--bad)' }}>{money(fc.margin, l)}</span>
           </div>
+          {fc.channelCut > 0 && (
+            <div class="stat-row">
+              <span class="k">{t('editor.channel', { pct: `${Math.round(fc.channelCut * 100)}%` })}</span>
+            </div>
+          )}
           <div class="stat-row" data-tip={t('tip.weekly')}>
             <span class="k">{t('editor.weekly')}</span>
             <span class="v">{t('editor.weeklyValue', { n: shortNum(fc.weeklyUnits, l) })}</span>
           </div>
+          {fc.features.missing.length > 0 && (
+            <div class="warn-line">{t('editor.expectedMissing', { list: fc.features.missing.map((f) => t(`feature.${f}`)).join(', ') })}</div>
+          )}
+          {fc.features.innovative.length > 0 && (
+            <div class="good-line">{t('editor.innovative', { list: fc.features.innovative.map((f) => t(`feature.${f}`)).join(', ') })}</div>
+          )}
           {free && (
             <>
               <div class="stat-row" data-tip={t('tip.devTime')}>
@@ -148,12 +160,13 @@ export function Editor() {
   const [hint, setHint] = useState<{ x: number; y: number; side: 'left' | 'bottom' } | null>(null);
   const advanceTimer = useRef<number>();
 
-  const select = (cat: Category, patch: Partial<PhoneDesign>) => {
+  const select = (cat: string, patch: DraftPatch) => {
     mark('firstInput');
     store.dispatch({ type: 'setDraft', patch });
     const next = { ...store.getState().draft };
     engine.setPhone(toVisual(next), { flourish: cat === 'shape' });
     if (cat === 'color') sfx.paint();
+    else if (cat === 'priceSlide') sfx.tick();
     else sfx.pop(cat === 'shape' ? 1 : 1.25);
     if (tutorialMode && step === cat) {
       clearTimeout(advanceTimer.current);
@@ -221,6 +234,7 @@ export function Editor() {
   const catClass = (i: number) => `cat ${stepIdx === i && tutorialMode && step !== 'done' ? 'active' : ''} ${stepIdx > i && tutorialMode ? 'done' : ''}`;
   const colors = COLORS.filter((c) => state.unlockedColors.includes(c.id));
   const showLaunch = first && (step === 'launch' || step === 'done');
+  const advanced = state.phase >= 2 && !tutorialMode;
 
   return (
     <div class="ui-layer">
@@ -237,7 +251,9 @@ export function Editor() {
           )}
         </div>
 
-        <div class={catClass(0)}>
+        {advanced && <AdvancedEditor state={state} suggestedPrice={fc.suggestedPrice} missing={fc.features.missing} onChange={select} />}
+
+        {!advanced && <div class={catClass(0)}>
           <h5><span class="num">1</span>{t('editor.cat.color')}</h5>
           <div class="swatches">
             {colors.map((c) => (
@@ -254,13 +270,13 @@ export function Editor() {
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
-        {stepIdx >= 1 && (
+        {!advanced && stepIdx >= 1 && (
           <div class={catClass(1)}>
             <h5><span class="num">2</span>{t('editor.cat.shape')}</h5>
             <div class="options">
-              {SHAPES.map((s) => (
+              {SHAPES.filter((s) => availableShapes(state).includes(s.id)).map((s) => (
                 <button key={s.id} class={`option ${draft.shapeId === s.id ? 'sel' : ''}`} onClick={() => select('shape', { shapeId: s.id })}>
                   <ShapeIcon id={s.id} />
                   {t(`editor.shape.${s.id}`)}
@@ -271,7 +287,7 @@ export function Editor() {
           </div>
         )}
 
-        {stepIdx >= 2 && (
+        {!advanced && stepIdx >= 2 && (
           <div class={catClass(2)}>
             <h5><span class="num">3</span>{t('editor.cat.display')}</h5>
             <div class="options">
@@ -290,7 +306,7 @@ export function Editor() {
 
       <div class="editor-bottom">
         {showLaunch && (
-          <button class="btn-primary btn-launch pulse" onClick={startLaunch}>
+          <button class="btn-primary btn-launch pulse" onClick={() => startLaunch()}>
             <IconRocket size={26} /> {t('editor.launch')}
           </button>
         )}

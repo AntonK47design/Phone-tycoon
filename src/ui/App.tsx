@@ -1,12 +1,15 @@
 import { lazy, Suspense } from 'preact/compat';
 import { useEffect } from 'preact/hooks';
 import { Editor } from './editor/Editor';
-import { game, launchData, mode, settingsOpen, toVisual, useGameState } from './game';
+import { game, launchData, launchSetupOpen, mode, settingsOpen, toVisual, useGameState } from './game';
 import { Hud } from './hud/Hud';
 import { ActionBar, BenchLabel, FounderBark, Goals, Products, Toasts } from './hud/Panels';
 import { Settings } from './hud/Settings';
 import { lang } from './i18n';
 import { LaunchSequence } from './launch/LaunchSequence';
+import { LaunchSetup } from './launch/LaunchSetup';
+import { Drawer, DrawerTabs } from './panels/Drawer';
+import { WelcomeBack } from './hud/WelcomeBack';
 
 const DevPanel = import.meta.env.DEV ? lazy(() => import('./debug/DevPanel').then((m) => ({ default: m.DevPanel }))) : null;
 
@@ -20,6 +23,7 @@ function usePhoneSync() {
     const last = state.products[state.products.length - 1];
     const design = m === 'editor' || m === 'tutorial' ? state.draft : state.dev?.design ?? last?.design ?? state.draft;
     engine.setPhone(toVisual(design));
+    engine.setPhase(state.phase, state.company.name);
   });
 }
 
@@ -34,10 +38,14 @@ export function App() {
       {m === 'free' && <Products />}
       {m === 'free' && <ActionBar />}
       {m === 'free' && <BenchLabel />}
+      {m === 'free' && <DrawerTabs />}
+      {m === 'free' && <Drawer />}
       <FounderBark />
       {(m === 'tutorial' || m === 'editor') && <Editor />}
       {launchData.value && <LaunchSequence />}
       <Toasts />
+      {launchSetupOpen.value && <LaunchSetup />}
+      <WelcomeBack />
       {settingsOpen.value && <Settings />}
       <div id="fx-layer" class="passthrough" />
       {DevPanel && (

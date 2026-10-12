@@ -32,6 +32,7 @@ import { PhoneModel, type PhoneVisual } from './phone/PhoneModel';
 import { createGradePass, createTiltShiftPass } from './post/passes';
 import { AutoQuality, initialQuality, isMobileDevice, PROFILES, type Quality, type QualitySetting } from './quality';
 import { buildGarage, TURNTABLE_POS, type GarageRoom } from './rooms/garage';
+import { OfficeCorner } from './rooms/officeCorner';
 import { backgroundTexture } from './textures';
 
 export type ViewName = 'intro' | 'overview' | 'editor' | 'launch';
@@ -68,6 +69,7 @@ export class Engine {
   };
   private key: DirectionalLight;
   private garage: GarageRoom;
+  private office: OfficeCorner;
   private phone: PhoneModel;
   private confetti = new Confetti();
   private quality: Quality;
@@ -153,6 +155,8 @@ export class Engine {
 
     this.garage = buildGarage(this.quality);
     this.scene.add(this.garage.root);
+    this.office = new OfficeCorner();
+    this.scene.add(this.office.group);
 
     this.phone = new PhoneModel({ colorHex: null, shapeId: 'round', displaySize: 3.5, kitYear: 2007, finishId: 'gloss', lenses: 1 });
     this.garage.heroAnchor.add(this.phone.group);
@@ -264,6 +268,7 @@ export class Engine {
     pivot.position.y = 0.09 + this.phone.sceneHeight / 2 + Math.sin(t * 1.6) * 0.012;
 
     this.garage.update(t, dt, this.dayFraction, this.launchBoost);
+    this.office.update(t);
     const tilt = this.rig.view.tiltShift * (PROFILES[this.quality].tiltShift ? 1 : 0);
     this.passes.tiltH.uniforms.strength.value = tilt;
     this.passes.tiltV.uniforms.strength.value = tilt;
@@ -349,6 +354,11 @@ export class Engine {
 
   spin() {
     this.flourish = { t: 0, from: 0 };
+  }
+
+  /** Shows the Phase-2 office corner with the company's neon sign. */
+  setPhase(phase: number, companyName: string) {
+    this.office.setVisible(phase >= 2, companyName);
   }
 
   setNight(on: boolean) {
