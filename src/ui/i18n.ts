@@ -4,7 +4,8 @@ import de from '../data/i18n/de.json';
 
 export type Lang = 'en' | 'de';
 const DICTS: Record<Lang, unknown> = { en, de };
-const LANG_KEY = 'phone-empire-lang';
+// v2: earlier builds auto-saved the browser language; only explicit choices count now.
+const LANG_KEY = 'phone-empire-lang-v2';
 
 function detect(): Lang {
   try {
@@ -19,9 +20,10 @@ function detect(): Lang {
 
 export const lang = signal<Lang>(detect());
 
-export function setLang(l: Lang) {
+export function setLang(l: Lang, persist = true) {
   lang.value = l;
   document.documentElement.lang = l;
+  if (!persist) return;
   try {
     localStorage.setItem(LANG_KEY, l);
   } catch {

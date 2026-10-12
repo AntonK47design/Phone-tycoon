@@ -26,7 +26,7 @@ import './ui/styles/main.css';
 
 async function boot() {
   const platformPromise = createPlatform();
-  setLang(lang.value);
+  setLang(lang.value, false);
   const engine = new Engine(document.getElementById('app')!);
   const prefs = loadPrefs();
   if (prefs.quality !== 'auto') engine.setQuality(prefs.quality);
