@@ -208,6 +208,47 @@ export function installJuice() {
         case 'contractFailed':
           toast(t('toast.contractFailed'), 'warn');
           break;
+        case 'campusBuilt':
+          toast(t('toast.campusBuilt', { level: e.level }), 'building', true);
+          sfx.fanfare();
+          platform.happytime();
+          break;
+        case 'projectStarted':
+          toast(t(e.what === 'chip' ? 'toast.chipStarted' : 'toast.osStarted'), 'spark');
+          break;
+        case 'projectDone':
+          later(() => {
+            toast(t(e.what === 'chip' ? 'toast.chipDone' : 'toast.osDone', { level: e.level }), 'trophy', true);
+            sfx.unlock2();
+          });
+          break;
+        case 'sideLaunched':
+          toast(t('toast.sideLaunched', { kind: t(`empire.kind.${e.kind}`) }), 'box', true);
+          break;
+        case 'acquired':
+          toast(t('toast.acquired', { rival: rivalName(e.rival) }), 'trophy', true);
+          sfx.fanfare();
+          break;
+        case 'phase5Ready':
+          later(() => {
+            toast(t('toast.phase5'), 'trophy', true);
+            sfx.fanfare();
+            platform.happytime();
+          });
+          break;
+        case 'phase6Ready':
+          later(() => {
+            toast(t('toast.phase6'), 'trophy', true);
+            sfx.fanfare();
+            platform.happytime();
+          });
+          break;
+        case 'achievement':
+          later(() => {
+            toast(t('toast.achievement', { name: t(`ach.${e.id}.name`) }), 'trophy', true);
+            sfx.unlock2();
+          });
+          break;
         case 'repaid':
           toast(t('toast.repaid', { amount: money(e.amount, lang.value) }), 'spark');
           break;

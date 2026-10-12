@@ -208,7 +208,15 @@
     "contracts3": "Liefere 3 Auftragsarbeiten",
     "regions5": "Verkaufe auf jedem Kontinent",
     "stores10": "Betreibe 10 Stores",
-    "valuation1b": "Werde eine Milliarden-Firma"
+    "valuation1b": "Werde eine Milliarden-Firma",
+    "valuation5b": "Erreiche 5 Mrd. $ Firmenwert",
+    "valuation20b": "Erreiche 20 Mrd. $ Firmenwert",
+    "campus": "Bau den Campus",
+    "ownChip": "Entwickle deinen eigenen Chip",
+    "ownOs": "Bring dein eigenes OS raus",
+    "side3": "Verkaufe Uhr, Earbuds und Tablet",
+    "acquire1": "Übernimm einen Rivalen",
+    "endgame": "20 % Marktanteil oder ab 2045 eine 50-Mrd.-$-Firma"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
@@ -268,7 +276,17 @@
     "storeOpened": "Dein eigener Store in {region} hat eröffnet. Schlange bis um die Ecke!",
     "contractOffered": "Neues Auftragsangebot im Welt-Tab.",
     "contractDone": "Auftrag geliefert: {amount}",
-    "contractFailed": "Ein Auftrag ist abgelaufen. Der Kunde ging woanders hin."
+    "contractFailed": "Ein Auftrag ist abgelaufen. Der Kunde ging woanders hin.",
+    "campusBuilt": "Campus Stufe {level} ist offen!",
+    "chipStarted": "Das Chip-Team legt los.",
+    "osStarted": "Das OS-Team legt los.",
+    "chipDone": "Dein eigener Chip, Generation {level}, ist fertig. Im Editor wählbar.",
+    "osDone": "Dein OS Version {level} ist fertig. Im Editor wählbar.",
+    "sideLaunched": "Neues Produkt im Handel: {kind}!",
+    "acquired": "Du hast {rival} gekauft!",
+    "phase5": "Tech-Gigant! Bau den Campus im Imperium-Tab.",
+    "phase6": "Endgame! Dein Handy-Imperium steht. Gründe im Vermächtnis-Tab eine neue Firma, wann du willst.",
+    "achievement": "Erfolg: {name}"
   },
   "barks": {
     "idle": [
@@ -314,7 +332,9 @@
     "market": "Markt",
     "team": "Team",
     "factory": "Fabrik",
-    "world": "Welt"
+    "world": "Welt",
+    "empire": "Imperium",
+    "legacy": "Vermächtnis"
   },
   "office": {
     "rent": "Ins Büro ziehen · {price}",
@@ -329,7 +349,8 @@
       "garage": "Garage",
       "office": "Büro",
       "factory": "Fabrik",
-      "store": "Store"
+      "store": "Store",
+      "hall": "Ruhmeshalle"
     }
   },
   "segment": {
@@ -370,7 +391,10 @@
     "plastic": "Kunststoff",
     "aluminium": "Aluminium",
     "glass": "Glas",
-    "titanium": "Titan"
+    "titanium": "Titan",
+    "ceramic": "Keramik",
+    "transparent": "Transparent",
+    "nano": "Nano-Legierung"
   },
   "finish": {
     "gloss": "Glänzend",
@@ -387,16 +411,24 @@
     "waterproof": "Wasserdicht",
     "wireless": "Kabellos laden",
     "faceUnlock": "Face-Unlock",
-    "net5g": "5G"
+    "net5g": "5G",
+    "satellite": "Satelliten-SOS",
+    "aiCore": "KI-Kern",
+    "underCam": "Unsichtbare Kamera",
+    "solidState": "Festkörperakku",
+    "holo": "Holo-Display"
   },
   "os": {
     "leafline": "Leafline (gratis)",
-    "mosaic": "Mosaic (+8 $/Stück)"
+    "mosaic": "Mosaic (+8 $/Stück)",
+    "own": "Eigenes OS"
   },
   "shapeName": {
     "blade": "Klinge",
     "edge": "Edge",
-    "fullscreen": "Vollbild"
+    "fullscreen": "Vollbild",
+    "fold": "Falt",
+    "roll": "Roll"
   },
   "research": {
     "title": "Forschungslabor",
@@ -420,7 +452,8 @@
       "reach": "Mehr Läden verkaufen deine Handys (Reichweite ×{mul})",
       "marketing": "Schaltet Marketingbudgets beim Launch frei",
       "presentation": "Launch-Events Stufe {n}",
-      "os": "Besseres OS lizenzieren: {name}"
+      "os": "Besseres OS lizenzieren: {name}",
+      "frontier": "+2 % Technik auf alle Teile (wiederholbar)"
     },
     "branch": {
       "chip": "Chips",
@@ -462,7 +495,18 @@
       "waterproof": "Wasserschutz",
       "wireless": "Kabelloses Laden",
       "faceUnlock": "Face-Unlock",
-      "net5g": "5G-Modem"
+      "net5g": "5G-Modem",
+      "fold": "Faltbares Gehäuse",
+      "ceramic": "Keramik",
+      "roll": "Rollbares Display",
+      "transparent": "Transparentes Gehäuse",
+      "nano": "Nano-Legierung",
+      "satellite": "Satelliten-SOS",
+      "aiCore": "KI auf dem Gerät",
+      "underCam": "Unter-Display-Kamera",
+      "solidState": "Festkörperakku",
+      "holo": "Holo-Display",
+      "frontier": "Grenzforschung"
     },
     "budget": "Laborbudget",
     "budgetHint": "Geld kauft Forschungstempo: je {amount}/Woche +1 FP/Tag."
@@ -728,7 +772,10 @@
       "influencer": "Ein großer Influencer schwärmt von {name}",
       "recallDone": "{name} zurückgerufen. Kunden schätzen die Ehrlichkeit",
       "recallIgnored": "Defekte {name} machen Schlagzeilen"
-    }
+    },
+    "acquired": "{rival} wurde aufgekauft",
+    "ownChip": "Gerücht: Ein Eigen-Chip, Generation {score}, kommt",
+    "ownOs": "Ein neues Handy-OS (Version {score}) startet"
   },
   "event": {
     "kicker": "Eilmeldung",
@@ -824,5 +871,177 @@
       "cost": "{name} ist in der Herstellung zu teuer.",
       "stock": "{name}: noch nicht genug auf Lager."
     }
+  },
+  "ach": {
+    "firstPhone": {
+      "name": "Das erste von vielen",
+      "desc": "Bring dein erstes Handy raus."
+    },
+    "garageHero": {
+      "name": "Garagenheld",
+      "desc": "Hab 20.000 $, noch in der Garage."
+    },
+    "perfect9": {
+      "name": "Liebling der Kritik",
+      "desc": "Hol eine Wertung von 9,0 oder besser."
+    },
+    "million": {
+      "name": "Eine Million",
+      "desc": "Verkaufe eine Million Handys."
+    },
+    "tenMillion": {
+      "name": "Überall",
+      "desc": "Verkaufe zehn Millionen Handys."
+    },
+    "fullOffice": {
+      "name": "Großraumbüro",
+      "desc": "Bau das Startup-Büro ganz aus."
+    },
+    "megaFactory": {
+      "name": "Megafabrik",
+      "desc": "Bau die Fabrik auf 8 Linien aus."
+    },
+    "globe": {
+      "name": "Rund um den Globus",
+      "desc": "Verkaufe in allen fünf Regionen."
+    },
+    "storeChain": {
+      "name": "Ladenkette",
+      "desc": "Betreibe 10 Stores."
+    },
+    "contractor": {
+      "name": "Zuverlässiger Lieferant",
+      "desc": "Liefere 10 Auftragsarbeiten."
+    },
+    "ownChip": {
+      "name": "Silizium-Tal",
+      "desc": "Entwickle deinen eigenen Chip."
+    },
+    "ownOs": {
+      "name": "Plattform-Besitzer",
+      "desc": "Bring dein eigenes OS raus."
+    },
+    "ecosystem": {
+      "name": "Ökosystem",
+      "desc": "Verkaufe gleichzeitig Uhr, Earbuds und Tablet."
+    },
+    "takeover": {
+      "name": "Feindliche Übernahme",
+      "desc": "Kauf einen Rivalen."
+    },
+    "billion": {
+      "name": "Einhorn",
+      "desc": "Erreiche 1 Mrd. $ Firmenwert."
+    },
+    "tenBillion": {
+      "name": "Zehnhorn",
+      "desc": "Erreiche 10 Mrd. $ Firmenwert."
+    },
+    "hundredBillion": {
+      "name": "Titan",
+      "desc": "Erreiche 100 Mrd. $ Firmenwert."
+    },
+    "frontier5": {
+      "name": "Grenzgänger",
+      "desc": "Schließe 5 Stufen Grenzforschung ab."
+    },
+    "year2050": {
+      "name": "Jahrhundertmitte",
+      "desc": "Noch im Geschäft im Jahr 2050."
+    },
+    "endgame": {
+      "name": "Handy-Imperium",
+      "desc": "Erreiche das Endgame."
+    },
+    "prestige": {
+      "name": "Zweiter Akt",
+      "desc": "Gründe eine neue Firma."
+    }
+  },
+  "empire": {
+    "title": "Imperium",
+    "locked": "Werde eine 5-Mrd.-$-Firma, um dein Tech-Imperium zu bauen.",
+    "notNow": "Gerade nicht möglich.",
+    "campusLevel": "Campus {n}/3",
+    "campus": "Campus bauen",
+    "campusNext": "Campus auf Stufe {n} ausbauen",
+    "campusDesc": "Heimat deiner Chip- und OS-Teams. Alle arbeiten {pct} % schneller.",
+    "chip": "Eigener Chip",
+    "noChip": "Noch kein Chip",
+    "chipName": "{name} Silicon {n}",
+    "chipPower": "{pct} % des besten Chips des Jahres",
+    "chipDesc": "Deine Ingenieure entwerfen Chips im Campus. Billiger als Kaufen, bald besser.",
+    "startChip": "Chip {n} entwerfen · {amount}",
+    "os": "Eigenes OS",
+    "noOs": "Noch kein OS",
+    "osName": "{name} OS {n}",
+    "osScore": "Wertung {score}",
+    "osQuality": "Qualität",
+    "osApps": "Apps",
+    "osBase": "Nutzer",
+    "osDesc": "Ein OS lebt von Apps, und Apps folgen den Nutzern. Anfangs ist es schwächer als Mosaic. So ist das.",
+    "startOs": "OS {n} bauen · {amount}",
+    "inProgress": "In Arbeit…",
+    "licenceChip": "Chip an Rivalen verkaufen",
+    "licenceOs": "OS an Rivalen lizenzieren",
+    "licenceIncome": "Lizenzeinnahmen: {amount}/Wo",
+    "side": "Nebenprodukte",
+    "kind": {
+      "watch": "Smartwatch",
+      "earbuds": "Earbuds",
+      "tablet": "Tablet"
+    },
+    "gen": "Gen {n}",
+    "perWeek": "{n}/Wo",
+    "revenue": "Umsatz",
+    "from": "Möglich ab {year}.",
+    "ecosystem": "Uhr + Earbuds + Tablet gleichzeitig im Handel: jedes Handy verkauft sich 5 % besser.",
+    "takeovers": "Übernahmen",
+    "yours": "deins",
+    "buy": "Kaufen · {amount}",
+    "tooStrong": "zu stark"
+  },
+  "legacy": {
+    "title": "Vermächtnis",
+    "runs": "Firma #{n}",
+    "hall": "Ruhmeshalle",
+    "noRecords": "Rekorde erscheinen beim Spielen.",
+    "record": {
+      "bestReview": "Beste Wertung",
+      "bestSeller": "Bestseller",
+      "biggestLaunch": "Größter Hype",
+      "peakValuation": "Höchster Wert",
+      "mostFans": "Meiste Fans"
+    },
+    "achievements": "Erfolge {n}/{max}",
+    "prestige": "Neue Firma gründen",
+    "prestigeDesc": "Neu anfangen mit Vermächtnis: {points} Vermächtnispunkte aus diesem Lauf, {have} gespart.",
+    "newCompany": "Nächste Firma planen",
+    "locked": "Erreiche das Endgame, um eine neue Firma zu gründen.",
+    "shopTitle": "Deine nächste Firma",
+    "shopDesc": "Noch {points} Vermächtnispunkte.",
+    "bonus": {
+      "cash": "Startkapital +25 %",
+      "research": "Forschung +5 %",
+      "brand": "Startmarke +5",
+      "skill": "Bessere Bewerber (+10 Skill)",
+      "colors": "Alle Farben ab Tag eins"
+    },
+    "scenario": "Szenario",
+    "scen": {
+      "classic": "Klassisch",
+      "budgetOnly": "Nur Budget",
+      "noMarketing": "Kein Marketing",
+      "recession": "Endlose Rezession",
+      "lateStart": "Spätstart 2016",
+      "budgetOnlyDesc": "Nur Budget-Handys, für immer.",
+      "noMarketingDesc": "Nur Mundpropaganda.",
+      "recessionDesc": "Der Markt erholt sich nie.",
+      "lateStartDesc": "Start 2016 gegen etablierte Rivalen.",
+      "lockedBy": "Freischalten: {ach}"
+    },
+    "warning": "Dieser Lauf endet. Rekorde, Erfolge und Vermächtnispunkte bleiben.",
+    "cancel": "Noch nicht",
+    "found": "Gründen!"
   }
 }

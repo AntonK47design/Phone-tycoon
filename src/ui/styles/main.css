@@ -566,6 +566,26 @@ svg { flex: none; }
 .small-btn { min-height: 28px !important; font-size: 10px !important; align-self: flex-end; }
 .lvl.neg { color: var(--red); }
 
+/* ── M6: empire & legacy ─────────────────────────────────────────────── */
+.toggle-line { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.toggle-line input { width: 18px; height: 18px; accent-color: var(--orange); }
+.side-launch { display: flex; gap: 6px; flex-wrap: wrap; }
+.side-launch .btn-secondary { min-height: 32px; padding: 0 10px; font-size: 11px; }
+.hall { display: flex; flex-direction: column; gap: 4px; }
+.hall-row { display: grid; grid-template-columns: 14px 96px 1fr auto; gap: 8px; align-items: center; font-size: 13px; padding: 4px 6px; border-bottom: 1px dashed rgba(29,26,22,.25); }
+.hall-kind { font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--muted); }
+.hall-val { font-family: var(--mono); font-size: 11px; }
+.badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+.ach { font-size: 12px; padding: 4px 6px; border: 1.5px dashed rgba(29,26,22,.35); border-radius: 6px; color: var(--muted); }
+.ach.got { border-style: solid; border-color: var(--ink); background: var(--sticky); color: var(--ink); }
+.ach b { color: var(--orange); }
+.wide-primary { width: 100%; }
+.modal.prestige { width: min(460px, calc(100vw - 24px)); gap: 8px; }
+.shop-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; }
+.shop-row .btn-secondary { min-height: 34px; font-size: 11px; padding: 0 10px; }
+.scenario-seg { flex-wrap: wrap; }
+.scenario-seg button { font-size: 11px; min-height: 34px; }
+
 /* Respect the OS "reduce motion" setting: no entrance animations or bobbing. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

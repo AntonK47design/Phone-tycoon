@@ -56,10 +56,10 @@ export type DrawerTab = 'company' | 'team' | 'factory' | 'research' | 'market' |
 /** Open side panel (Phase 2+). */
 export const drawer = signal<DrawerTab | null>(null);
 /** Which room the hub camera shows (Phase 2+). */
-export type Room = 'garage' | 'office' | 'factory' | 'store';
+export type Room = 'garage' | 'office' | 'factory' | 'store' | 'hall';
 export const hubView = signal<Room>('garage');
 /** Camera view for the hub, depending on the chosen room. */
-export function hubCamera(): 'overview' | 'office' | 'factory' | 'store' {
+export function hubCamera(): 'overview' | 'office' | 'factory' | 'store' | 'hall' {
   return hubView.value === 'garage' ? 'overview' : hubView.value;
 }
 /** Daily calendar & orders dialog. */

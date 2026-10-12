@@ -304,6 +304,12 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
 - Zukunftsepochen E7–E9, endlose Forschung, Ruhmeshalle, Vitrine (3D), Prestige mit
   Legacy-Boni und Szenarien, Erfolge komplett.
 - **Abnahme:** Bot (Optimierer) erreicht Phase 5 bei 4–6 h, Phase 6 bei 12–18 h.
+- **Stand:** fertig. Imperium-Tab (Campus, Chip, OS, Lizenzen, Nebenprodukte, Übernahmen),
+  Vermächtnis-Tab (Ruhmeshalle, Erfolge, Prestige-Dialog mit Boni und Szenarien). Ruhmeshalle als
+  fünftes Diorama (Vitrinen mit Rekord-Handys). Save v7 inkl. Vermächtnis.
+- **Abweichung Abnahme:** Kalibriert auf den *Durchschnitts*-Bot (Phase 5 ≈ 4 h, Phase 6 ≈ 10 h).
+  Der Optimierer spielt dauerhaft 4× und ist in Spieljahren viel schneller (Phase 5 in < 1 h).
+  Faltbar ist eine Gehäuseform statt eines eigenen Segments.
 
 ### M7 – Plattform & Politur
 - SDK komplett: Midgame/Rewarded mit Regeln, Ad-Pause/Mute, Cloud-Save via `SDK.data`

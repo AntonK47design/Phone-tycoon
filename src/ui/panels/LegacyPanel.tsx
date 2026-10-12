@@ -1,5 +1,6 @@
 // Endgame (GDD §16): Hall of Fame, achievements, prestige with legacy bonuses and scenarios.
 
+import { createPortal } from 'preact/compat';
 import { useState } from 'preact/hooks';
 import { sfx } from '../../audio/sfx';
 import { newGame } from '../../sim/game';
@@ -55,7 +56,8 @@ export function LegacyPanel() {
       ) : (
         <p class="hint-line">{t('legacy.locked')}</p>
       )}
-      {shop && <PrestigeDialog close={() => setShop(false)} />}
+      {/* Portal: the drawer's slide animation would clip a fixed dialog. */}
+      {shop && createPortal(<PrestigeDialog close={() => setShop(false)} />, document.querySelector('.ui-layer') ?? document.body)}
     </>
   );
 }

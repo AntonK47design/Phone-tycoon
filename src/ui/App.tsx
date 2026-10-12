@@ -44,6 +44,11 @@ function usePhoneSync() {
       companyName: state.company.name,
       phones: [...state.products].reverse().filter((p) => p.active).map((p) => colorById(p.design.colorId)?.hex ?? '#cccccc'),
     });
+    const records = [...state.hall, ...state.legacy.hall.filter((h) => !state.hall.some((x) => x.kind === h.kind))];
+    // Record phones first, then the all-time best sellers fill the remaining cases.
+    const fame = records.filter((h) => h.color !== undefined).map((h) => h.color ?? null);
+    const sellers = [...state.products].sort((a, b) => b.unitsSold - a.unitsSold).map((p) => colorById(p.design.colorId)?.hex ?? null);
+    engine.setHall({ companyName: state.company.name, colors: [...fame, ...sellers].slice(0, 6) });
     const f = state.factory;
     engine.setFactory({
       size: f.size,

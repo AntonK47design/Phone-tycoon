@@ -208,7 +208,15 @@
     "contracts3": "Deliver 3 contract jobs",
     "regions5": "Sell on every continent",
     "stores10": "Run 10 stores",
-    "valuation1b": "Become a $1B company"
+    "valuation1b": "Become a $1B company",
+    "valuation5b": "Reach a $5B valuation",
+    "valuation20b": "Reach a $20B valuation",
+    "campus": "Build the campus",
+    "ownChip": "Design your own chip",
+    "ownOs": "Ship your own OS",
+    "side3": "Sell watch, earbuds and tablet",
+    "acquire1": "Take over a rival",
+    "endgame": "20% market share, or a $50B company from 2045"
   },
   "teaser": {
     "office": "{amount} more and you can stop working in a garage.",
@@ -268,7 +276,17 @@
     "storeOpened": "Your own store in {region} opened. Queue around the block!",
     "contractOffered": "New contract offer in the World tab.",
     "contractDone": "Contract delivered: {amount}",
-    "contractFailed": "A contract expired. The client went elsewhere."
+    "contractFailed": "A contract expired. The client went elsewhere.",
+    "campusBuilt": "Campus level {level} is open!",
+    "chipStarted": "The chip team is on it.",
+    "osStarted": "The OS team is on it.",
+    "chipDone": "Your own chip, generation {level}, is ready. Pick it in the editor.",
+    "osDone": "Your OS version {level} is ready. Pick it in the editor.",
+    "sideLaunched": "New {kind} on sale!",
+    "acquired": "You bought {rival}!",
+    "phase5": "Tech giant! Build the campus in the Empire tab.",
+    "phase6": "Endgame! Your phone empire is complete. Found a new company in the Legacy tab whenever you like.",
+    "achievement": "Achievement: {name}"
   },
   "barks": {
     "idle": [
@@ -314,7 +332,9 @@
     "market": "Market",
     "team": "Team",
     "factory": "Factory",
-    "world": "World"
+    "world": "World",
+    "empire": "Empire",
+    "legacy": "Legacy"
   },
   "office": {
     "rent": "Move into an office · {price}",
@@ -329,7 +349,8 @@
       "garage": "Garage",
       "office": "Office",
       "factory": "Factory",
-      "store": "Store"
+      "store": "Store",
+      "hall": "Hall"
     }
   },
   "segment": {
@@ -370,7 +391,10 @@
     "plastic": "Plastic",
     "aluminium": "Aluminium",
     "glass": "Glass",
-    "titanium": "Titanium"
+    "titanium": "Titanium",
+    "ceramic": "Ceramic",
+    "transparent": "Transparent",
+    "nano": "Nano alloy"
   },
   "finish": {
     "gloss": "Gloss",
@@ -387,16 +411,24 @@
     "waterproof": "Waterproof",
     "wireless": "Wireless charging",
     "faceUnlock": "Face unlock",
-    "net5g": "5G"
+    "net5g": "5G",
+    "satellite": "Satellite SOS",
+    "aiCore": "AI core",
+    "underCam": "Hidden camera",
+    "solidState": "Solid-state cell",
+    "holo": "Holo display"
   },
   "os": {
     "leafline": "Leafline (free)",
-    "mosaic": "Mosaic (+$8/unit)"
+    "mosaic": "Mosaic (+$8/unit)",
+    "own": "Own OS"
   },
   "shapeName": {
     "blade": "Blade",
     "edge": "Edge",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "fold": "Fold",
+    "roll": "Roll"
   },
   "research": {
     "title": "Research lab",
@@ -420,7 +452,8 @@
       "reach": "More shops sell your phones (reach ×{mul})",
       "marketing": "Unlocks marketing budgets at launch",
       "presentation": "Launch events level {n}",
-      "os": "Licence a better OS: {name}"
+      "os": "Licence a better OS: {name}",
+      "frontier": "+2% tech on every part (repeatable)"
     },
     "branch": {
       "chip": "Chips",
@@ -462,7 +495,18 @@
       "waterproof": "Waterproofing",
       "wireless": "Wireless charging",
       "faceUnlock": "Face unlock",
-      "net5g": "5G modem"
+      "net5g": "5G modem",
+      "fold": "Foldable body",
+      "ceramic": "Ceramic",
+      "roll": "Rollable screen",
+      "transparent": "Transparent body",
+      "nano": "Nano alloy",
+      "satellite": "Satellite SOS",
+      "aiCore": "On-device AI",
+      "underCam": "Under-display camera",
+      "solidState": "Solid-state battery",
+      "holo": "Holo display",
+      "frontier": "Frontier research"
     },
     "budget": "Lab budget",
     "budgetHint": "Money buys research speed: every {amount}/week adds 1 RP/day."
@@ -728,7 +772,10 @@
       "influencer": "A big influencer can't stop talking about {name}",
       "recallDone": "{name} recalled. Customers appreciate the honesty",
       "recallIgnored": "Faulty {name} units make headlines"
-    }
+    },
+    "acquired": "{rival} has been bought up",
+    "ownChip": "Rumour: an in-house chip, generation {score}, is coming",
+    "ownOs": "A new phone OS (version {score}) launches"
   },
   "event": {
     "kicker": "Breaking",
@@ -824,5 +871,177 @@
       "cost": "{name} is too expensive to build.",
       "stock": "{name}: not enough units in stock yet."
     }
+  },
+  "ach": {
+    "firstPhone": {
+      "name": "First of many",
+      "desc": "Launch your first phone."
+    },
+    "garageHero": {
+      "name": "Garage hero",
+      "desc": "Have $20K while still in the garage."
+    },
+    "perfect9": {
+      "name": "Critics’ darling",
+      "desc": "Get a review of 9.0 or better."
+    },
+    "million": {
+      "name": "One million",
+      "desc": "Sell a million phones."
+    },
+    "tenMillion": {
+      "name": "Everywhere",
+      "desc": "Sell ten million phones."
+    },
+    "fullOffice": {
+      "name": "Open-plan life",
+      "desc": "Max out the startup office."
+    },
+    "megaFactory": {
+      "name": "Megafactory",
+      "desc": "Grow the factory to 8 lines."
+    },
+    "globe": {
+      "name": "Around the globe",
+      "desc": "Sell in all five regions."
+    },
+    "storeChain": {
+      "name": "Store chain",
+      "desc": "Run 10 stores."
+    },
+    "contractor": {
+      "name": "Reliable supplier",
+      "desc": "Deliver 10 contract jobs."
+    },
+    "ownChip": {
+      "name": "Silicon valley",
+      "desc": "Design your own chip."
+    },
+    "ownOs": {
+      "name": "Platform owner",
+      "desc": "Ship your own OS."
+    },
+    "ecosystem": {
+      "name": "Ecosystem",
+      "desc": "Sell a watch, earbuds and a tablet at once."
+    },
+    "takeover": {
+      "name": "Hostile takeover",
+      "desc": "Buy a rival."
+    },
+    "billion": {
+      "name": "Unicorn",
+      "desc": "Reach a $1B valuation."
+    },
+    "tenBillion": {
+      "name": "Decacorn",
+      "desc": "Reach a $10B valuation."
+    },
+    "hundredBillion": {
+      "name": "Titan",
+      "desc": "Reach a $100B valuation."
+    },
+    "frontier5": {
+      "name": "Frontier",
+      "desc": "Finish 5 levels of frontier research."
+    },
+    "year2050": {
+      "name": "Mid-century",
+      "desc": "Still in business in 2050."
+    },
+    "endgame": {
+      "name": "Phone empire",
+      "desc": "Reach the endgame."
+    },
+    "prestige": {
+      "name": "Second act",
+      "desc": "Found a new company."
+    }
+  },
+  "empire": {
+    "title": "Empire",
+    "locked": "Become a $5B company to start building your tech empire.",
+    "notNow": "Not possible right now.",
+    "campusLevel": "campus {n}/3",
+    "campus": "Build the campus",
+    "campusNext": "Expand the campus to level {n}",
+    "campusDesc": "Home of your chip and OS teams. Everyone works {pct}% faster.",
+    "chip": "Own chip",
+    "noChip": "No chip yet",
+    "chipName": "{name} Silicon {n}",
+    "chipPower": "{pct}% of the best chip of the year",
+    "chipDesc": "Your engineers design chips at the campus. Cheaper than buying, and soon better.",
+    "startChip": "Design chip {n} · {amount}",
+    "os": "Own OS",
+    "noOs": "No OS yet",
+    "osName": "{name} OS {n}",
+    "osScore": "score {score}",
+    "osQuality": "Quality",
+    "osApps": "Apps",
+    "osBase": "Users",
+    "osDesc": "An OS lives from its apps, and apps follow users. It starts weaker than Mosaic. That’s the deal.",
+    "startOs": "Build OS {n} · {amount}",
+    "inProgress": "In the works…",
+    "licenceChip": "Sell the chip to rivals",
+    "licenceOs": "License the OS to rivals",
+    "licenceIncome": "Licence income: {amount}/wk",
+    "side": "Side products",
+    "kind": {
+      "watch": "Smartwatch",
+      "earbuds": "Earbuds",
+      "tablet": "Tablet"
+    },
+    "gen": "gen {n}",
+    "perWeek": "{n}/wk",
+    "revenue": "Revenue",
+    "from": "Possible from {year}.",
+    "ecosystem": "Watch + earbuds + tablet on sale at once: every phone sells 5% better.",
+    "takeovers": "Takeovers",
+    "yours": "yours",
+    "buy": "Buy · {amount}",
+    "tooStrong": "too strong"
+  },
+  "legacy": {
+    "title": "Legacy",
+    "runs": "company #{n}",
+    "hall": "Hall of Fame",
+    "noRecords": "Records appear as you play.",
+    "record": {
+      "bestReview": "Best review",
+      "bestSeller": "Best seller",
+      "biggestLaunch": "Biggest hype",
+      "peakValuation": "Peak value",
+      "mostFans": "Most fans"
+    },
+    "achievements": "Achievements {n}/{max}",
+    "prestige": "Found a new company",
+    "prestigeDesc": "Start over with a legacy: {points} legacy points from this run, {have} saved.",
+    "newCompany": "Plan the next company",
+    "locked": "Reach the endgame to found a new company.",
+    "shopTitle": "Your next company",
+    "shopDesc": "{points} legacy points left to spend.",
+    "bonus": {
+      "cash": "Start capital +25%",
+      "research": "Research +5%",
+      "brand": "Start brand +5",
+      "skill": "Better applicants (+10 skill)",
+      "colors": "All colours from day one"
+    },
+    "scenario": "Scenario",
+    "scen": {
+      "classic": "Classic",
+      "budgetOnly": "Budget only",
+      "noMarketing": "No marketing",
+      "recession": "Endless recession",
+      "lateStart": "Late start 2016",
+      "budgetOnlyDesc": "Only budget phones, ever.",
+      "noMarketingDesc": "Word of mouth only.",
+      "recessionDesc": "The market never recovers.",
+      "lateStartDesc": "Start in 2016 against grown-up rivals.",
+      "lockedBy": "Unlock: {ach}"
+    },
+    "warning": "This run ends. Records, achievements and legacy points stay.",
+    "cancel": "Not yet",
+    "found": "Found it!"
   }
 }

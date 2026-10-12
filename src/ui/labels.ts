@@ -28,6 +28,7 @@ export function researchEffect(node: ResearchNode, currentReach: number): string
   if (u.marketing) return t('research.unlock.marketing');
   if (u.presentation) return t('research.unlock.presentation', { n: u.presentation });
   if (u.os) return t('research.unlock.os', { name: t(`os.${u.os}`) });
+  if (u.frontier) return t('research.unlock.frontier');
   return '';
 }
 

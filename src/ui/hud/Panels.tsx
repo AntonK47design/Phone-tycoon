@@ -3,7 +3,7 @@ import { sfx } from '../../audio/sfx';
 import { colorById } from '../../data/design';
 import { goalProgress, visibleGoals } from '../../sim/goals';
 import { decimal, money, shortNum } from '../format';
-import { game, mode, sayBark, bark, toVisual, toasts, useGameState } from '../game';
+import { game, hubView, mode, sayBark, bark, toVisual, toasts, useGameState } from '../game';
 import { lang, t, tList } from '../i18n';
 import { openLaunchSetup } from '../launch/LaunchSetup';
 import { IconBuilding, IconPencil, IconRocket, IconWrench, ToastIconView } from '../icons';
@@ -209,7 +209,8 @@ export function FounderBark() {
     return () => cancelAnimationFrame(raf);
   }, [engine, bark.value?.id]);
   const b = bark.value;
-  if (!b || mode.value !== 'free') return null;
+  // The founder lives in the garage.
+  if (!b || mode.value !== 'free' || hubView.value !== 'garage') return null;
   return (
     <div class="bark passthrough" ref={ref} key={b.id}>
       {b.text}

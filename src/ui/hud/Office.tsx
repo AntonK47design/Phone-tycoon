@@ -16,6 +16,7 @@ export function ViewToggle() {
   const rooms: Room[] = ['garage', 'office'];
   if (state.factory.size > 0) rooms.push('factory');
   if (Object.values(state.regions.stores).some((n) => n > 0)) rooms.push('store');
+  if (state.phase5Ready || state.legacy.runs > 0) rooms.push('hall');
   const go = (v: Room) => {
     if (hubView.value === v) return;
     sfx.whoosh();
