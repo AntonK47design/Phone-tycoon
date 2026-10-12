@@ -276,6 +276,13 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
 - Kapazität, Linienupgrades, Qualität vs. Tempo, Ausschuss, Lagerhalle, Ausverkauf &
   Nachproduktion, Abverkauf.
 - **Abnahme:** Bot Phase 3 → 4 bei 75–120 min.
+- **Stand:** fertig. Fabrik als drittes Diorama links der Garage (Umschalter Garage/Büro/
+  Fabrik). Instanziert: Handys auf den Bändern (Produktfarbe), Roboterarme (4 Teile, Anzahl
+  je Linienstufe), Prüfstations-Lampen, Kisten in der Lagerhalle. Megafabrik mit 4+ Linien
+  ≈ 53 Draw Calls (Medium). Ausschuss sichtbar: Handy rutscht nach der Prüfstation in die
+  rote Kiste, Lampe blinkt rot. Save v5.
+- **Abweichungen:** Linienkapazität 60 statt 300 · L^1,5 (Marktvolumen). Phase-4-Gate
+  400 M $ Umsatz statt 25 M $ (Bot-Balancing). Abverkauf/Nachproduktion gab es schon seit M2.
 
 ### M5 – Konkurrenz, Events, Regionen, Aufträge
 - 8 KI-Firmen mit Strategien, Releases, Reaktionen, News-Ticker, Rangliste.

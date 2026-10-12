@@ -210,7 +210,9 @@
     "officeReady": "Dein Büro ist bereit. Zieh ein, um Forschung, Marketing und echte Produktion freizuschalten.",
     "generic": "Nächstes Ziel: {goal}",
     "research": "{name} wartet im Labor.",
-    "phase3": "Noch {amount} Firmenwert bis zum nächsten großen Schritt."
+    "phase3": "Noch {amount} Firmenwert bis zum nächsten großen Schritt.",
+    "factory": "Als Nächstes: Bau deine eigene Fabrik (Tab Fabrik).",
+    "phase4": "Als Nächstes: noch {amount} Umsatz bis zur Expansion."
   },
   "action": {
     "newPhone": "Neues Handy",
@@ -233,7 +235,7 @@
     "orderArrived": "Lieferung: {n} × {name}",
     "soldOut": "{name} ist ausverkauft!",
     "loan": "Die Bank springt ein: {amount} Kredit.",
-    "phase3": "Firmenwert-Meilenstein! Designstudio & Fabrik kommen im nächsten Update.",
+    "phase3": "Phase 3 freigeschaltet! Bau deine eigene Fabrik im Tab „Fabrik“.",
     "researchStarted": "Das Labor legt los.",
     "hired": "{name} ist dabei als {role}!",
     "trained": "{name} ist zurück vom Kurs: Skill {skill}",

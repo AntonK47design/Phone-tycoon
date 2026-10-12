@@ -538,6 +538,24 @@ Max. Linien: Kleine Fabrik 2, Fabrik 4, Megafabrik 8, (Phase 5) Werke in Regione
 
 **Lagerhalle:** Kapazität 10 000 · 3^Stufe Einheiten, darüber Überlaufkosten (§7.6).
 
+### 9.2b Umsetzung M4 (Zahlen nach Bot-Balancing)
+
+```
+Kapazität/Tag je Linie = 60 · L^1,5   (statt 300: an die Marktvolumina des Spiels angepasst;
+                                      L1 ≈ 420/Wo, L5 ≈ 4 700/Wo, L10 ≈ 13 300/Wo)
+Montage je Stück = 12 $ · 0,85^(L−1) · Inflation, kein Auftragsfertiger-Aufschlag (×1,2)
+Ausschuss = (4 % − 0,35 % · (L−1)) · Tempo (0,5/1/2) · Produktionsleitung (−10 %/Kopf, max −50 %)
+Rückläufer: R_cur −5 · Ausschuss-Rate (gleitender Schnitt) → 0,1 Punkte je 2 %
+Linien füllen den Vorrat bis Zielwochen · Nachfrage + Rückstau (2/4/8 Wochen wählbar) und stoppen dann.
+Fabrik 400K $ (1 Linie, max. 2) · Fabrik 1,5 M $ (4 Linien) · Megafabrik 8 M $ (8 Linien)
+Neue Linie 150K $ · (1 + 0,25 · vorhandene Linien); Upgrade 50K $ · 2,2^(L−1); alles · Inflation
+Unterhalt: 1 %/Woche aller Fabrik-Investitionen; Firmenwert zählt 50 % davon
+Lagerhalle 10 000 · 3^Stufe Einheiten, Ausbau 80K $ · 3^Stufe; Überlauf kostet 1 % des Werts/Woche
+Neue Handys bekommen automatisch eine Linie (freie oder die mit dem schwächsten Verkaufsschlager).
+Mit Fabrik ist die erste Auftragscharge beim Launch optional („Nur Fabrik“).
+Phase-4-Gate: Gesamtumsatz 400 M $ (+ Ziel „3 Linien“), statt 25 M $ + 10 Launches
+```
+
 ### 9.3 3D-Darstellung
 Fließbänder mit instanzierten Handys (zeigen das aktuell produzierte Modell und dessen
 Farbe), Roboterarme, Prüfstation mit Ausschuss-Rutsche. Linienstufe sichtbar (mehr

@@ -253,6 +253,9 @@ function nextTeaser(state: ReturnType<typeof useGameState>): string | null {
     }
     const gate = GOALS.find((g) => g.gate === 'phase3')!;
     if (!state.phase3Ready) return t('teaser.phase3', { amount: money(Math.max(0, gate.target - goalProgress(state, gate)), l) });
+    if (state.factory.size === 0) return t('teaser.factory');
+    const gate4 = GOALS.find((g) => g.gate === 'phase4')!;
+    if (!state.phase4Ready) return t('teaser.phase4', { amount: money(Math.max(0, gate4.target - goalProgress(state, gate4)), l) });
   }
   if (state.officeReady) return t('teaser.officeReady');
   const office = GOALS.find((g) => g.id === 'office')!;

@@ -139,7 +139,6 @@ function CompanyPanel() {
   const l = lang.value;
   const last = (arr: number[]) => arr[arr.length - 1] ?? 0;
   const products = state.products.filter((p) => p.active);
-  const gate = GOALS.find((g) => g.gate === 'phase3')!;
   const order = (id: number, units: number) => {
     const ev = store.dispatch({ type: 'orderBatch', productId: id, units });
     const e = ev[0];
@@ -204,13 +203,16 @@ function CompanyPanel() {
           </div>
         );
       })}
-      {!state.phase3Ready && (
-        <p class="muted">
-          {t('company.phase3', { goal: t(`goals.${visibleGoals(state).find((g) => g.gate === 'phase3')?.id ?? gate.id}`) })}
-          {' · '}
-          {money(Math.max(0, gate.target - goalProgress(state, gate)), l)}
-        </p>
-      )}
+      {!state.phase4Ready && (() => {
+        const g = GOALS.find((x) => x.gate === (state.phase3Ready ? 'phase4' : 'phase3'))!;
+        return (
+          <p class="muted">
+            {t('company.phase3', { goal: t(`goals.${visibleGoals(state).find((v) => v.gate)?.id ?? g.id}`) })}
+            {' · '}
+            {money(Math.max(0, g.target - goalProgress(state, g)), l)}
+          </p>
+        );
+      })()}
     </>
   );
 }

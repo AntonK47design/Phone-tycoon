@@ -5,7 +5,7 @@ import { colorById } from '../data/design';
 import { GOALS } from '../data/goals';
 import type { SimEvent } from '../sim/events';
 import { money } from './format';
-import { game, launchData, sayBark, toast } from './game';
+import { game, hubView, launchData, sayBark, toast } from './game';
 import { lang, t, tList } from './i18n';
 import { researchNameById } from './labels';
 
@@ -146,6 +146,9 @@ export function installJuice() {
         }
         case 'factoryBuilt':
           toast(t('toast.factoryBuilt'), 'building', true);
+          // Show it off right away.
+          hubView.value = 'factory';
+          engine.goToView('factory', 1.4);
           sfx.fanfare();
           platform.happytime();
           break;

@@ -210,7 +210,9 @@
     "officeReady": "Your office is ready. Move in to unlock research, marketing and real production.",
     "generic": "Next goal: {goal}",
     "research": "{name} is waiting in the lab.",
-    "phase3": "Valuation {amount} to go until the next big step."
+    "phase3": "Valuation {amount} to go until the next big step.",
+    "factory": "Next: build your own factory (Factory tab).",
+    "phase4": "Next: {amount} more in sales unlocks expansion."
   },
   "action": {
     "newPhone": "New phone",
@@ -233,7 +235,7 @@
     "orderArrived": "Delivery: {n} × {name}",
     "soldOut": "{name} is sold out!",
     "loan": "The bank stepped in: {amount} loan.",
-    "phase3": "Valuation milestone! Design studio & factory arrive in the next update.",
+    "phase3": "Phase 3 unlocked! Build your own factory in the Factory tab.",
     "researchStarted": "The lab is on it.",
     "hired": "{name} joins as {role}!",
     "trained": "{name} is back from training: skill {skill}",
