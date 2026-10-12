@@ -289,6 +289,14 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
 - Event-Director mit allen Events aus GDD §13.
 - Regionen, Markteintritt, Stores (Store-Diorama), Auftragsarbeiten.
 - Senioren-/Gaming-Segment.
+- **Stand:** fertig. KI-Firmen mit Modellen, Kadenz, Alterung, Markendrift und Preiskampf;
+  News-Ticker (oben mittig) und Rivalen-Liste im Markt-Tab. Event-Director mit Karten.
+  Welt-Tab mit Karte, Regionen, Stores und Auftragsarbeiten. Store als viertes Diorama
+  (hinter der Garage): Verkaufsinseln mit den eigenen Handys, Bummler (instanziert), ≈ 43 Draw
+  Calls. Save v6. Tabs umbrechen in zwei Reihen, damit „Neues Handy“ frei bleibt.
+- **Abweichungen:** Zollstreit senkt die Reichweite statt die Kosten (Umsatz wird nicht je
+  Region verbucht). Patentstreit kommt mit Phase 5 (M6). Aufträge ohne eingeblendete
+  Grenzen im Editor – geliefert wird aus dem Lager eines passenden Handys.
 
 ### M6 – Tech-Gigant & Endgame
 - Campus, eigener Chip, eigenes OS (Installierte Basis, Lizenzen), Nebenprodukte,

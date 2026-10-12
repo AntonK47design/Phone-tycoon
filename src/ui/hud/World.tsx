@@ -6,7 +6,7 @@ import { currentReview } from '../../sim/game';
 import { yearOf } from '../../sim/time';
 import { contractProblem, contractValue, entryCost, regionReach, storeCost } from '../../sim/world';
 import { decimal, money, shortNum } from '../format';
-import { game, mode, toast, useGameState } from '../game';
+import { dailyOpen, game, launchSetupOpen, mode, settingsOpen, toast, useGameState, welcomeReport } from '../game';
 import { lang, t } from '../i18n';
 import { newsText } from '../labels';
 
@@ -34,7 +34,8 @@ export function EventCard() {
   const state = useGameState();
   const { store } = game();
   const p = state.events.pending;
-  if (!p || mode.value !== 'free') return null;
+  // Never stack on top of another dialog.
+  if (!p || mode.value !== 'free' || welcomeReport.value || dailyOpen.value || launchSetupOpen.value || settingsOpen.value) return null;
   const l = lang.value;
   const product = p.target ? state.products.find((x) => String(x.id) === p.target) : null;
   const pick = (option: string) => {

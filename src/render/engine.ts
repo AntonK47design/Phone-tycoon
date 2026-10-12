@@ -49,7 +49,7 @@ const VIEWS: Record<ViewName, View> = {
   launch: { target: new Vector3(TT.x, 0.6, TT.z), azimuth: 0.3, elevation: 0.24, distance: 2.3, fov: 32, tiltShift: 0.5 },
   office: { target: OFFICE_ORIGIN.clone().add(new Vector3(0, 0.7, 0)), azimuth: 0.55, elevation: 0.55, distance: 12, fov: 30, tiltShift: 1 },
   factory: { target: FACTORY_ORIGIN.clone().add(new Vector3(0, 0.6, 0)), azimuth: 0.5, elevation: 0.58, distance: 15, fov: 30, tiltShift: 1 },
-  store: { target: STORE_ORIGIN.clone().add(new Vector3(0, 0.8, 0)), azimuth: 0.55, elevation: 0.5, distance: 13, fov: 30, tiltShift: 1 },
+  store: { target: STORE_ORIGIN.clone().add(new Vector3(0, 1.1, -0.3)), azimuth: 0.5, elevation: 0.42, distance: 15.5, fov: 30, tiltShift: 1 },
 };
 
 export interface EngineStats {

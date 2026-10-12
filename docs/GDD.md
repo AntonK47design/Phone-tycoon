@@ -673,6 +673,20 @@ R_ai = clamp(P_ai + V_ai, 0, 10)        Preise nahe anchor · (P_ai/7)^1,6 · Pr
   Marktanteil, Fans, Patente (Forschung).
 - Launches der KI werden als News-Ticker und kleine 3D-Karte im Markt-Tab gezeigt.
 
+### 12.1 Umsetzung M5
+
+```
+Modell-Review beim Launch = 7,2 + 3 · log2(τ(Jahr) + τ_drift) · (1 + 0,1 · Marke/100)) + 0,4 · DesignBias + N(0; 0,35)
+Altern im Regal: −1,14 Punkte/Jahr (Erwartungskurve +30 %/Jahr)
+Attraktivität = (R_cur/10)^3 · Markenfaktor · Reichweite(Jahr) · Preisfaktor · Frische (1 + 0,4 · e^(−Wochen/3))
+Jahresende: Marke → Startmarke + 15 · (Ø-Review − 7) (20 %/Jahr), τ_drift ±0,02/0,03 je nach
+            Wachstum gegenüber dem Markt (Grenzen −0,25 … +0,08)
+Reaktion: Spieler > 30 % eines Segments (Woche) → stärkste KI senkt dort 26 Wochen die Preise um 12 %
+Kadenz: Launch alle Kadenz/(Segmente/1,5) Wochen ±20 %, ersetzt jeweils das älteste Modell
+Tellmark: τ 0,75 → 0,55 bis 2015, Reichweite 1,0 → 0,7; Novaphone-Reichweite 0,4 → 1,0 bis 2012;
+Vantor: τ 1,15 und Reichweite 0,6 ab 2016
+```
+
 ---
 
 ## 13. Events & Trends
@@ -696,6 +710,14 @@ gleichzeitig. Alle Events zeigen eine Karte mit Wahl oder Countdown.
 | Tech-Durchbruch | Forschung | 0,5 % | eine laufende Forschung −50 % | – |
 
 Trends verschieben Gewichte `w_k`, `α`, Segmentanteile oder Farben, nie mehr als ±30 %.
+
+**Umsetzung M5:** Wöchentlicher Wurf, Cooldown 52 Wochen je Event, max. 1 großes Event
+(Chipmangel, Rezession, Kamera-Hype, Zollstreit). Chipmangel und Rückruf zeigen eine Karte;
+ohne Antwort gilt nach 4 bzw. 2 Wochen die vorsichtige Option. Chipmangel „Einlagern“ kostet
+max(20K $, 4 % Jahresumsatz), sonst 16 Wochen +8 % Stückkosten und −30 % Linienkapazität.
+Kamera-Hype: Handys mit Pro-Kamera ×1,2 Attraktivität. Rezession: Markt ×0,85, Elastizität ×1,25.
+Zollstreit: Reichweite in der Region ×0,85. Starbewerber: Skill 70–85 (Perfektionist) im Pool.
+Patentstreit folgt mit Phase 5 (M6). Influencer: 5 % je Launch (ab dem 3.) +15 Hype.
 
 ---
 
@@ -726,6 +748,22 @@ Auszahlung = N · C · (1,3 … 1,8) + Bonus bei Score-Übererfüllung
 Strafe bei Verspätung: −10 %/Woche
 ```
 Nutzt den normalen Editor mit eingeblendeten Grenzen. Max. 3 Angebote gleichzeitig.
+
+### 14.4 Umsetzung M5
+
+```
+Phase 4 beginnt mit dem ersten Markteintritt (Gate: 400 M $ Gesamtumsatz).
+Regionsmarkt = Heimatmarkt · Anteil/0,18 (Heimat = bisheriger Markt) · Rezession
+Reichweite in der Region = Basisreichweite · (Heimat 1,0 | neu 0,5) · (1 + 0,15 · Stores) · Zoll 0,85
+Preisfaktor je Region mit Elastizität · Preissensibilität
+Fit = Segment-Beliebtheit · Π (1 + Gewicht · (Rating − 6,5)/1,5), geklemmt 0,7 … 1,3 (je Produkt gecacht)
+Store: 1 M $ · (1 + 0,5 · vorhandene in der Region), Miete 20K $/Woche, Marke +2, max. 5 je Region
+Aufträge: alle 3–6 Wochen, max. 3; Menge 2–5 × Wochennachfrage (1 000 … 200 000),
+          max. Stückkosten = eigene Stückkosten · 1,05–1,25, Mindestwertung = Bestwert − 0,8 … 2
+          Auszahlung = N · C · 1,3–1,8 · (1 + 5 % je Punkt über Mindestwertung) · (1 − 10 %/Woche Verspätung);
+          verfällt 4 Wochen nach Frist. Geliefert wird aus dem Lager.
+Neue Segmente ab Phase 4: Senioren (Anker 199 $, ε 1,8) und Gaming (699 $, ε 1,2).
+```
 
 ---
 

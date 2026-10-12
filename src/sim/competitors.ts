@@ -26,7 +26,7 @@ export function rivalDef(id: string): CompetitorDef {
 function modelReview(rng: Rng, def: CompetitorDef, rival: RivalState, year: number): number {
   const tau = Math.max(0.3, curveAt(def.tau, year) + rival.tauAdj);
   const budget = rival.brand / 100;
-  return clamp(7.4 + 3 * Math.log2(tau * (1 + 0.1 * budget)) + 0.4 * def.designBias + rng.normal(0, 0.35), 1, 10);
+  return clamp(7.2 + 3 * Math.log2(tau * (1 + 0.1 * budget)) + 0.4 * def.designBias + rng.normal(0, 0.35), 1, 10);
 }
 
 function launchModel(rng: Rng, rival: RivalState, segment: Segment, day: number): RivalModel {
@@ -137,7 +137,7 @@ export function tickRivalsWeek(state: GameState, segmentUnits: Map<Segment, { pl
       r.brand = clamp(r.brand + 0.2 * (def.brand + 15 * (avg - 7) - r.brand), 5, 95);
       if (r.unitsLastYear > 0) {
         const growth = r.unitsYear / r.unitsLastYear / marketGrowth;
-        r.tauAdj = clamp(r.tauAdj + (growth < 0.92 ? -0.03 : growth > 1.08 ? 0.02 : 0), -0.25, 0.12);
+        r.tauAdj = clamp(r.tauAdj + (growth < 0.92 ? -0.03 : growth > 1.08 ? 0.02 : 0), -0.25, 0.08);
       }
       r.unitsLastYear = r.unitsYear;
       r.unitsYear = 0;
