@@ -32,4 +32,16 @@ export type SimEvent =
   | { type: 'orderArrived'; productId: number; units: number }
   | { type: 'soldOut'; productId: number }
   | { type: 'loan'; amount: number }
-  | { type: 'rejected'; reason: 'noCash' | 'busy' | 'notReady' };
+  | { type: 'hired'; id: number; role: string }
+  | { type: 'fired'; id: number }
+  | { type: 'trainingStarted'; id: number }
+  | { type: 'trainingDone'; id: number; skill: number }
+  | { type: 'staffQuit'; id: number; name: string }
+  | { type: 'officeUpgraded'; level: number }
+  | { type: 'labBuilt'; level: number }
+  | { type: 'studioBuilt'; level: number }
+  | { type: 'bonusPaid' }
+  | { type: 'dailyDone'; index: number }
+  | { type: 'dailyClaimed'; index: number; reward: { cash?: number; hype?: number } }
+  | { type: 'calendarClaimed'; step: number; cash: number; cosmetic?: string }
+  | { type: 'rejected'; reason: 'noCash' | 'busy' | 'notReady' | 'noSeats' };

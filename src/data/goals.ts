@@ -11,7 +11,10 @@ export type GoalKind =
   | 'hypeLaunch'
   | 'revenueTotal'
   | 'valuation'
-  | 'brand';
+  | 'brand'
+  | 'staff'
+  | 'officeLevel'
+  | 'trainings';
 
 export interface GoalReward {
   cash?: number;
@@ -38,12 +41,16 @@ export const GOALS: GoalDef[] = [
   { id: 'office', kind: 'cash', target: 25_000, reward: {}, gate: 'office', requires: ['secondLaunch'] },
   // Phase 2 – startup office.
   { id: 'rentOffice', kind: 'phase', target: 2, reward: { cash: 5_000 } },
+  { id: 'firstHire', kind: 'staff', target: 1, reward: { cash: 4_000 } },
   { id: 'firstResearch', kind: 'research', target: 1, reward: { unlockColor: 'gold' } },
+  { id: 'team4', kind: 'staff', target: 4, reward: { cash: 12_000 } },
   { id: 'hypeLaunch', kind: 'hypeLaunch', target: 20, reward: { cash: 10_000 } },
   { id: 'review8', kind: 'review', target: 8, reward: { cash: 15_000 } },
   { id: 'research5', kind: 'research', target: 5, reward: { cash: 20_000 } },
   { id: 'sell5k', kind: 'unitsTotal', target: 5_000, reward: { cash: 25_000 } },
   { id: 'fans500', kind: 'fans', target: 500, reward: { cash: 20_000 } },
+  { id: 'train1', kind: 'trainings', target: 1, reward: { cash: 15_000 } },
+  { id: 'office2', kind: 'officeLevel', target: 2, reward: { cash: 40_000 } },
   { id: 'revenue1m', kind: 'revenueTotal', target: 1_000_000, reward: { cash: 50_000 } },
   { id: 'brand35', kind: 'brand', target: 35, reward: {} },
   { id: 'valuation10m', kind: 'valuation', target: 10_000_000, reward: {}, gate: 'phase3', requires: ['brand35'] },

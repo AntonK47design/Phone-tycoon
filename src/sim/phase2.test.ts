@@ -5,7 +5,7 @@ import { advanceDay, applyAction, creditAvailable, forecast, newGame } from './g
 import { applyOffline, OFFLINE_MAX_DAYS } from './offline';
 import { availableParts, researchCost, researchStatus, rpPerDay } from './research';
 import { deserialize } from './save/save';
-import type { GameState } from './state';
+import { SAVE_VERSION, type GameState } from './state';
 
 /** A company that has launched once and rented the office. */
 function officeGame(): GameState {
@@ -116,7 +116,7 @@ describe('saves & offline', () => {
     v1.cashHistory = [1, 2, 3];
     v1.version = 1;
     const out = deserialize(JSON.stringify({ version: 1, savedAt: 0, state: v1 })).state;
-    expect(out.version).toBe(3);
+    expect(out.version).toBe(SAVE_VERSION);
     expect(out.research.budget).toBe(0);
     expect(out.draft.parts.chip).toBe('chip-2007-std');
     expect(out.research.done).toEqual([]);

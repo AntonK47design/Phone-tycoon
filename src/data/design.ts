@@ -85,11 +85,14 @@ export interface FinishDef {
   /** Design bonus. */
   bonus: number;
   cost: number;
+  /** Cosmetic reward (calendar), not researched. */
+  cosmetic?: boolean;
 }
 
 export const FINISHES: FinishDef[] = [
   { id: 'gloss', bonus: 0, cost: 0 },
   { id: 'matte', bonus: 0.5, cost: 2 },
+  { id: 'aurora', bonus: 0.7, cost: 3, cosmetic: true },
 ];
 
 export function finishById(id: string): FinishDef {

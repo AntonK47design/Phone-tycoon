@@ -29,6 +29,12 @@ export function goalProgress(state: GameState, goal: GoalDef): number {
       return valuation(state);
     case 'brand':
       return state.company.brand;
+    case 'staff':
+      return state.team.staff.length;
+    case 'officeLevel':
+      return state.team.office;
+    case 'trainings':
+      return state.stats.trainings;
   }
 }
 

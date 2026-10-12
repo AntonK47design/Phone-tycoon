@@ -200,14 +200,14 @@ export interface ReviewEstimate {
  * Deterministic review score (GDD §5.11). `tutorial` clamps the very first launch
  * into 6.5–8.0 (GDD §19).
  */
-export function reviewEstimate(design: PhoneDesign, year: number, opts: { q?: number; hype?: number; tutorial?: boolean } = {}): ReviewEstimate {
+export function reviewEstimate(design: PhoneDesign, year: number, opts: { q?: number; hype?: number; tutorial?: boolean; bonus?: number } = {}): ReviewEstimate {
   const q = opts.q ?? 1;
   const hype = opts.hype ?? 0;
   const rating = overallRating(design, year);
   const value = valueAdjustment(design, rating.p, year);
   const rHype = 5 + (4 * hype) / 100;
   const hypePenalty = 0.3 * Math.max(0, rHype - rating.p * q);
-  let score = clamp(rating.p * q + value - hypePenalty, 0, 10);
+  let score = clamp(rating.p * q + (opts.bonus ?? 0) + value - hypePenalty, 0, 10);
   if (opts.tutorial) score = clamp(score, 6.5, 8.0);
   return { score: Math.round(score * 10) / 10, rating, value };
 }

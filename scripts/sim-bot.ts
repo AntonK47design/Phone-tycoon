@@ -19,10 +19,10 @@ for (const profile of profiles) {
   console.log(`\n## Bot "${profile}" – seed ${seed}, ${minutes} min`);
   const m = (x: number | null) => (x === null ? 'never' : `${x.toFixed(1)} min`);
   console.log(`first launch: ${res.firstLaunchSec}s · office gate: ${m(res.officeReadyMin)} · office rented: ${m(res.officeRentedMin)} · phase-3 gate: ${m(res.phase3Min)}`);
-  console.log('\n| min | date | phase | cash | valuation | launches | Ø review (last 5) | units/wk | brand | fans | research | share % |');
-  console.log('|---|---|---|---|---|---|---|---|---|---|---|---|');
+  console.log('\n| min | date | phase | cash | valuation | launches | Ø review (last 5) | units/wk | brand | fans | research | share % | staff | payroll/wk | office |');
+  console.log('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
   for (const s of res.samples) {
-    console.log(`| ${s.minute} | ${s.date} | ${s.phase} | ${fmt(s.cash)} | ${fmt(s.valuation)} | ${s.launches} | ${s.avgReview} | ${s.unitsPerWeek} | ${s.brand} | ${s.fans} | ${s.research} | ${s.share} |`);
+    console.log(`| ${s.minute} | ${s.date} | ${s.phase} | ${fmt(s.cash)} | ${fmt(s.valuation)} | ${s.launches} | ${s.avgReview} | ${s.unitsPerWeek} | ${s.brand} | ${s.fans} | ${s.research} | ${s.share} | ${s.staff} | ${fmt(s.payroll)} | ${s.office} |`);
   }
   const max = Math.max(...res.samples.map((s) => s.cash), 1);
   console.log('\nCash over time:');

@@ -32,6 +32,22 @@ import {
   researchStatus,
 } from './research';
 import { isTrendColor } from './scoring/score';
+import {
+  bonusCost,
+  bonusReady,
+  expectedSkill,
+  hireFee,
+  isWorking,
+  labCost,
+  officeUpgradeCost,
+  payroll,
+  rolesAvailable,
+  salary,
+  seats,
+  studioCost,
+  trainingCost,
+} from './team';
+import type { Role } from '../data/team';
 import type { GameState, PhoneDesign } from './state';
 import { SECONDS_PER_DAY, calendar, yearOf } from './time';
 
@@ -50,6 +66,9 @@ export interface BotSample {
   fans: number;
   research: number;
   share: number;
+  staff: number;
+  payroll: number;
+  office: number;
 }
 
 export interface BotResult {
@@ -196,6 +215,7 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
     const share = profile === 'optimizer' ? 0.35 : profile === 'weak' ? 0.1 : 0.25;
     applyAction(state, { type: 'setLabBudget', amount: Math.max(0, Math.min(avg * share, state.company.cash / 30)) });
   }
+  if (state.phase >= 2) manageTeam(state, profile);
   const reserve = 4 * 3000 * inf;
   if (state.phase >= 2 && !state.research.current && state.company.cash > reserve) {
     const id = pickResearch(state, profile);
@@ -238,6 +258,57 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
   applyAction(state, { type: 'startDev' });
 }
 
+/** Target team mix per seat. */
+const MIX: Record<Role, number> = { designer: 0.2, engineer: 0.3, programmer: 0.2, researcher: 0.2, marketer: 0.1 };
+
+function manageTeam(state: GameState, profile: BotProfile): void {
+  const year = yearOf(state.day);
+  const team = state.team;
+  const care = profile === 'optimizer' ? 1 : profile === 'weak' ? 2.5 : 1.5;
+  const reserve = () => payroll(state) * 6 * care + 20_000 * inflation(Math.floor(year));
+  const cap = seats(state);
+  const recent = state.history.profit.slice(-8);
+  const avgProfit = recent.length ? recent.reduce((a, b) => a + b, 0) / recent.length : 0;
+
+  // Hire for the role with the biggest gap.
+  if (team.staff.length < cap && team.applicants.length) {
+    const roles = rolesAvailable(state);
+    const total = roles.reduce((a, r) => a + MIX[r], 0);
+    const gap = (r: Role) => (MIX[r] / total) * seats(state) - team.staff.filter((e) => e.role === r).length;
+    const cands = [...team.applicants].sort((a, b) => gap(b.role) - gap(a.role) || b.skill / salary(b, year) - a.skill / salary(a, year));
+    const pick = profile === 'weak' ? team.applicants[0] : cands[0];
+    // Only hire what the weekly profit can carry (the Team panel shows this ratio too).
+    const affordable = !!pick && avgProfit > salary(pick, year) * (profile === 'optimizer' ? 1 : 1.5);
+    if (pick && affordable && state.company.cash - hireFee(pick, year) > reserve()) applyAction(state, { type: 'hire', id: pick.id });
+  }
+  // Losing money with an empty bank account: let the least productive person go.
+  if (team.staff.length && avgProfit < 0 && recent.length >= 8 && state.company.cash < payroll(state) * 3) {
+    const worst = [...team.staff].sort((a, b) => a.skill / salary(a, year) - b.skill / salary(b, year))[0];
+    applyAction(state, { type: 'fire', id: worst.id });
+  }
+  // Grow the office once it is full.
+  const up = officeUpgradeCost(state);
+  if (up !== null && team.staff.length >= seats(state) && state.company.cash > up * (profile === 'optimizer' ? 1.8 : profile === 'weak' ? 4 : 2.5)) {
+    applyAction(state, { type: 'upgradeOffice' });
+  }
+  const lab = labCost(state);
+  if (lab !== null && team.office >= 2 && state.company.cash > lab * 3 * care) applyAction(state, { type: 'buildLab' });
+  const studio = studioCost(state);
+  if (studio !== null && team.office >= 2 && state.company.cash > studio * 3 * care) applyAction(state, { type: 'buildStudio' });
+
+  // Training keeps the team up with the era (weak bots never train).
+  {
+    const busy = team.staff.filter((e) => !isWorking(e, state.day)).length;
+    const lagging = team.staff.filter((e) => isWorking(e, state.day) && e.skill < expectedSkill(year) + (profile === 'optimizer' ? 15 : profile === 'weak' ? -5 : 5)).sort((a, b) => a.skill - b.skill)[0];
+    if (lagging && busy < Math.max(1, team.staff.length / 4) && state.company.cash > trainingCost(lagging, year) * care + reserve()) {
+      applyAction(state, { type: 'train', id: lagging.id });
+    }
+  }
+  // Bonus when spirits sag.
+  const avgMorale = team.staff.reduce((a, e) => a + e.morale, 0) / Math.max(1, team.staff.length);
+  if (profile !== 'weak' && avgMorale < 55 && bonusReady(state) && state.company.cash > bonusCost(state) * 6) applyAction(state, { type: 'payBonus' });
+}
+
 function sample(state: GameState, minute: number): BotSample {
   const cal = calendar(state.day);
   const reviews = state.products.slice(-5).map((p) => p.review.score);
@@ -254,5 +325,8 @@ function sample(state: GameState, minute: number): BotSample {
     fans: Math.round(state.company.fans),
     research: state.research.done.length,
     share: Math.round(marketShare(state) * 1000) / 10,
+    staff: state.team.staff.length,
+    payroll: Math.round(payroll(state)),
+    office: state.team.office,
   };
 }

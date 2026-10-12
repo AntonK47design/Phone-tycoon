@@ -53,6 +53,16 @@ export const MIGRATIONS: Record<number, Migration> = {
     s.research.budget ??= 0;
     return s;
   },
+  3: (s: Obj) => {
+    // M3: team, buildings, daily orders. An existing office becomes office level 1.
+    s.team ??= { staff: [], applicants: [], nextId: 1, poolDay: -999, office: s.phase >= 2 ? 1 : 0, lab: 0, studio: 0, boost: 0, lastBonusDay: -999 };
+    s.daily ??= { date: null, orders: [], calendarStep: 0, cycles: 0, lastClaim: null };
+    s.cosmetics ??= [];
+    s.stats.hires ??= 0;
+    s.stats.trainings ??= 0;
+    s.stats.reorders ??= 0;
+    return s;
+  },
 };
 
 export function serialize(state: GameState, now: number): string {

@@ -259,6 +259,11 @@ export class PhoneModel {
       this.paintT = 0;
     }
     this.bodyMat.metalness = surface(next).metalness;
+    // Aurora: thin-film shimmer that shifts with the viewing angle.
+    const aurora = next.finishId === 'aurora' && !!next.colorHex;
+    this.bodyMat.iridescence = aurora ? 1 : 0;
+    this.bodyMat.iridescenceIOR = 1.8;
+    this.bodyMat.iridescenceThicknessRange = [180, 620];
     if (prev.colorHex !== next.colorHex) {
       this.paintUniforms.uOld.value.copy(this.currentColor());
       this.paintUniforms.uNew.value.set(next.colorHex ?? PRIMER.getHex());

@@ -13,7 +13,6 @@ import {
   OPERATIONS_RATE,
   OEM_MIN_BATCH,
   OFFICE_PRICE,
-  OFFICE_RENT_WEEK,
   PRESENTATIONS,
   STORAGE_RATE,
   TECH_CATEGORIES,
@@ -25,15 +24,13 @@ import { defaultParts, LAST_GEN } from '../data/parts';
 import {
   attractiveness,
   devCost,
-  devDays,
-  devPoints,
-  FOUNDER_POINTS_PER_DAY,
   marketSize,
   segmentDemand,
   unitCost,
   volumeDiscount,
 } from './economy/market';
 import type { SimEvent } from './events';
+import { checkDaily, claimCalendar, claimDaily, dailySync, newDaily } from './daily';
 import { checkGoals } from './goals';
 import {
   availableFeatures,
@@ -65,6 +62,23 @@ import {
   type ReviewAspect,
 } from './scoring/score';
 import { SAVE_VERSION, type GameState, type PhoneDesign, type Product, type ReviewCard, type ReviewResult } from './state';
+import {
+  applyTeamAction,
+  buildingRent,
+  devDaysFor,
+  devRequired,
+  marketingBoost,
+  newTeam,
+  payroll,
+  refreshApplicants,
+  studioPolish,
+  teamQuality,
+  teamRates,
+  tickTeamDay,
+  tickTeamWeek,
+  type TeamAction,
+} from './team';
+import { LAB_LEVELS, OFFICE_LEVELS, STUDIO_LEVELS } from '../data/team';
 import { yearOf } from './time';
 
 export const START_CASH = 2_000;
@@ -111,7 +125,10 @@ export function newGame(seed: number): GameState {
     unlockedColors: COLORS.filter((c) => c.starter).map((c) => c.id),
     completedGoals: [],
     research: { done: [], current: null, budget: 0 },
-    stats: { launches: 0, unitsTotal: 0, revenueTotal: 0, profitTotal: 0, bestReview: 0, bestLaunchHype: 0 },
+    stats: { launches: 0, unitsTotal: 0, revenueTotal: 0, profitTotal: 0, bestReview: 0, bestLaunchHype: 0, hires: 0, trainings: 0, reorders: 0 },
+    team: newTeam(),
+    daily: newDaily(),
+    cosmetics: [],
     history: { cash: [], revenue: [], profit: [], playerUnits: [], compUnits: {} },
     week: { revenue: 0, profit: 0, units: 0 },
   };
@@ -139,7 +156,11 @@ export type Action =
   | { type: 'orderBatch'; productId: number; units: number }
   | { type: 'discontinue'; productId: number }
   | { type: 'setLabBudget'; amount: number }
-  | { type: 'debugCash'; amount: number };
+  | { type: 'debugCash'; amount: number }
+  | { type: 'dailySync'; date: string }
+  | { type: 'claimDaily'; index: number }
+  | { type: 'claimCalendar'; date: string }
+  | TeamAction;
 
 export function isFirstLaunch(state: GameState): boolean {
   return state.stats.launches === 0;
@@ -226,6 +247,14 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
     case 'setLabBudget':
       state.research.budget = Math.max(0, Math.round(action.amount));
       return [];
+    case 'dailySync':
+      return dailySync(state, action.date).concat(checkDaily(state));
+    case 'claimDaily':
+      return claimDaily(state, action.index).concat(checkGoals(state));
+    case 'claimCalendar':
+      return claimCalendar(state, action.date).concat(checkGoals(state));
+    default:
+      return applyTeamAction(state, action).concat(checkGoals(state), checkDaily(state));
   }
 }
 
@@ -235,6 +264,8 @@ function rentOffice(state: GameState): SimEvent[] {
   if (state.company.cash < price) return [{ type: 'rejected', reason: 'noCash' }];
   state.company.cash -= price;
   state.phase = 2;
+  state.team.office = 1;
+  refreshApplicants(state);
   normalizeDraft(state, state.draft);
   return [{ type: 'officeRented' } as SimEvent].concat(checkGoals(state));
 }
@@ -245,15 +276,20 @@ function startDev(state: GameState): SimEvent[] {
   normalizeDraft(state, design);
   if (isFirstLaunch(state)) {
     // Tutorial: the first prototype is built overnight for free (GDD §19).
-    const req = devPoints(design);
+    const req = devRequired(state, design);
     state.dev = { design, required: req, progress: { ...req }, done: true };
     return [{ type: 'devDone' }];
   }
   const cost = devCost(design);
   if (state.company.cash < cost) return [{ type: 'rejected', reason: 'noCash' }];
   state.company.cash -= cost;
-  state.dev = { design, required: devPoints(design), progress: { design: 0, tech: 0, software: 0 }, done: false };
-  return [{ type: 'devStarted', days: devDays(design), cost }];
+  state.dev = { design, required: devRequired(state, design), progress: { design: 0, tech: 0, software: 0 }, done: false };
+  return [{ type: 'devStarted', days: devDaysFor(state, design), cost }];
+}
+
+/** Team quality and studio polish for a review (GDD §5.8). */
+function reviewOpts(state: GameState, hype: number) {
+  return { tutorial: isFirstLaunch(state), hype, q: teamQuality(state), bonus: studioPolish(state) };
 }
 
 function makeCards(rng: Rng, est: ReturnType<typeof reviewEstimate>): ReviewCard[] {
@@ -308,7 +344,7 @@ export function launchHype(state: GameState, marketing: number, presentation: nu
   const stage = PRESENTATIONS[presentation]?.hype ?? 0;
   // Something genuinely new on stage makes a bigger splash.
   const fromStage = stage * (1 + 0.25 * fc.innovative.length);
-  return clamp(fromMarketing + fromStage, 0, 100);
+  return clamp((fromMarketing + fromStage) * marketingBoost(state), 0, 100);
 }
 
 export function batchCost(design: PhoneDesign, units: number, year: number): number {
@@ -360,7 +396,7 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
   if (!payWithCredit(state, quote.total, quote.batchCost, minBatch)) return [{ type: 'rejected', reason: 'noCash' }];
 
   const rng = createRng(state.rng);
-  const est = reviewEstimate(design, year, { tutorial: isFirstLaunch(state), hype: quote.hype });
+  const est = reviewEstimate(design, year, reviewOpts(state, quote.hype));
   const review: ReviewResult = {
     score: est.score,
     design: Math.round(est.rating.design.score * 10) / 10,
@@ -448,6 +484,7 @@ function orderBatch(state: GameState, productId: number, units: number, leadDays
   const cost = batchCost(p.design, units, yearOf(state.day));
   if (!payWithCredit(state, cost, cost, batchCost(p.design, OEM_MIN_BATCH, yearOf(state.day)))) return [{ type: 'rejected', reason: 'noCash' }];
   p.orders.push({ units, arriveDay: state.day + leadDays });
+  state.stats.reorders += 1;
   return [{ type: 'orderPlaced', productId, units, cost }];
 }
 
@@ -523,7 +560,12 @@ function productDemand(state: GameState, product: Product, all: Product[]): numb
 export function valuation(state: GameState): number {
   const year = yearOf(state.day);
   const profit52 = state.history.profit.reduce((a, b) => a + b, 0);
-  const assets = state.phase >= 2 ? OFFICE_PRICE * 0.5 : 0;
+  const t = state.team;
+  const built =
+    OFFICE_LEVELS.slice(0, t.office).reduce((a, l) => a + l.price, 0) +
+    LAB_LEVELS.slice(0, t.lab).reduce((a, l) => a + l.price, 0) +
+    STUDIO_LEVELS.slice(0, t.studio).reduce((a, l) => a + l.price, 0);
+  const assets = built * 0.5 * inflation(Math.floor(year));
   const stockValue = state.products.reduce((a, p) => a + (p.active && !p.madeToOrder ? p.stock * p.unitCost * 0.5 : 0), 0);
   return state.company.cash - state.company.debt + 4 * Math.max(0, profit52) + 2000 * state.company.brand * Math.sqrt(marketSize(year) / marketSize(2007)) + assets + stockValue;
 }
@@ -548,11 +590,12 @@ export function advanceDay(state: GameState): SimEvent[] {
   state.day += 1;
   const year = yearOf(state.day);
 
-  // Development (founder works at the bench).
+  // Development: founder and team.
   const dev = state.dev;
   if (dev && !dev.done) {
+    const rates = teamRates(state);
     for (const k of ['design', 'tech', 'software'] as const) {
-      dev.progress[k] = Math.min(dev.required[k], dev.progress[k] + FOUNDER_POINTS_PER_DAY);
+      dev.progress[k] = Math.min(dev.required[k], dev.progress[k] + rates[k]);
     }
     if (dev.progress.design >= dev.required.design && dev.progress.tech >= dev.required.tech && dev.progress.software >= dev.required.software) {
       dev.done = true;
@@ -560,6 +603,7 @@ export function advanceDay(state: GameState): SimEvent[] {
     }
   }
   events.push(...tickResearch(state));
+  events.push(...tickTeamDay(state));
 
   // Production orders arriving.
   for (const p of state.products) {
@@ -622,7 +666,7 @@ export function advanceDay(state: GameState): SimEvent[] {
   // Week end.
   if (state.day % DAYS_PER_WEEK === 0) {
     const inf = inflation(Math.floor(year));
-    const rent = (state.phase >= 2 ? OFFICE_RENT_WEEK : GARAGE_UPKEEP_WEEK) * inf;
+    const rent = state.phase >= 2 ? buildingRent(state) + payroll(state) : GARAGE_UPKEEP_WEEK * inf;
     let storage = 0;
     for (const p of state.products) if (p.active && !p.madeToOrder) storage += p.stock * p.unitCost * STORAGE_RATE;
     const interest = state.company.debt * LOAN_INTEREST_WEEK;
@@ -657,6 +701,7 @@ export function advanceDay(state: GameState): SimEvent[] {
     }
     state.company.fans *= 0.995;
     state.company.brand *= 0.995;
+    events.push(...tickTeamWeek(state));
 
     // Market history: player vs. competitors (weekly snapshot).
     const comps: Record<string, number> = {};
@@ -685,7 +730,7 @@ export function advanceDay(state: GameState): SimEvent[] {
     events.push({ type: 'loan', amount });
   }
 
-  return events.concat(checkGoals(state));
+  return events.concat(checkGoals(state), checkDaily(state));
 }
 
 export interface Forecast {
@@ -712,7 +757,7 @@ export function forecast(state: GameState, design: PhoneDesign = state.draft, la
   const d: PhoneDesign = structuredClone(design);
   normalizeDraft(state, d);
   const hype = state.phase >= 2 ? launchHype(state, launchOpts.marketing ?? 0, launchOpts.presentation ?? 0, d) : 0;
-  const est = reviewEstimate(d, year, { tutorial: isFirstLaunch(state), hype });
+  const est = reviewEstimate(d, year, reviewOpts(state, hype));
   const mode = state.phase >= 2 ? 'oem' : 'garage';
   const cost = unitCost(d, year, mode) * (mode === 'oem' ? volumeDiscount(launchOpts.batch ?? 1000) : 1);
   const temp: Product = {
@@ -734,7 +779,7 @@ export function forecast(state: GameState, design: PhoneDesign = state.draft, la
     suggestedPrice: suggestedPrice(d, year),
     margin: d.price * (1 - channelCut(state)) - cost,
     channelCut: channelCut(state),
-    devDays: isFirstLaunch(state) ? 0 : devDays(d),
+    devDays: isFirstLaunch(state) ? 0 : devDaysFor(state, d),
     devCost: isFirstLaunch(state) ? 0 : devCost(d),
     weeklyUnits: weekly,
     hype,

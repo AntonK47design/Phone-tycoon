@@ -2,8 +2,9 @@
 
 import type { TechCategory } from '../data/components';
 import type { Segment } from '../data/market';
+import type { Role, TraitId } from '../data/team';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 export interface PhoneDesign {
   name: string;
@@ -87,6 +88,64 @@ export interface Development {
   done: boolean;
 }
 
+export interface Employee {
+  id: number;
+  first: string;
+  last: string;
+  role: Role;
+  /** 1–100. */
+  skill: number;
+  /** 0–100. */
+  morale: number;
+  trait: TraitId;
+  hiredDay: number;
+  /** Day until which the person is away for training (null = working). */
+  trainingUntil: number | null;
+  /** Visual seed for the 3D figure (hair, skin). */
+  look: number;
+}
+
+export interface TeamState {
+  staff: Employee[];
+  applicants: Employee[];
+  nextId: number;
+  /** Day the applicant pool was last refreshed. */
+  poolDay: number;
+  /** Startup office stage 1–4 (0 = still in the garage). */
+  office: number;
+  /** Research lab and design studio levels (0 = not built). */
+  lab: number;
+  studio: number;
+  /** Temporary morale boost from bonuses (decays weekly). */
+  boost: number;
+  lastBonusDay: number;
+}
+
+export type DailyKind = 'sell' | 'revenue' | 'launch' | 'research' | 'hire' | 'train' | 'reorder';
+
+export interface DailyOrder {
+  kind: DailyKind;
+  target: number;
+  /** Counter value when the order was created (progress = counter − base). */
+  base: number;
+  /** Creation day (for launch orders: products launched after this day count). */
+  day: number;
+  reward: { cash?: number; hype?: number };
+  done: boolean;
+  claimed: boolean;
+}
+
+export interface DailyState {
+  /** Real-world date (YYYY-MM-DD) of the current mini orders. */
+  date: string | null;
+  orders: DailyOrder[];
+  /** Calendar position 0–6 (next reward index). */
+  calendarStep: number;
+  /** Completed 7-day cycles. */
+  cycles: number;
+  lastClaim: string | null;
+}
+
 export type TutorialStep = 'color' | 'shape' | 'display' | 'launch' | 'done';
 
 export interface GameState {
@@ -131,7 +190,14 @@ export interface GameState {
     profitTotal: number;
     bestReview: number;
     bestLaunchHype: number;
+    hires: number;
+    trainings: number;
+    reorders: number;
   };
+  team: TeamState;
+  daily: DailyState;
+  /** Cosmetic unlocks (e.g. the calendar's aurora finish). */
+  cosmetics: string[];
   /** Weekly history (last 52 weeks). */
   history: {
     cash: number[];

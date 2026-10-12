@@ -1,11 +1,11 @@
 // Offline progress (GDD §20.1): the calendar moves at most 4 weeks; the rest of the
 // absence (capped at 8 h) becomes a 25 % work credit for research and development.
 
-import { FOUNDER_POINTS_PER_DAY } from './economy/market';
 import type { SimEvent } from './events';
 import { advanceDay } from './game';
 import { tickResearch } from './research';
 import type { GameState } from './state';
+import { teamRates } from './team';
 import { SECONDS_PER_DAY } from './time';
 
 export const OFFLINE_CAP_SECONDS = 8 * 3600;
@@ -40,8 +40,9 @@ export function applyOffline(state: GameState, seconds: number): OfflineReport |
     events.push(...tickResearch(state, creditDays));
     const dev = state.dev;
     if (dev && !dev.done) {
+      const rates = teamRates(state);
       for (const k of ['design', 'tech', 'software'] as const) {
-        dev.progress[k] = Math.min(dev.required[k], dev.progress[k] + FOUNDER_POINTS_PER_DAY * creditDays);
+        dev.progress[k] = Math.min(dev.required[k], dev.progress[k] + rates[k] * creditDays);
       }
       if (dev.progress.design >= dev.required.design && dev.progress.tech >= dev.required.tech && dev.progress.software >= dev.required.software) {
         dev.done = true;
