@@ -487,11 +487,11 @@ Valuation = Cash + 4 · Gewinn(letzte 52 Wochen) + 2 000 · B · sqrt(M(y)/M(200
 | Jahr | E_T (Flaggschiff) | E_size (″) | E_th (mm) | E_stb |
 |---|---|---|---|---|
 | 2007 | 100 | 3,5 | 12,5 | 0,55 |
-| 2010 | 220 | 4,6 | 10,1 | 0,70 |
-| 2014 | 628 | 5,7 | 8,5 | 0,81 |
+| 2010 | 220 | 4,9 | 10,1 | 0,70 |
+| 2014 | 627 | 5,9 | 8,5 | 0,81 |
 | 2018 | 1 792 | 6,3 | 7,8 | 0,87 |
-| 2022 | 5 119 | 6,5 | 7,4 | 0,90 |
-| 2030 | 41 740 | 6,7 | 7,2 | 0,92 |
+| 2022 | 5 119 | 6,5 | 7,5 | 0,90 |
+| 2030 | 41 754 | 6,7 | 7,3 | 0,92 |
 
 (Ab 2045 wird der Technik-Index intern logarithmisch normalisiert, um Fließkomma-Überlauf
 und unlesbare Zahlen zu vermeiden; die UI zeigt nur Ratings.)
