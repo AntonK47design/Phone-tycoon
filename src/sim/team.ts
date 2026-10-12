@@ -17,6 +17,7 @@ import {
   OFFICE_LEVELS,
   QUIT_MORALE,
   ROLE_MIN_OFFICE,
+  ROLE_MIN_PHASE,
   ROLE_OUTPUT,
   ROLES,
   SALARY_BASE,
@@ -156,7 +157,14 @@ export function buildingRent(state: GameState): number {
 }
 
 export function rolesAvailable(state: GameState): Role[] {
-  return ROLES.filter((r) => state.team.office >= ROLE_MIN_OFFICE[r]);
+  return ROLES.filter((r) => state.team.office >= ROLE_MIN_OFFICE[r] && state.phase >= (ROLE_MIN_PHASE[r] ?? 0));
+}
+
+/** Production leads: −10 % scrap and +5 % line speed each (max −50 % / +25 %). */
+export function productionBoost(state: GameState): { speed: number; scrap: number } {
+  let n = 0;
+  for (const e of state.team.staff) if (e.role === 'producer' && isWorking(e, state.day)) n += (e.skill / 40) * moraleFactor(e.morale);
+  return { speed: 1 + Math.min(0.25, 0.05 * n), scrap: 1 - Math.min(0.5, 0.1 * n) };
 }
 
 function makePerson(state: GameState, rng: Rng, role: Role): Employee {

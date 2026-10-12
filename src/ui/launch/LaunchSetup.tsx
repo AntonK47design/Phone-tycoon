@@ -15,13 +15,15 @@ export function LaunchSetup() {
   const l = lang.value;
   const design = state.dev!.design;
   const base = useMemo(() => forecast(state, design, { batch: 1000 }), [state.day]);
-  const [weeks, setWeeks] = useState(5);
+  // With an own factory the lines build the stock; an extra contract batch is optional.
+  const hasFactory = state.factory.lines.length > 0;
+  const [weeks, setWeeks] = useState(hasFactory ? 0 : 5);
   const scale = marketingScale(state);
   const [mkt, setMkt] = useState(canMarket(state) ? Math.round(scale) : 0);
   const [stage, setStage] = useState(0);
 
   const weekly = Math.max(1, base.weeklyUnits);
-  const batch = Math.max(OEM_MIN_BATCH, Math.round((weekly * weeks) / 50) * 50);
+  const batch = weeks === 0 ? 0 : Math.max(OEM_MIN_BATCH, Math.round((weekly * weeks) / 50) * 50);
   const opts = { batch, marketing: mkt, presentation: stage };
   const quote = launchQuote(state, design, opts);
   const fc = forecast(state, design, opts);
@@ -50,11 +52,11 @@ export function LaunchSetup() {
         <div class="field">
           {t('launchSetup.batch')}
           <div class="slider-row">
-            <input class="slider" type="range" min={1} max={16} step={1} value={weeks} onInput={(e) => setWeeks(Number((e.target as HTMLInputElement).value))} />
-            <b>{shortNum(batch, l)}</b>
+            <input class="slider" type="range" min={hasFactory ? 0 : 1} max={16} step={1} value={weeks} onInput={(e) => setWeeks(Number((e.target as HTMLInputElement).value))} />
+            <b>{batch ? shortNum(batch, l) : t('launchSetup.factoryOnly')}</b>
           </div>
           <span class="hint-line">
-            {t('launchSetup.weeks', { n: weeks })} · {money(quote.batchCost, l)}
+            {batch ? `${t('launchSetup.weeks', { n: weeks })} · ${money(quote.batchCost, l)}` : t('launchSetup.factoryHint')}
           </span>
         </div>
 

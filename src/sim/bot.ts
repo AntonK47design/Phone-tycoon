@@ -32,6 +32,8 @@ import {
   researchStatus,
 } from './research';
 import { isTrendColor } from './scoring/score';
+import { buildFactoryCost, factorySizeCost, lineRate, lineUpgradeCost, newLineCost, stockTotal, warehouseCost } from './factory';
+import { warehouseCapacity } from '../data/factory';
 import {
   bonusCost,
   bonusReady,
@@ -69,6 +71,8 @@ export interface BotSample {
   staff: number;
   payroll: number;
   office: number;
+  lines: number;
+  produced: number;
 }
 
 export interface BotResult {
@@ -77,6 +81,8 @@ export interface BotResult {
   officeReadyMin: number | null;
   officeRentedMin: number | null;
   phase3Min: number | null;
+  factoryMin: number | null;
+  phase4Min: number | null;
   final: GameState;
 }
 
@@ -169,7 +175,7 @@ export function runBot(opts: { minutes: number; seed: number; profile?: BotProfi
   const profile = opts.profile ?? 'average';
   const state = newGame(opts.seed);
   const samples: BotSample[] = [];
-  const marks = { officeReadyMin: null as number | null, officeRentedMin: null as number | null, phase3Min: null as number | null };
+  const marks = { officeReadyMin: null as number | null, officeRentedMin: null as number | null, phase3Min: null as number | null, factoryMin: null as number | null, phase4Min: null as number | null };
   let pick = opts.seed;
 
   // First minute: three taps in the tutorial (~8 s each), then launch.
@@ -192,6 +198,8 @@ export function runBot(opts: { minutes: number; seed: number; profile?: BotProfi
       if (state.officeReady && marks.officeReadyMin === null) marks.officeReadyMin = min;
       if (state.phase >= 2 && marks.officeRentedMin === null) marks.officeRentedMin = min;
       if (state.phase3Ready && marks.phase3Min === null) marks.phase3Min = min;
+      if (state.factory.size > 0 && marks.factoryMin === null) marks.factoryMin = min;
+      if (state.phase4Ready && marks.phase4Min === null) marks.phase4Min = min;
     }
     if (sec >= nextSample) {
       samples.push(sample(state, sec / 60));
@@ -216,6 +224,7 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
     applyAction(state, { type: 'setLabBudget', amount: Math.max(0, Math.min(avg * share, state.company.cash / 30)) });
   }
   if (state.phase >= 2) manageTeam(state, profile);
+  if (state.phase3Ready) manageFactory(state, profile);
   const reserve = 4 * 3000 * inf;
   if (state.phase >= 2 && !state.research.current && state.company.cash > reserve) {
     const id = pickResearch(state, profile);
@@ -225,6 +234,7 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
   // Re-orders: keep ~4 weeks of stock.
   for (const p of state.products) {
     if (!p.active || p.madeToOrder) continue;
+    if (state.factory.lines.some((l) => l.productId === p.id && !l.paused)) continue;
     const demand = currentDemand(state, p);
     const pipeline = p.stock + p.orders.reduce((a, o) => a + o.units, 0);
     if (currentReview(p, year) >= 4.5 && pipeline < demand * 3 && demand > 5) {
@@ -238,10 +248,12 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
     const marketing = canMarket(state) && profile !== 'weak' ? Math.min(state.company.cash * 0.12, marketingScale(state) * 2) : 0;
     let presentation = profile !== 'weak' ? presentationLevel(state) : 0;
     while (presentation > 0 && PRESENTATIONS[presentation].cost * inf > state.company.cash * 0.15) presentation--;
-    let batch = Math.max(100, Math.round(f.weeklyUnits * 5));
+    // With a free factory line the bot lets the factory build the stock.
+    const freeLine = state.factory.lines.some((l) => !state.products.some((p) => p.id === l.productId && p.active));
+    let batch = freeLine ? 0 : Math.max(100, Math.round(f.weeklyUnits * 5));
     let quote = launchQuote(state, state.dev.design, { batch, marketing, presentation });
     const budget = state.company.cash * 0.85 + creditAvailable(state) * 0.5;
-    while (quote.total > budget && batch > 100) {
+    while (quote.total > budget && batch > 100 && !freeLine) {
       batch = Math.max(100, Math.floor(batch * 0.7));
       quote = launchQuote(state, state.dev.design, { batch, marketing, presentation });
     }
@@ -259,7 +271,7 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
 }
 
 /** Target team mix per seat. */
-const MIX: Record<Role, number> = { designer: 0.2, engineer: 0.3, programmer: 0.2, researcher: 0.2, marketer: 0.1 };
+const MIX: Record<Role, number> = { designer: 0.2, engineer: 0.3, programmer: 0.2, researcher: 0.2, marketer: 0.1, producer: 0.08 };
 
 function manageTeam(state: GameState, profile: BotProfile): void {
   const year = yearOf(state.day);
@@ -309,6 +321,52 @@ function manageTeam(state: GameState, profile: BotProfile): void {
   if (profile !== 'weak' && avgMorale < 55 && bonusReady(state) && state.company.cash > bonusCost(state) * 6) applyAction(state, { type: 'payBonus' });
 }
 
+function manageFactory(state: GameState, profile: BotProfile): void {
+  const care = profile === 'optimizer' ? 1.5 : profile === 'weak' ? 3 : 2;
+  const f = state.factory;
+  if (f.size === 0) {
+    if (state.phase >= 2 && state.company.cash > buildFactoryCost(state) * care) applyAction(state, { type: 'buildFactory' });
+    return;
+  }
+  if (state.day % 7 !== 3) return;
+  const active = state.products.filter((p) => p.active && !p.madeToOrder);
+  const demand = new Map(active.map((p) => [p.id, currentDemand(state, p)]));
+  // Lines go to the best sellers.
+  const top = active.filter((p) => demand.get(p.id)! > 20).sort((a, b) => demand.get(b.id)! - demand.get(a.id)!).slice(0, f.lines.length);
+  const topIds = new Set(top.map((p) => p.id));
+  const keep = new Set(f.lines.filter((l) => l.productId !== null && topIds.has(l.productId)).map((l) => l.productId));
+  const todo = top.filter((p) => !keep.has(p.id));
+  for (const l of f.lines) {
+    if (l.productId !== null && topIds.has(l.productId)) continue;
+    const p = todo.shift();
+    if (p) applyAction(state, { type: 'assignLine', id: l.id, productId: p.id });
+  }
+  const covered = new Set(f.lines.map((l) => l.productId));
+  const uncovered = active.filter((p) => !covered.has(p.id) && demand.get(p.id)! > 200);
+  if (uncovered.length) {
+    const add = newLineCost(state);
+    if (add !== null && state.company.cash > add * care * 1.5) applyAction(state, { type: 'addLine' });
+    else {
+      const grow = factorySizeCost(state);
+      if (add === null && grow !== null && state.company.cash > grow * care * 1.5) applyAction(state, { type: 'growFactory' });
+    }
+  }
+  // Upgrade lines that cannot keep up (or, for rich optimizers, to cut assembly cost).
+  for (const l of f.lines) {
+    const p = active.find((x) => x.id === l.productId);
+    const cost = lineUpgradeCost(state, l);
+    if (!p || cost === null) continue;
+    const short = currentDemand(state, p) > lineRate(state, l) * 7 * 0.85;
+    if ((short && state.company.cash > cost * care * 2) || state.company.cash > cost * care * 8) {
+      applyAction(state, { type: 'upgradeLine', id: l.id });
+    }
+  }
+  if (stockTotal(state) > warehouseCapacity(f.warehouse) * 0.8 && state.company.cash > warehouseCost(state) * care * 2) {
+    applyAction(state, { type: 'upgradeWarehouse' });
+  }
+  if (profile === 'optimizer' && f.tempo !== 'quality' && state.team.staff.some((e) => e.role === 'producer')) applyAction(state, { type: 'setTempo', tempo: 'quality' });
+}
+
 function sample(state: GameState, minute: number): BotSample {
   const cal = calendar(state.day);
   const reviews = state.products.slice(-5).map((p) => p.review.score);
@@ -328,5 +386,7 @@ function sample(state: GameState, minute: number): BotSample {
     staff: state.team.staff.length,
     payroll: Math.round(payroll(state)),
     office: state.team.office,
+    lines: state.factory.lines.reduce((a, l) => a + l.level, 0),
+    produced: state.factory.produced,
   };
 }

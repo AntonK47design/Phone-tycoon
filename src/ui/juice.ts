@@ -144,6 +144,30 @@ export function installJuice() {
           if (p && p.orders.length === 0) toast(t('toast.soldOut', { name: p.design.name }), 'warn');
           break;
         }
+        case 'factoryBuilt':
+          toast(t('toast.factoryBuilt'), 'building', true);
+          sfx.fanfare();
+          platform.happytime();
+          break;
+        case 'factoryGrown':
+          toast(t('toast.factoryGrown'), 'building', true);
+          break;
+        case 'lineAdded':
+          toast(t('toast.lineAdded'), 'box');
+          break;
+        case 'lineUpgraded':
+          toast(t('toast.lineUpgraded', { level: e.level }), 'box');
+          break;
+        case 'warehouseUpgraded':
+          toast(t('toast.warehouseUpgraded'), 'box');
+          break;
+        case 'phase4Ready':
+          later(() => {
+            toast(t('toast.phase4'), 'trophy', true);
+            sfx.fanfare();
+            platform.happytime();
+          });
+          break;
         case 'repaid':
           toast(t('toast.repaid', { amount: money(e.amount, lang.value) }), 'spark');
           break;

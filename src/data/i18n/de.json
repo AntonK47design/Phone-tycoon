@@ -195,7 +195,14 @@
     "firstHire": "Stell deine erste Person ein",
     "team4": "Wachse auf 4 Leute",
     "train1": "Schick jemanden auf einen Kurs",
-    "office2": "Bau das Büro aus"
+    "office2": "Bau das Büro aus",
+    "buildFactory": "Bau deine eigene Fabrik",
+    "produce50k": "Baue 50.000 Handys selbst",
+    "lineLevel3": "Bring eine Linie auf Stufe 3",
+    "lines3": "Betreibe 3 Fertigungslinien",
+    "revenue100m": "Mache 100 Mio. $ Gesamtumsatz",
+    "valuation100m": "Erreiche 100 Mio. $ Firmenwert",
+    "revenue400m": "Mache 400 Mio. $ Gesamtumsatz"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
@@ -241,7 +248,13 @@
     "orderPlaced": "{n} Stück bestellt. Sie kommen in 2 Wochen.",
     "orderReduced": "Die Bank finanziert nur {n} von {wanted} Stück. {n} bestellt – verkauf erst und bestell dann nach.",
     "noCashProto": "Zu wenig Geld für die Prototyp-Teile.",
-    "repaid": "{amount} getilgt. Die Bank sagt danke."
+    "repaid": "{amount} getilgt. Die Bank sagt danke.",
+    "factoryBuilt": "Deine eigene Fabrik läuft! Die erste Linie wärmt sich auf.",
+    "factoryGrown": "Größere Fabrik: Platz für mehr Linien.",
+    "lineAdded": "Neue Fertigungslinie installiert.",
+    "lineUpgraded": "Linie auf Stufe {level}: schneller und günstiger.",
+    "warehouseUpgraded": "Lagerhalle erweitert.",
+    "phase4": "Expansion freigeschaltet! Regionen, Stores und Rivalen kommen im nächsten Update."
   },
   "barks": {
     "idle": [
@@ -285,7 +298,8 @@
     "company": "Firma",
     "research": "Forschung",
     "market": "Markt",
-    "team": "Team"
+    "team": "Team",
+    "factory": "Fabrik"
   },
   "office": {
     "rent": "Ins Büro ziehen · {price}",
@@ -295,7 +309,12 @@
     "viewOffice": "Büro",
     "idle": "Kaffee & Ideen",
     "researching": "forscht",
-    "hypeBoost": "+{pct} % Hype"
+    "hypeBoost": "+{pct} % Hype",
+    "view": {
+      "garage": "Garage",
+      "office": "Büro",
+      "factory": "Fabrik"
+    }
   },
   "segment": {
     "title": "Positionierung",
@@ -485,7 +504,9 @@
     "cancel": "Noch nicht",
     "tooPoor": "Zu wenig Geld – weniger Marketing oder kleineres Event.",
     "overhype": "Vorsicht: Hype über dem, was das Handy kann, kostet Fans.",
-    "bigBatch": "Das ist viel. Handys veralten schnell – unverkaufte Ware verliert an Wert."
+    "bigBatch": "Das ist viel. Handys veralten schnell – unverkaufte Ware verliert an Wert.",
+    "factoryOnly": "Nur Fabrik",
+    "factoryHint": "Deine Fabrik baut den Vorrat. Vorbestellungen warten ein, zwei Tage. Nach rechts schieben für eine zusätzliche Auftragscharge."
   },
   "welcome": {
     "title": "Während du weg warst…",
@@ -555,14 +576,16 @@
       "engineer": "Ingenieur",
       "programmer": "Programmierer",
       "researcher": "Forscher",
-      "marketer": "Marketing"
+      "marketer": "Marketing",
+      "producer": "Produktionsleitung"
     },
     "roles": {
       "designer": "Design",
       "engineer": "Hardware",
       "programmer": "Software",
       "researcher": "Labor",
-      "marketer": "Marketing"
+      "marketer": "Marketing",
+      "producer": "Produktion"
     },
     "trait": {
       "fast": "Flink",
@@ -620,5 +643,51 @@
     "pay": "{amount} tilgen",
     "payAll": "Alles tilgen",
     "auto": "Jede Woche nimmt die Bank 25 % des Gewinns, plus alles Geld über {reserve} (deine Reserve)."
+  },
+  "factory": {
+    "title": "Fabrik",
+    "pitch": "Schluss mit dem Aufschlag des Auftragsfertigers. Eigene Linien bauen günstiger – genau dann, wenn du Nachschub brauchst.",
+    "point1": "Keine 20 % Aufschlag, keine 2 Wochen Wartezeit, keine Mindestmenge.",
+    "point2": "Linien halten ein paar Wochen Vorrat und stoppen, wenn die Regale voll sind.",
+    "point3": "Linien-Upgrades bringen Tempo und billigere Montage. Achte auf den Ausschuss: Rückläufer kosten Review-Punkte.",
+    "build": "Fabrik bauen · {amount}",
+    "locked": "Wird mit dem Phase-3-Ziel frei (Firmenwert + Marke).",
+    "notNow": "Gerade nicht möglich.",
+    "lines": "{n}/{max} Linien",
+    "tempo": "Linientempo",
+    "tempoName": {
+      "quality": "Sorgfältig",
+      "normal": "Normal",
+      "speed": "Eilig"
+    },
+    "tempoTip": {
+      "quality": "80 % Tempo, halber Ausschuss",
+      "normal": "Standard",
+      "speed": "130 % Tempo, doppelter Ausschuss"
+    },
+    "tempoInfo": "{speed} % Tempo · {scrap} % Ausschuss",
+    "target": "Vorrat halten",
+    "weeks": "{n} Wo",
+    "linesTitle": "Fertigungslinien",
+    "line": "Linie {n}",
+    "level": "Stufe {n}/{max}",
+    "idle": "Frei – tippen, um ein Handy zu wählen",
+    "cycleTip": "Tippen, um das Handy dieser Linie zu wechseln",
+    "capacity": "Kapazität",
+    "built": "Gebaut letzte Wo",
+    "scrap": "Ausschuss",
+    "unit": "Stückkosten",
+    "tooSlow": "Kunden wollen {demand}/Wo. Die Linie kommt nicht hinterher: ausbauen oder Linie dazu.",
+    "pause": "Pause",
+    "resume": "Weiter",
+    "upgrade": "Ausbauen · {amount}",
+    "addLine": "Neue Fertigungslinie · {amount}",
+    "grow": "Größere Fabrik ({lines} Linien) · {amount}",
+    "warehouse": "Lagerhalle",
+    "inStock": "Auf Lager",
+    "totalBuilt": "Insgesamt gebaut",
+    "overflow": "Die Halle quillt über. Überbestand kostet jede Woche 1 % seines Werts.",
+    "warehouseUp": "Halle erweitern auf {cap} · {amount}",
+    "howItWorks": "Neue Handys bekommen automatisch eine Linie (eine freie oder die mit dem schwächsten Verkaufsschlager)."
   }
 }

@@ -18,6 +18,7 @@ import { decimal, money, shortNum } from '../format';
 import { drawer, game, hubView, toast, useGameState, type DrawerTab } from '../game';
 import { seats } from '../../sim/team';
 import { TeamPanel } from './TeamPanel';
+import { FactoryPanel } from './FactoryPanel';
 import { lang, t } from '../i18n';
 import { IconClose } from '../icons';
 import { researchEffect, researchName, researchNameById } from '../labels';
@@ -25,7 +26,7 @@ import { researchEffect, researchName, researchNameById } from '../labels';
 export function DrawerTabs() {
   const state = useGameState();
   if (state.phase < 2) return null;
-  const tabs: DrawerTab[] = ['company', 'team', 'research', 'market'];
+  const tabs: DrawerTab[] = state.phase3Ready || state.factory.size > 0 ? ['company', 'team', 'factory', 'research', 'market'] : ['company', 'team', 'research', 'market'];
   const busy = researchProgress(state);
   return (
     <div class="tabs">
@@ -41,10 +42,15 @@ export function DrawerTabs() {
               hubView.value = 'office';
               game().engine.goToView('office', 1.2);
             }
+            if (drawer.value === 'factory' && state.factory.size > 0 && hubView.value !== 'factory') {
+              hubView.value = 'factory';
+              game().engine.goToView('factory', 1.2);
+            }
           }}
         >
           {t(`tabs.${tab}`)}
           {tab === 'research' && !busy && <i class="dot-alert" />}
+          {tab === 'factory' && state.factory.size === 0 && <i class="dot-alert" />}
           {tab === 'team' && state.team.staff.length < seats(state) && state.team.applicants.length > 0 && state.team.staff.length < 2 && <i class="dot-alert" />}
         </button>
       ))}
@@ -63,6 +69,7 @@ export function Drawer() {
       </button>
       {tab === 'company' && <CompanyPanel />}
       {tab === 'team' && <TeamPanel />}
+      {tab === 'factory' && <FactoryPanel />}
       {tab === 'research' && <ResearchPanel />}
       {tab === 'market' && <MarketPanel />}
     </div>

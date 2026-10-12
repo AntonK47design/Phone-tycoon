@@ -50,14 +50,15 @@ export interface LaunchData {
   options?: LaunchOptions;
 }
 
-export type DrawerTab = 'company' | 'team' | 'research' | 'market';
+export type DrawerTab = 'company' | 'team' | 'factory' | 'research' | 'market';
 /** Open side panel (Phase 2+). */
 export const drawer = signal<DrawerTab | null>(null);
 /** Which room the hub camera shows (Phase 2+). */
-export const hubView = signal<'garage' | 'office'>('garage');
+export type Room = 'garage' | 'office' | 'factory';
+export const hubView = signal<Room>('garage');
 /** Camera view for the hub, depending on the chosen room. */
-export function hubCamera(): 'overview' | 'office' {
-  return hubView.value === 'office' ? 'office' : 'overview';
+export function hubCamera(): 'overview' | 'office' | 'factory' {
+  return hubView.value === 'garage' ? 'overview' : hubView.value;
 }
 /** Daily calendar & orders dialog. */
 export const dailyOpen = signal(false);

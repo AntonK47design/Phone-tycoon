@@ -6,27 +6,30 @@ import { ROLE_COLORS, ROLES, type Role } from '../../data/team';
 import { researchProgress } from '../../sim/research';
 import type { GameState } from '../../sim/state';
 import { marketingBoost } from '../../sim/team';
-import { drawer, game, hubView, useGameState } from '../game';
+import { drawer, game, hubView, useGameState, type Room } from '../game';
 import { t } from '../i18n';
 
 export function ViewToggle() {
   const state = useGameState();
   const { engine } = game();
   if (state.phase < 2) return null;
-  const go = (v: 'garage' | 'office') => {
+  const rooms: Room[] = state.factory.size > 0 ? ['garage', 'office', 'factory'] : ['garage', 'office'];
+  const go = (v: Room) => {
     if (hubView.value === v) return;
     sfx.whoosh();
     hubView.value = v;
-    engine.goToView(v === 'office' ? 'office' : 'overview', 1.3);
-    if (v === 'garage' && drawer.value === 'team') drawer.value = null;
+    engine.goToView(v === 'garage' ? 'overview' : v, 1.3);
+    if (v !== 'office' && drawer.value === 'team') drawer.value = null;
+    if (v !== 'factory' && drawer.value === 'factory') drawer.value = null;
   };
   return (
     <div class="view-toggle">
-      <button class={hubView.value === 'garage' ? 'on' : ''} onClick={() => go('garage')}>{t('office.viewGarage')}</button>
-      <button class={hubView.value === 'office' ? 'on' : ''} onClick={() => go('office')}>
-        {t('office.viewOffice')}
-        {state.team.staff.length === 0 && <i class="dot-alert" />}
-      </button>
+      {rooms.map((r) => (
+        <button key={r} class={hubView.value === r ? 'on' : ''} onClick={() => go(r)}>
+          {t(`office.view.${r}`)}
+          {r === 'office' && state.team.staff.length === 0 && <i class="dot-alert" />}
+        </button>
+      ))}
     </div>
   );
 }

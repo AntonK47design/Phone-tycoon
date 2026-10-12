@@ -1,8 +1,8 @@
 // Team & buildings (GDD §10). Content and constants; rules live in sim/team.ts.
 
-export type Role = 'designer' | 'engineer' | 'programmer' | 'researcher' | 'marketer';
+export type Role = 'designer' | 'engineer' | 'programmer' | 'researcher' | 'marketer' | 'producer';
 
-export const ROLES: Role[] = ['designer', 'engineer', 'programmer', 'researcher', 'marketer'];
+export const ROLES: Role[] = ['designer', 'engineer', 'programmer', 'researcher', 'marketer', 'producer'];
 
 /** Which development points a role produces (null = none). */
 export const ROLE_OUTPUT: Record<Role, 'design' | 'tech' | 'software' | 'rp' | null> = {
@@ -11,6 +11,7 @@ export const ROLE_OUTPUT: Record<Role, 'design' | 'tech' | 'software' | 'rp' | n
   programmer: 'software',
   researcher: 'rp',
   marketer: null,
+  producer: null,
 };
 
 /** Office level from which a role can be hired. */
@@ -20,7 +21,11 @@ export const ROLE_MIN_OFFICE: Record<Role, number> = {
   programmer: 1,
   researcher: 1,
   marketer: 2,
+  producer: 1,
 };
+
+/** Roles that need a game phase (production leads need the own factory). */
+export const ROLE_MIN_PHASE: Partial<Record<Role, number>> = { producer: 3 };
 
 export type TraitId = 'fast' | 'perfectionist' | 'nightOwl' | 'cheerful' | 'frugal' | 'mentor';
 
@@ -113,4 +118,5 @@ export const ROLE_COLORS: Record<Role, string> = {
   programmer: '#3cc48a',
   researcher: '#b18cff',
   marketer: '#ffb020',
+  producer: '#ff6a2a',
 };

@@ -15,6 +15,8 @@ export type SimEvent =
       hype: number;
       /** Extra launch spend (marketing + presentation + first batch). */
       spend: number;
+      /** Factory line that now builds this phone. */
+      lineId?: number | null;
     }
   | { type: 'goalCompleted'; goalId: string; reward: GoalReward }
   | { type: 'colorUnlocked'; colorId: string }
@@ -42,6 +44,13 @@ export type SimEvent =
   | { type: 'labBuilt'; level: number }
   | { type: 'studioBuilt'; level: number }
   | { type: 'bonusPaid' }
+  | { type: 'factoryBuilt' }
+  | { type: 'factoryGrown'; size: number }
+  | { type: 'lineAdded'; id: number }
+  | { type: 'lineUpgraded'; id: number; level: number }
+  | { type: 'warehouseUpgraded'; level: number }
+  | { type: 'produced'; units: number; scrapped: number }
+  | { type: 'phase4Ready' }
   | { type: 'dailyDone'; index: number }
   | { type: 'dailyClaimed'; index: number; reward: { cash?: number; hype?: number } }
   | { type: 'calendarClaimed'; step: number; cash: number; cosmetic?: string }

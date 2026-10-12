@@ -31,6 +31,7 @@ import {
 } from './economy/market';
 import type { SimEvent } from './events';
 import { checkDaily, claimCalendar, claimDaily, dailySync, newDaily } from './daily';
+import { applyFactoryAction, autoAssign, factoryWeek, newFactory, produceDay, returnsPenalty, type FactoryAction } from './factory';
 import { checkGoals } from './goals';
 import {
   availableFeatures,
@@ -127,6 +128,8 @@ export function newGame(seed: number): GameState {
     research: { done: [], current: null, budget: 0 },
     stats: { launches: 0, unitsTotal: 0, revenueTotal: 0, profitTotal: 0, bestReview: 0, bestLaunchHype: 0, hires: 0, trainings: 0, reorders: 0 },
     team: newTeam(),
+    factory: newFactory(),
+    phase4Ready: false,
     daily: newDaily(),
     cosmetics: [],
     history: { cash: [], revenue: [], profit: [], playerUnits: [], compUnits: {} },
@@ -161,7 +164,10 @@ export type Action =
   | { type: 'claimDaily'; index: number }
   | { type: 'claimCalendar'; date: string }
   | { type: 'repay'; amount: number }
-  | TeamAction;
+  | TeamAction
+  | FactoryAction;
+
+const FACTORY_ACTIONS = new Set(['buildFactory', 'growFactory', 'addLine', 'upgradeLine', 'assignLine', 'pauseLine', 'setTempo', 'upgradeWarehouse', 'setTargetWeeks']);
 
 export function isFirstLaunch(state: GameState): boolean {
   return state.stats.launches === 0;
@@ -257,7 +263,12 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
     case 'claimCalendar':
       return claimCalendar(state, action.date).concat(checkGoals(state));
     default:
-      return applyTeamAction(state, action).concat(checkGoals(state), checkDaily(state));
+      if (FACTORY_ACTIONS.has(action.type)) {
+        const ev = applyFactoryAction(state, action as FactoryAction);
+        if (ev.some((e) => e.type === 'factoryBuilt')) normalizeDraft(state, state.draft);
+        return ev.concat(checkGoals(state), checkDaily(state));
+      }
+      return applyTeamAction(state, action as TeamAction).concat(checkGoals(state), checkDaily(state));
   }
 }
 
@@ -312,7 +323,7 @@ function makeCards(rng: Rng, est: ReturnType<typeof reviewEstimate>): ReviewCard
 /** Weekly running costs (rent, payroll, lab budget) – used for the cash reserve. */
 export function weeklyCosts(state: GameState): number {
   const inf = inflation(Math.floor(yearOf(state.day)));
-  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget : GARAGE_UPKEEP_WEEK * inf;
+  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget + state.factory.invested * 0.01 : GARAGE_UPKEEP_WEEK * inf;
 }
 
 /** Cash the company keeps before spare money goes to the bank. */
@@ -389,7 +400,9 @@ export function launchQuote(state: GameState, design: PhoneDesign, opts: LaunchO
   const year = yearOf(state.day);
   const marketing = canMarket(state) ? Math.max(0, opts.marketing ?? 0) : 0;
   const presentation = clamp(Math.floor(opts.presentation ?? 0), 0, presentationLevel(state));
-  const batch = state.phase >= 2 ? Math.max(OEM_MIN_BATCH, Math.round(opts.batch ?? OEM_MIN_BATCH)) : 0;
+  // With an own factory the first batch is optional: the lines build the stock.
+  const factoryOnly = state.factory.size > 0 && opts.batch === 0;
+  const batch = state.phase >= 2 && !factoryOnly ? Math.max(OEM_MIN_BATCH, Math.round(opts.batch ?? OEM_MIN_BATCH)) : 0;
   const pCost = presentationCost(presentation, year);
   const bCost = batch ? batchCost(design, batch, year) : 0;
   return {
@@ -437,7 +450,7 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
     design,
     launchDay: state.day,
     review,
-    unitCost: madeToOrder ? unitCost(design, year, 'garage') : unitCost(design, year, 'oem') * volumeDiscount(quote.batch),
+    unitCost: madeToOrder ? unitCost(design, year, 'garage') : quote.batch ? unitCost(design, year, 'oem') * volumeDiscount(quote.batch) : unitCost(design, year, 'factory'),
     unitsSold: 0,
     revenue: 0,
     profit: 0,
@@ -468,6 +481,7 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
   sell(state, product, preorderUnits, true);
 
   state.products.push(product);
+  const lineId = state.factory.size > 0 ? autoAssign(state, product.id) : null;
   state.dev = null;
   state.stats.launches += 1;
   state.stats.bestReview = Math.max(state.stats.bestReview, review.score);
@@ -496,6 +510,7 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
       brandDelta,
       hype: quote.hype,
       spend: quote.total,
+      lineId,
     },
   ];
   return events.concat(checkGoals(state));
@@ -564,7 +579,7 @@ function activeInSegment(state: GameState, segment: Segment): Product[] {
 /** Current review of a product: launch review minus how much it has aged (GDD §5.12). */
 export function currentReview(product: Product, year: number): number {
   const pNow = overallRating(product.design, year).p;
-  return clamp(product.review.score - (product.review.p - pNow), 0, 10);
+  return clamp(product.review.score - (product.review.p - pNow) - returnsPenalty(product), 0, 10);
 }
 
 function productA(state: GameState, product: Product, year: number): number {
@@ -599,8 +614,9 @@ export function valuation(state: GameState): number {
     LAB_LEVELS.slice(0, t.lab).reduce((a, l) => a + l.price, 0) +
     STUDIO_LEVELS.slice(0, t.studio).reduce((a, l) => a + l.price, 0);
   const assets = built * 0.5 * inflation(Math.floor(year));
+  const factory = state.factory.invested * 0.5;
   const stockValue = state.products.reduce((a, p) => a + (p.active && !p.madeToOrder ? p.stock * p.unitCost * 0.5 : 0), 0);
-  return state.company.cash - state.company.debt + 4 * Math.max(0, profit52) + 2000 * state.company.brand * Math.sqrt(marketSize(year) / marketSize(2007)) + assets + stockValue;
+  return state.company.cash - state.company.debt + 4 * Math.max(0, profit52) + 2000 * state.company.brand * Math.sqrt(marketSize(year) / marketSize(2007)) + assets + factory + stockValue;
 }
 
 /** Market share of the player over the last 52 weeks (0–1). */
@@ -659,6 +675,8 @@ export function advanceDay(state: GameState): SimEvent[] {
     const res = segmentDemand(list.map((p) => ({ a: productA(state, p, year), reach: r })), seg, year);
     list.forEach((p, i) => daily.set(p.id, res.player[i] / DAYS_PER_WEEK));
   }
+  // Own factory lines refill stock before the day's sales.
+  events.push(...produceDay(state, daily));
   // Garage capacity is shared by made-to-order products.
   const mtoDemand = active.filter((p) => p.madeToOrder).reduce((a, p) => a + (daily.get(p.id) ?? 0), 0);
   const capDaily = GARAGE_CAPACITY_WEEK / DAYS_PER_WEEK;
@@ -705,8 +723,10 @@ export function advanceDay(state: GameState): SimEvent[] {
     const interest = state.company.debt * LOAN_INTEREST_WEEK;
     const operations = state.phase >= 2 ? state.week.revenue * OPERATIONS_RATE : 0;
     const lab = state.phase >= 2 ? state.research.budget : 0;
-    state.company.cash -= rent + storage + interest + operations + lab;
-    state.week.profit -= rent + storage + interest + operations + lab;
+    const factory = factoryWeek(state);
+    const costs = rent + storage + interest + operations + lab + factory;
+    state.company.cash -= costs;
+    state.week.profit -= costs;
     // The bank is paid back automatically: a share of a good week's profit, plus all
     // cash above a safety reserve (≈ 4 weeks of running costs).
     state.company.lastRepay = 0;
@@ -798,8 +818,9 @@ export function forecast(state: GameState, design: PhoneDesign = state.draft, la
   normalizeDraft(state, d);
   const hype = state.phase >= 2 ? launchHype(state, launchOpts.marketing ?? 0, launchOpts.presentation ?? 0, d) : 0;
   const est = reviewEstimate(d, year, reviewOpts(state, hype));
-  const mode = state.phase >= 2 ? 'oem' : 'garage';
-  const cost = unitCost(d, year, mode) * (mode === 'oem' ? volumeDiscount(launchOpts.batch ?? 1000) : 1);
+  const mode = state.factory.size > 0 ? 'factory' : state.phase >= 2 ? 'oem' : 'garage';
+  const bestLine = state.factory.lines.reduce((a, l) => Math.max(a, l.level), 1);
+  const cost = unitCost(d, year, mode, bestLine) * (mode === 'oem' ? volumeDiscount(launchOpts.batch ?? 1000) : 1);
   const temp: Product = {
     id: -1, design: d, launchDay: state.day, review: { score: est.score, design: 0, tech: 0, p: est.rating.p, value: est.value, cards: [] },
     unitCost: cost, unitsSold: 0, revenue: 0, profit: 0, lastWeekUnits: 0, weekUnits: 0, weekDemand: 0, lastWeekDemand: 0, carry: 0, active: true, capped: false,

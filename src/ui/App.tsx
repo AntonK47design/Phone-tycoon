@@ -13,6 +13,9 @@ import { WelcomeBack } from './hud/WelcomeBack';
 import { DailyModal, useDailySync } from './hud/Daily';
 import { TeamLabels, ViewToggle } from './hud/Office';
 import { isWorking } from '../sim/team';
+import { lineScrapRate, stockTotal } from '../sim/factory';
+import { TEMPOS, warehouseCapacity } from '../data/factory';
+import { colorById } from '../data/design';
 
 const DevPanel = import.meta.env.DEV ? lazy(() => import('./debug/DevPanel').then((m) => ({ default: m.DevPanel }))) : null;
 
@@ -34,6 +37,22 @@ function usePhoneSync() {
       companyName: state.company.name,
       staff: state.team.staff.map((e) => ({ id: e.id, role: e.role, look: e.look, morale: e.morale, away: !isWorking(e, state.day) })),
       busy: !!state.dev && !state.dev.done,
+    });
+    const f = state.factory;
+    engine.setFactory({
+      size: f.size,
+      speed: TEMPOS[f.tempo].speed,
+      warehouse: f.warehouse,
+      fill: stockTotal(state) / warehouseCapacity(f.warehouse),
+      lines: f.lines.map((line) => {
+        const p = state.products.find((x) => x.id === line.productId && x.active && !x.madeToOrder);
+        return {
+          level: line.level,
+          colorHex: p ? colorById(p.design.colorId)?.hex ?? '#d8d8d8' : null,
+          running: !line.paused && line.lastWeek + line.week > 0,
+          scrap: lineScrapRate(state, line),
+        };
+      }),
     });
   });
 }

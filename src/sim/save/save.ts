@@ -63,6 +63,12 @@ export const MIGRATIONS: Record<number, Migration> = {
     s.stats.reorders ??= 0;
     return s;
   },
+  4: (s: Obj) => {
+    // M4: own factory.
+    s.factory ??= { size: 0, lines: [], nextLineId: 1, tempo: 'normal', warehouse: 0, targetWeeks: 4, invested: 0, produced: 0, scrapped: 0 };
+    s.phase4Ready ??= false;
+    return s;
+  },
 };
 
 export function serialize(state: GameState, now: number): string {

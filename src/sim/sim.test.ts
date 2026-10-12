@@ -162,4 +162,12 @@ describe('pacing (GDD §24.1)', () => {
     const launches = r.samples.map((x) => x.launches);
     expect(launches[launches.length - 1]).toBeGreaterThan(launches[1]);
   }, 60_000);
+
+  it('average bot builds a factory and reaches the phase-4 gate between 75 and 120 minutes (M4)', () => {
+    const r = runBot({ minutes: 120, seed: 42, sampleEveryMin: 30 });
+    expect(r.factoryMin).not.toBeNull();
+    expect(r.phase4Min).not.toBeNull();
+    expect(r.phase4Min!).toBeGreaterThan(75);
+    expect(r.phase4Min!).toBeLessThan(120);
+  }, 180_000);
 });

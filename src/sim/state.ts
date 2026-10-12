@@ -2,9 +2,10 @@
 
 import type { TechCategory } from '../data/components';
 import type { Segment } from '../data/market';
+import type { Tempo } from '../data/factory';
 import type { Role, TraitId } from '../data/team';
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 export interface PhoneDesign {
   name: string;
@@ -79,6 +80,8 @@ export interface Product {
   /** Current hype 0–100 (decays weekly). */
   hype: number;
   launchHype: number;
+  /** Recent scrap share of own-factory production (returns cost review points). */
+  defectRate?: number;
 }
 
 export interface Development {
@@ -103,6 +106,35 @@ export interface Employee {
   trainingUntil: number | null;
   /** Visual seed for the 3D figure (hair, skin). */
   look: number;
+}
+
+export interface FactoryLine {
+  id: number;
+  /** 1–10. */
+  level: number;
+  /** Product the line builds (null = idle). */
+  productId: number | null;
+  paused: boolean;
+  /** Fractional units carried between days. */
+  carry: number;
+  /** Units built last week / this week (for the UI). */
+  lastWeek: number;
+  week: number;
+}
+
+export interface FactoryState {
+  /** 0 = no factory, 1 small (2 lines), 2 factory (4), 3 mega (8). */
+  size: number;
+  lines: FactoryLine[];
+  nextLineId: number;
+  tempo: Tempo;
+  warehouse: number;
+  /** Lines keep this many weeks of demand in stock. */
+  targetWeeks: number;
+  /** Everything spent on the factory (drives upkeep and valuation). */
+  invested: number;
+  produced: number;
+  scrapped: number;
 }
 
 export interface TeamState {
@@ -197,6 +229,9 @@ export interface GameState {
     reorders: number;
   };
   team: TeamState;
+  factory: FactoryState;
+  /** Phase-4 gate reached (expansion – next update). */
+  phase4Ready: boolean;
   daily: DailyState;
   /** Cosmetic unlocks (e.g. the calendar's aurora finish). */
   cosmetics: string[];

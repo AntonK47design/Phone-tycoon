@@ -35,6 +35,12 @@ export function goalProgress(state: GameState, goal: GoalDef): number {
       return state.team.office;
     case 'trainings':
       return state.stats.trainings;
+    case 'produced':
+      return state.factory.produced;
+    case 'lineLevel':
+      return state.factory.lines.reduce((a, l) => Math.max(a, l.level), 0);
+    case 'lines':
+      return state.factory.lines.length;
   }
 }
 
@@ -66,6 +72,10 @@ export function checkGoals(state: GameState): SimEvent[] {
       if (goal.gate === 'phase3' && !state.phase3Ready) {
         state.phase3Ready = true;
         events.push({ type: 'phase3Ready' });
+      }
+      if (goal.gate === 'phase4' && !state.phase4Ready) {
+        state.phase4Ready = true;
+        events.push({ type: 'phase4Ready' });
       }
       changed = true;
     }

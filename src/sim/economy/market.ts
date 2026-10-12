@@ -7,6 +7,7 @@ import {
   OEM_ASSEMBLY_COST,
   OEM_MARKUP,
 } from '../../data/components';
+import { lineAssembly } from '../../data/factory';
 import { finishById, materialById, PACKAGING, shapeById } from '../../data/design';
 import { inflation } from '../../data/eras';
 import { COMPETITORS, SEGMENT_SHARES, SEGMENTS, restMarketAttractiveness, type Segment } from '../../data/market';
@@ -38,10 +39,10 @@ export function brandFactor(brand: number): number {
   return 0.4 + (1.2 * clamp(brand, 0, 100)) / 100;
 }
 
-export type BuildMode = 'garage' | 'oem';
+export type BuildMode = 'garage' | 'oem' | 'factory';
 
 /** Unit cost of a design built in `year` (GDD §6.1). */
-export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'garage'): number {
+export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'garage', lineLevel = 1): number {
   const inf = inflation(Math.floor(year));
   const area = Math.pow(design.displaySize / 3.5, 2);
   let parts = 0;
@@ -55,6 +56,8 @@ export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'g
   const body =
     (materialById(design.materialId).cost + finishById(design.finishId).cost + shapeById(design.shapeId).cost + PACKAGING.basic.cost + extras) * inf;
   if (mode === 'garage') return parts + body + GARAGE_ASSEMBLY_COST * inf + os.feePerUnit;
+  // Own line: no contract manufacturer markup, assembly gets cheaper with the line level.
+  if (mode === 'factory') return parts + body + lineAssembly(lineLevel) * inf + os.feePerUnit;
   return (parts + body + OEM_ASSEMBLY_COST * inf) * OEM_MARKUP + os.feePerUnit;
 }
 

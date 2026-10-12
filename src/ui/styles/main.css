@@ -519,6 +519,17 @@ svg { flex: none; }
 .loan-rows { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 13px; }
 .loan-rows b { font-family: var(--mono); text-align: right; }
 
+/* ── M4: factory ─────────────────────────────────────────────────────── */
+.factory-points { margin: 0 0 12px; padding-left: 18px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.factory-build { width: 100%; }
+.line-card { border: 2px solid var(--ink); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: #fffdf6; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 6px; }
+.line-head { display: flex; justify-content: space-between; align-items: baseline; }
+.line-head .lvl { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.line-product { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px; border: 2px dashed var(--ink); border-radius: 6px; background: var(--paper); font-weight: 800; font-size: 14px; text-align: left; }
+.line-product .muted { margin-left: auto; }
+.btn-secondary.wide { width: 100%; margin: 4px 0 8px; font-size: 12px; }
+.prod-stats b.neg { color: var(--red); }
+
 /* Respect the OS "reduce motion" setting: no entrance animations or bobbing. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
