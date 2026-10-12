@@ -13,7 +13,8 @@ function detect(): Lang {
   } catch {
     /* ignore */
   }
-  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('de') ? 'de' : 'en';
+  // English is the default; German is opt-in via settings.
+  return 'en';
 }
 
 export const lang = signal<Lang>(detect());
@@ -26,6 +27,22 @@ export function setLang(l: Lang) {
   } catch {
     /* ignore */
   }
+}
+
+function lookupRaw(dict: unknown, key: string): unknown {
+  let cur: unknown = dict;
+  for (const part of key.split('.')) {
+    if (cur && typeof cur === 'object' && part in (cur as Record<string, unknown>)) {
+      cur = (cur as Record<string, unknown>)[part];
+    } else return undefined;
+  }
+  return cur;
+}
+
+/** Translated string list (e.g. founder barks). */
+export function tList(key: string): string[] {
+  const v = lookupRaw(DICTS[lang.value], key) ?? lookupRaw(DICTS.en, key);
+  return Array.isArray(v) ? (v as string[]) : [];
 }
 
 function lookup(dict: unknown, key: string): string | undefined {

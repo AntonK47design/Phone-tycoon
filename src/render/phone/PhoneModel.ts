@@ -31,7 +31,7 @@ export interface PhoneVisual {
   lenses: number;
 }
 
-const PRIMER = new Color('#8f9297');
+const PRIMER = new Color('#6f7378');
 /** Scene units per millimetre: phones are oversized showcase models. */
 export const PHONE_SCALE = 0.0048;
 

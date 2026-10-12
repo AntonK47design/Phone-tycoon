@@ -3,9 +3,10 @@ import { sfx } from '../../audio/sfx';
 import { colorById } from '../../data/design';
 import { goalProgress, visibleGoals } from '../../sim/goals';
 import { decimal, money, shortNum } from '../format';
-import { game, mode, toVisual, toasts, useGameState } from '../game';
-import { lang, t } from '../i18n';
+import { game, mode, sayBark, bark, toVisual, toasts, useGameState } from '../game';
+import { lang, t, tList } from '../i18n';
 import { startLaunch } from '../launch/flow';
+import { IconPencil, IconRocket, IconWrench, ToastIconView } from '../icons';
 
 export function scoreClass(score: number) {
   return score >= 8 ? 'good' : score >= 6.5 ? 'ok' : 'bad';
@@ -94,7 +95,7 @@ export function ActionBar() {
     return (
       <div class="action-bar">
         <button class="btn-primary btn-launch pulse" onClick={() => startLaunch()}>
-          🚀 {t('action.ready', { name: dev.design.name })}
+          <IconRocket size={24} /> {t('action.ready', { name: dev.design.name })}
         </button>
       </div>
     );
@@ -107,7 +108,7 @@ export function ActionBar() {
   };
   return (
     <div class="action-bar">
-      <button class="btn-primary" onClick={open}>✏️ {t('action.newPhone')}</button>
+      <button class="btn-primary" onClick={open}><IconPencil /> {t('action.newPhone')}</button>
     </div>
   );
 }
@@ -117,7 +118,7 @@ export function Toasts() {
     <div class="toasts">
       {toasts.value.map((x) => (
         <div key={x.id} class={`glass toast ${x.gold ? 'gold' : ''}`}>
-          {x.icon && <span class="ic">{x.icon}</span>}
+          {x.icon && <span class="ic"><ToastIconView kind={x.icon} /></span>}
           {x.text}
         </div>
       ))}
@@ -150,12 +151,52 @@ export function BenchLabel() {
   const p = dev.progress;
   return (
     <div class="glass world-label passthrough" ref={ref}>
-      🔧 {dev.design.name}
+      <IconWrench size={14} /> {dev.design.name}
       <div class="tri-bar">
         <div><i style={{ width: `${(p.design / r.design) * 100}%`, background: 'var(--design)' }} /></div>
         <div><i style={{ width: `${(p.tech / r.tech) * 100}%`, background: 'var(--tech)' }} /></div>
         <div><i style={{ width: `${(p.software / r.software) * 100}%`, background: 'var(--software)' }} /></div>
       </div>
+    </div>
+  );
+}
+
+/** The founder thinks out loud now and then. */
+export function FounderBark() {
+  const state = useGameState();
+  const ref = useRef<HTMLDivElement>(null);
+  const { engine } = game();
+  const developing = !!state.dev && !state.dev.done;
+  useEffect(() => {
+    let timer = 0;
+    const schedule = (first = false) => {
+      timer = window.setTimeout(() => {
+        if (mode.value === 'free' && !document.hidden) sayBark(tList(developing ? 'barks.dev' : 'barks.idle'));
+        schedule();
+      }, first ? 6000 + Math.random() * 4000 : 22000 + Math.random() * 16000);
+    };
+    schedule(true);
+    return () => clearTimeout(timer);
+  }, [developing]);
+  useEffect(() => {
+    let raf = 0;
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      const el = ref.current;
+      if (!el) return;
+      const p = engine.project('founder');
+      el.style.left = `${p.x}px`;
+      el.style.top = `${p.y}px`;
+      el.style.visibility = p.visible ? 'visible' : 'hidden';
+    };
+    loop();
+    return () => cancelAnimationFrame(raf);
+  }, [engine, bark.value?.id]);
+  const b = bark.value;
+  if (!b || mode.value !== 'free') return null;
+  return (
+    <div class="bark passthrough" ref={ref} key={b.id}>
+      {b.text}
     </div>
   );
 }

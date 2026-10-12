@@ -147,14 +147,26 @@ export function LaunchSequence() {
           <div class="cards">
             {launched.review.cards.slice(0, cardsShown).map((c) => {
               const outlet = OUTLETS.find((o) => o.id === c.outletId);
+              const quote = t(`review.${c.outletId}.${c.quote}`);
+              if (c.outletId === 'techblitz') {
+                return (
+                  <div class={`review-card outlet-techblitz ${scoreClass(c.score)}`} key={c.outletId}>
+                    <div class="masthead">techblitz://review</div>
+                    <div class="term">
+                      <span class="prompt">$</span> score <b>{decimal(c.score, l)}</b>/10
+                    </div>
+                    <div class="quote">&gt; {quote}<span class="cursor" /></div>
+                  </div>
+                );
+              }
               return (
-                <div class={`review-card ${scoreClass(c.score)}`} key={c.outletId}>
-                  <div class="outlet">{outlet?.name}</div>
+                <div class={`review-card outlet-${c.outletId} ${scoreClass(c.score)}`} key={c.outletId}>
+                  <div class="masthead">{outlet?.name}</div>
                   <div class="score">
                     {decimal(c.score, l)}
                     <small>/10</small>
                   </div>
-                  <div class="quote">“{t(`review.${c.quote}`)}”</div>
+                  <div class="quote">“{quote}”</div>
                 </div>
               );
             })}

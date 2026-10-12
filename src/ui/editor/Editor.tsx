@@ -10,6 +10,7 @@ import { mark } from '../funnel';
 import { game, mode, toVisual, useGameState } from '../game';
 import { lang, t } from '../i18n';
 import { startLaunch } from '../launch/flow';
+import { IconClose, IconRocket, IconWrench } from '../icons';
 
 const STEPS: TutorialStep[] = ['color', 'shape', 'display', 'launch'];
 type Category = 'color' | 'shape' | 'display';
@@ -20,8 +21,8 @@ function ShapeIcon({ id }: { id: string }) {
   const r = s.corner * 0.5;
   return (
     <svg viewBox="0 0 26 40">
-      <rect x={(26 - w) / 2} y="2" width={w} height="36" rx={r} fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.85)" stroke-width="1.6" />
-      <rect x={(26 - w) / 2 + 2.5} y="7" width={w - 5} height="25" rx="1.2" fill="rgba(120,180,255,.6)" />
+      <rect x={(26 - w) / 2} y="2" width={w} height="36" rx={r} fill="none" stroke="currentColor" stroke-width="2" />
+      <rect x={(26 - w) / 2 + 3} y="7" width={w - 6} height="25" rx="1" fill="currentColor" opacity=".3" />
     </svg>
   );
 }
@@ -32,8 +33,8 @@ function DisplayIcon({ size }: { size: number }) {
   const h = 34 * k;
   return (
     <svg viewBox="0 0 26 40">
-      <rect x={(26 - w) / 2} y={(40 - h) / 2} width={w} height={h} rx="3" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.7)" stroke-width="1.4" />
-      <rect x={(26 - w) / 2 + 2} y={(40 - h) / 2 + 4} width={w - 4} height={h - 8} rx="1" fill="rgba(120,180,255,.75)" />
+      <rect x={(26 - w) / 2} y={(40 - h) / 2} width={w} height={h} rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+      <rect x={(26 - w) / 2 + 3} y={(40 - h) / 2 + 4} width={w - 6} height={h - 8} rx="1" fill="currentColor" opacity=".3" />
     </svg>
   );
 }
@@ -73,7 +74,8 @@ function Stats({ fc, full, free }: { fc: Forecast; full: boolean; free: boolean 
   const dCost = useDelta(fc.unitCost, 0.5);
   const reviewColor = fc.review >= 8 ? 'var(--good)' : fc.review >= 6.5 ? '#ffd666' : 'var(--bad)';
   return (
-    <div class="glass editor-right">
+    <div class="editor-right">
+      <div class="label" style={{ color: '#b8ad98' }}>{t('editor.forecast')}</div>
       <div class="review-big" data-tip={t('tip.review')} style={{ position: 'relative' }}>
         <span class="lbl">{t('editor.review')}</span>
         <span class="num" style={{ color: reviewColor }}>
@@ -222,12 +224,15 @@ export function Editor() {
 
   return (
     <div class="ui-layer">
-      <div class="glass editor-left">
+      <div class="editor-left paper">
         <div class="editor-title">
-          <span>{draft.name}</span>
+          <span>
+            <small>{t('editor.sheet')}</small>
+            {draft.name}
+          </span>
           {!tutorialMode && (
             <button class="icon-btn" aria-label={t('editor.close')} onClick={close} style={{ width: 36, height: 36 }}>
-              ✕
+              <IconClose />
             </button>
           )}
         </div>
@@ -286,12 +291,12 @@ export function Editor() {
       <div class="editor-bottom">
         {showLaunch && (
           <button class="btn-primary btn-launch pulse" onClick={startLaunch}>
-            🚀 {t('editor.launch')}
+            <IconRocket size={26} /> {t('editor.launch')}
           </button>
         )}
         {!first && (
           <button class="btn-primary" disabled={state.company.cash < fc.devCost || !!state.dev} onClick={startDev}>
-            🛠️ {t('editor.startDev')} · {money(fc.devCost, l)}
+            <IconWrench /> {t('editor.startDev')} · {money(fc.devCost, l)}
           </button>
         )}
       </div>
@@ -312,7 +317,6 @@ export function Editor() {
           }
         >
           <div class={`hint ${hint.side}`} key={step}>
-            {hint.side === 'left' && <span class="arrow-bob">👈</span>}
             {t(`tutorial.${step}`)}
           </div>
         </div>

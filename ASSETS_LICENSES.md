@@ -1,7 +1,7 @@
 # Assets & Licenses
 
-Phone Empire 3D ships **no third-party art, audio or font files** in M1. Everything visible
-or audible is generated at runtime:
+Phone Empire 3D ships **no third-party art or audio**. Apart from three open-licensed fonts
+(below), everything visible or audible is generated at runtime:
 
 | Asset | Source | License |
 |---|---|---|
@@ -9,7 +9,7 @@ or audible is generated at runtime:
 | Textures (concrete, wood, pegboard, poster, whiteboard, rug, phone UI, laptop UI, sky, background) | Canvas-generated (`src/render/textures.ts`) | Original work (project) |
 | Reflections / environment | `RoomEnvironment` + PMREM generated at runtime | three.js (MIT) |
 | Sound effects | WebAudio synthesis (`src/audio/sfx.ts`) | Original work (project) |
-| Fonts | System font stack, nothing downloaded | – |
+| Fonts: Bungee (display), Barlow Semi Condensed (UI), Space Mono (numbers) | Bundled latin subsets via `@fontsource/*` (no external requests) | SIL Open Font License 1.1 |
 
 ## Runtime libraries
 
@@ -17,6 +17,7 @@ or audible is generated at runtime:
 |---|---|
 | three.js (incl. `examples/jsm` passes and helpers) | MIT |
 | Preact, @preact/signals | MIT |
+| @fontsource/bungee, @fontsource/barlow-semi-condensed, @fontsource/space-mono | OFL-1.1 (fonts), MIT (packaging) |
 
 ## Planned (later milestones)
 

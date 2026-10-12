@@ -3,7 +3,7 @@ import { useEffect } from 'preact/hooks';
 import { Editor } from './editor/Editor';
 import { game, launchData, mode, settingsOpen, toVisual, useGameState } from './game';
 import { Hud } from './hud/Hud';
-import { ActionBar, BenchLabel, Goals, Products, Toasts } from './hud/Panels';
+import { ActionBar, BenchLabel, FounderBark, Goals, Products, Toasts } from './hud/Panels';
 import { Settings } from './hud/Settings';
 import { lang } from './i18n';
 import { LaunchSequence } from './launch/LaunchSequence';
@@ -34,6 +34,7 @@ export function App() {
       {m === 'free' && <Products />}
       {m === 'free' && <ActionBar />}
       {m === 'free' && <BenchLabel />}
+      <FounderBark />
       {(m === 'tutorial' || m === 'editor') && <Editor />}
       {launchData.value && <LaunchSequence />}
       <Toasts />

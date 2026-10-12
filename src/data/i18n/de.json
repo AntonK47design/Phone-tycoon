@@ -1,8 +1,5 @@
 {
-  "app": {
-    "title": "Phone Empire 3D",
-    "loading": "Deine Garage wird gebaut…"
-  },
+  "app": { "title": "Phone Empire 3D", "loading": "Die Garage wird gefegt…" },
   "hud": {
     "date": "Woche {week} · {year}",
     "cash": "Kapital",
@@ -13,144 +10,199 @@
     "rename": "Firma umbenennen"
   },
   "tip": {
-    "cash": "Das Kapital deiner Firma. Kommt aus Handyverkäufen abzüglich Stückkosten, Miete und Entwicklung.",
-    "brand": "Markenwert (0–100). Steigt mit guten Reviews und macht jedes Handy attraktiver.",
-    "fans": "Fans bestellen zum Launch vor und werden mit jedem gut bewerteten Handy mehr.",
-    "date": "Spielzeit. Bei 1x vergeht alle 5 Sekunden ein Tag.",
-    "design": "Design-Score 0–10: Material, Dicke, Display-Anteil, Größe, Farbe und Proportionen – gemessen an den Erwartungen der Epoche.",
-    "tech": "Technik-Score 0–10: Chip, Display, Akku, Kamera, Speicher und RAM im Vergleich zu dem, was der Markt dieses Jahr erwartet.",
-    "review": "Prognose der Review-Note (±0,5). Bessere Reviews verkaufen deutlich mehr Handys.",
-    "unitCost": "Was dich ein Handy in der Herstellung kostet: Bauteile, Material, Montage und Verpackung.",
-    "price": "Verkaufspreis, vorerst automatisch auf einen fairen Wert gesetzt.",
-    "margin": "Gewinn pro verkauftem Handy.",
-    "devTime": "Entwicklungszeit in Spieltagen (Gründer arbeitet allein).",
-    "devCost": "Einmalige Entwicklungskosten, fällig beim Start.",
-    "weekly": "Erwartete Verkäufe in den ersten Wochen. Die Garage schafft 50 Handys pro Woche.",
+    "cash": "Geld auf dem Konto. Verkäufe minus Bauteile, Miete und Nachtschichten.",
+    "brand": "Marke (0–100). Gute Reviews heben sie, und eine starke Marke verkauft jedes Handy ein bisschen leichter.",
+    "fans": "Fans bestellen zum Launch vor. Jedes gut bewertete Handy bringt neue.",
+    "date": "Spielzeit. Bei 1× dauert ein Tag 5 Sekunden.",
+    "design": "Design 0–10: Material, Dicke, Display-Anteil, Größe, Farbe und Proportionen – gemessen an den Erwartungen dieses Jahres.",
+    "tech": "Technik 0–10: Chip, Display, Akku, Kamera, Speicher und RAM – gemessen an dem, was der Markt dieses Jahr erwartet.",
+    "review": "Wo die Kritiker vermutlich landen (±0,5). Bessere Reviews verkaufen deutlich mehr Handys.",
+    "unitCost": "Was dich ein Handy kostet: Bauteile, Plastik, Montage, Karton.",
+    "price": "Ladenpreis. Vorerst automatisch fair gesetzt – mit dem Büro bestimmst du ihn selbst.",
+    "margin": "Was dir pro verkauftem Handy bleibt.",
+    "devTime": "Spieltage, bis der Prototyp läuft (du, allein, an der Werkbank).",
+    "devCost": "Bauteile und Prototypen. Wird vorab bezahlt.",
+    "weekly": "Wahrscheinliche Verkäufe in den ersten Wochen. Die Garage schafft 50 handgebaute Handys pro Woche.",
     "speed": "Spielgeschwindigkeit"
   },
   "tutorial": {
-    "color": "Wähle eine Farbe – dein Handy wird live lackiert.",
-    "shape": "Jetzt die Form.",
-    "display": "Wähle die Displaygröße. Groß sieht toll aus, kostet aber Akku.",
-    "launch": "Fertig! Bring dein erstes Handy auf den Markt.",
-    "skip": "Überspringen"
+    "color": "Okay. Erste Entscheidung deines Imperiums: Welche Farbe?",
+    "shape": "Gut. Jetzt die Silhouette – weich, kantig oder flach?",
+    "display": "Displaygröße. Groß sieht super aus. Der Akku wird dich dafür hassen.",
+    "launch": "Es funktioniert. Meistens. Drück den Knopf.",
+    "skip": "Intro überspringen"
   },
   "editor": {
-    "cat": {
-      "color": "Farbe",
-      "shape": "Form",
-      "display": "Display"
-    },
-    "shape": {
-      "round": "Rund",
-      "boxy": "Kantig",
-      "slim": "Schlank"
-    },
-    "trend": "Trend",
-    "new": "Neu",
+    "cat": { "color": "Lack", "shape": "Form", "display": "Display" },
+    "shape": { "round": "Kiesel", "boxy": "Ziegel", "slim": "Waffel" },
+    "trend": "HEISS",
+    "new": "NEU",
     "design": "Design",
     "tech": "Technik",
-    "review": "Review-Prognose",
+    "review": "Kritiker sagen",
     "unitCost": "Stückkosten",
     "price": "Preis",
     "margin": "Marge",
-    "devTime": "Entwicklung",
+    "devTime": "Bauzeit",
     "devTimeValue": "{days} Tage",
-    "devCost": "Entw.-Kosten",
-    "weekly": "Absatzprognose",
-    "weeklyValue": "≈ {n}/Woche",
-    "startDev": "Entwicklung starten",
-    "launch": "Launch!",
+    "devCost": "Prototyp-Kosten",
+    "weekly": "Erwartete Verkäufe",
+    "weeklyValue": "~{n}/Woche",
+    "startDev": "Bau starten",
+    "launch": "LAUNCH",
     "close": "Schließen",
     "inches": "{n}″",
     "thinner": "dünner",
-    "pricier": "teurer"
+    "pricier": "teurer",
+    "sheet": "Datenblatt",
+    "forecast": "Prognose"
   },
   "color": {
-    "graphite": "Graphit",
-    "snow": "Schnee",
-    "silver": "Silber",
-    "crimson": "Karmesin",
-    "ocean": "Ozean",
-    "lime": "Limette",
-    "midnight": "Mitternachtsblau",
-    "coral": "Koralle",
-    "mint": "Mint",
-    "gold": "Champagner"
+    "graphite": "Graphit", "snow": "Schnee", "silver": "Silber", "crimson": "Karmesin", "ocean": "Ozean",
+    "lime": "Limette", "midnight": "Mitternacht", "coral": "Koralle", "mint": "Mint", "gold": "Champagner"
   },
   "launch": {
-    "overnight": "Die Nacht durchgearbeitet…",
+    "overnight": "Kaffee Nummer sieben. Löten. Fragwürdige Entscheidungen.",
     "launching": "{name} geht an den Start",
+    "now": "Frisch von der Werkbank",
     "preorders": "Vorbestellungen",
     "units": "{n} Handys",
     "revenue": "Umsatz",
     "profit": "Gewinn",
-    "reviews": "Die Reviews sind da!",
-    "score": "Review-Note",
+    "reviews": "Die Presse hat Meinungen.",
+    "score": "Schnitt",
     "brand": "Marke +{n}",
-    "continue": "Weiter",
+    "continue": "Zurück an die Arbeit",
     "next": "Als Nächstes",
-    "unlockColor": "Neue Farbe freigeschaltet: {color}",
-    "now": "Jetzt neu"
+    "unlockColor": "Neuer Lack freigeschaltet: {color}"
   },
   "review": {
-    "good": {
-      "color": "Die Farbe trifft genau den Nerv der Saison.",
-      "shape": "Wunderbar ausgewogene Proportionen.",
-      "thin": "Beeindruckend dünn – passt in jede Tasche.",
-      "screen": "Das Display füllt die Front. Traumhaft.",
-      "display": "Ein Display in genau der richtigen Größe.",
-      "battery": "Der Akku hält locker den ganzen Tag.",
-      "performance": "Flott und flüssig im Alltag.",
-      "price": "Hervorragendes Preis-Leistungs-Verhältnis."
+    "pocketbyte": {
+      "good": {
+        "color": "DIESE FARBE! Wir würden sie vom Tisch klauen.",
+        "shape": "Liegt in der Hand, als wäre sie dafür geschnitzt. WOW.",
+        "thin": "SO dünn, dass es uns aus der Tasche gerutscht ist. Egal.",
+        "screen": "NUR DISPLAY, KEIN QUATSCH.",
+        "display": "Displaygröße? Perfekt. Keine Fragen.",
+        "battery": "Akku hielt die ganze Büroparty durch. Und die Afterparty.",
+        "performance": "SCHNELL. Also wirklich schnell.",
+        "price": "Billig UND gut? Wer hat das erlaubt?"
+      },
+      "bad": {
+        "color": "Die Farbe ist sowas von letztes Jahr.",
+        "shape": "Fühlt sich an wie ein Türstopper.",
+        "thin": "KLOBIG. Wir nutzen es als Briefbeschwerer.",
+        "screen": "Ränder, auf denen man parken könnte.",
+        "display": "Die Displaygröße ist einfach… komisch.",
+        "battery": "Vor der Mittagspause tot. RIP.",
+        "performance": "App geöffnet. Brot geschmiert. Lädt immer noch.",
+        "price": "Für DEN Preis? Auf keinen Fall."
+      }
     },
-    "bad": {
-      "color": "Die Farbe wirkt etwas aus der Mode.",
-      "shape": "Die Proportionen wirken unglücklich.",
-      "thin": "Klobig im Vergleich zur Konkurrenz.",
-      "screen": "Viel Rand, wenig Display.",
-      "display": "Die Displaygröße passt nicht ganz.",
-      "battery": "Der Akku kämpft sich kaum durch den Tag.",
-      "performance": "Träge, wenn viele Apps laufen.",
-      "price": "Zu teuer für das Gebotene."
+    "gadgetwelt": {
+      "good": {
+        "color": "Eine Farbwahl mit echter Zurückhaltung – selten in dieser Klasse.",
+        "shape": "Die Proportionen sind leise selbstbewusst.",
+        "thin": "Eine Lektion in Schlankheit, ohne Kompromiss.",
+        "screen": "Das Display wirkt wie eine ruhige, ungebrochene Fläche.",
+        "display": "Die Größe wirkt durchdacht, nicht erjagt.",
+        "battery": "Ausdauer, bei der man das Ladekabel vergisst.",
+        "performance": "Unaufgeregt, flüssig, angenehm.",
+        "price": "Ehrlicher Wert, ehrlich gemacht."
+      },
+      "bad": {
+        "color": "Die Farbwahl wirkt wie eine Gremiumsentscheidung.",
+        "shape": "Die Proportionen finden nie ganz zueinander.",
+        "thin": "Leider ziemlich dick.",
+        "screen": "Zu viel Rahmen, zu wenig Bild.",
+        "display": "Die Displaygröße wirkt unentschlossen.",
+        "battery": "Sorgt sich um den eigenen Akku – wir auch.",
+        "performance": "Es zögert. Oft.",
+        "price": "Ambitioniert bepreist für das, was es ist."
+      }
+    },
+    "techblitz": {
+      "good": {
+        "color": "farb_score: hoch. trend_treffer: true.",
+        "shape": "ergonomie-test: BESTANDEN (14/15 Tester).",
+        "thin": "messschieber: beeindruckend niedrig.",
+        "screen": "screen-to-body: über Segment-Schnitt.",
+        "display": "panelgröße im optimalen Bereich.",
+        "battery": "akku-test: 26h. deutlich über Schnitt.",
+        "performance": "benchmark: Klassenbester. kein Drosseln.",
+        "price": "preis/leistung: exzellent."
+      },
+      "bad": {
+        "color": "farb_score: niedrig. trend_treffer: false.",
+        "shape": "ergonomie-test: DURCHGEFALLEN (Daumenkrampf).",
+        "thin": "messschieber: dick. Segment ist dünner.",
+        "screen": "screen-to-body: unter Segment-Schnitt.",
+        "display": "panelgröße außerhalb des optimalen Bereichs.",
+        "battery": "akku-test: 9h. unter Schnitt.",
+        "performance": "benchmark: Ruckler unter Last.",
+        "price": "preis/leistung: schwach. auf Angebot warten."
+      }
     }
   },
   "goals": {
-    "title": "Ziele",
-    "done": "Ziel erreicht!",
-    "firstLaunch": "Bring dein erstes Handy auf den Markt",
-    "earn10k": "Besitze 10K $ Kapital",
-    "secondLaunch": "Launche ein zweites Handy",
-    "sell500": "Verkaufe insgesamt 500 Handys",
-    "office": "Spare 25K $ für dein erstes Büro",
-    "review8": "Erreiche eine Review-Note von 8,0",
-    "fans100": "Gewinne 100 Fans",
+    "title": "To-do",
+    "done": "Erledigt:",
+    "firstLaunch": "Bring dein erstes Handy raus",
+    "earn10k": "Hab 10K $ auf dem Konto",
+    "secondLaunch": "Bring ein zweites Handy raus",
+    "sell500": "Verkaufe 500 Handys",
+    "office": "Spar 25K $ für ein echtes Büro",
+    "review8": "Hol dir eine 8,0 im Review",
+    "fans100": "Finde 100 Fans",
     "rewardCash": "+{amount}",
-    "rewardColor": "Neue Farbe"
+    "rewardColor": "neuer Lack"
   },
   "teaser": {
-    "office": "Nur noch {amount} bis zu deinem ersten Büro!",
-    "secondLaunch": "Designe dein nächstes Handy – jedes stärkt deine Marke.",
-    "officeReady": "Dein Startup-Büro ist bereit. Team und Forschung kommen im nächsten Update!",
+    "office": "Noch {amount}, dann ist Schluss mit Garage.",
+    "secondLaunch": "Ein Handy ist ein Zufall. Zwei sind eine Firma. Bau das nächste.",
+    "officeReady": "Ein echtes Büro ist drin. Team und Forschung kommen im nächsten Update.",
     "generic": "Nächstes Ziel: {goal}"
   },
   "action": {
-    "newPhone": "Neues Handy designen",
-    "developing": "In Entwicklung… {p} %",
-    "ready": "{name} launchen!"
+    "newPhone": "Neues Handy",
+    "developing": "Wird gebaut… {p} %",
+    "ready": "{name} launchen"
   },
   "products": {
-    "title": "Deine Handys",
+    "title": "Im Verkauf",
     "perWeek": "{n}/Wo.",
     "sold": "{n} verkauft",
     "retired": "Ausgelaufen",
-    "capped": "Garage ausgelastet"
+    "capped": "Garage am Limit"
   },
   "toast": {
-    "noCash": "Nicht genug Kapital für die Entwicklung.",
-    "devDone": "Prototyp fertig – bereit zum Launch!",
-    "officeReady": "Startup-Büro freigeschaltet!",
-    "retired": "{name} ist ausgelaufen."
+    "noCash": "Zu wenig Geld für die Prototyp-Teile.",
+    "devDone": "Der Prototyp läuft. Meistens. Bereit zum Launch!",
+    "officeReady": "Ein echtes Büro ist jetzt drin!",
+    "retired": "{name} hat leise die Regale verlassen."
+  },
+  "barks": {
+    "idle": [
+      "Sollte das nächste dünner sein? Es sollte dünner sein.",
+      "Notiz an mich: Stuhl mit Lehne kaufen.",
+      "Irgendwo kopiert mich gerade ein Konkurrent. Bestimmt.",
+      "Liegt die Katze schon wieder auf dem Prototyp?",
+      "Diese Garage riecht nach Lötzinn und Ehrgeiz.",
+      "Vielleicht Rot. Leute mögen Rot. Oder?",
+      "Mama fragt, wann ich einen richtigen Job habe.",
+      "Fünfzig Handys pro Woche von Hand. Meine Daumen."
+    ],
+    "dev": [
+      "Warum bootet es in den Taschenrechner?",
+      "Einen Bug gefixt. Drei gebaut. Fortschritt.",
+      "Wenn ich das festklebe, zählt das als Scharnier?",
+      "Prototyp Nummer vier. Eins bis drei hat niemand gesehen."
+    ],
+    "sold": [
+      "Jemand hat dafür echt bezahlt!",
+      "Noch eine Bestellung. Ich sollte die Quittungen rahmen.",
+      "Kling-kling. Zurück zum Lötkolben."
+    ]
   },
   "settings": {
     "title": "Einstellungen",
@@ -163,8 +215,8 @@
     "sound": "Ton",
     "on": "An",
     "off": "Aus",
-    "reset": "Neu beginnen",
-    "resetConfirm": "Firma löschen und neu beginnen?",
-    "close": "Schließen"
+    "reset": "Alles abfackeln (neues Spiel)",
+    "resetConfirm": "Wirklich? Deine Firma ist dann weg.",
+    "close": "Fertig"
   }
 }

@@ -1,8 +1,5 @@
 {
-  "app": {
-    "title": "Phone Empire 3D",
-    "loading": "Building your garage…"
-  },
+  "app": { "title": "Phone Empire 3D", "loading": "Sweeping the garage floor…" },
   "hud": {
     "date": "Week {week} · {year}",
     "cash": "Cash",
@@ -10,147 +7,202 @@
     "fans": "Fans",
     "pause": "Pause",
     "settings": "Settings",
-    "rename": "Rename company"
+    "rename": "Rename your company"
   },
   "tip": {
-    "cash": "Your company's cash. Earned from phone sales minus unit costs, upkeep and development.",
-    "brand": "Brand value (0–100). Grows with good reviews and makes every phone more attractive.",
-    "fans": "Fans buy at launch (pre-orders) and grow with every well-reviewed phone.",
-    "date": "Game time. One day passes every 5 seconds at 1x.",
-    "design": "Design score 0–10: material, thickness, screen-to-body, size, color and proportions – measured against this era's expectations.",
-    "tech": "Tech score 0–10: chip, display, battery, camera, storage and RAM compared with what the market expects this year.",
-    "review": "Forecast review score (±0.5). Higher reviews sell far more phones.",
-    "unitCost": "What one phone costs you to build: parts, materials, assembly and packaging.",
-    "price": "Retail price, set automatically to a fair value for now.",
-    "margin": "Profit per phone sold.",
-    "devTime": "Development time in game days (founder working alone).",
-    "devCost": "One-off development cost, paid when development starts.",
-    "weekly": "Expected sales in the first weeks. The garage can build 50 phones per week.",
+    "cash": "Money in the bank. Sales minus parts, rent and late-night development.",
+    "brand": "Brand (0–100). Good reviews push it up, and a strong brand sells every phone a little easier.",
+    "fans": "Fans pre-order at launch. Every well-reviewed phone wins a few more.",
+    "date": "Game time. At 1× a day takes 5 seconds.",
+    "design": "Design 0–10: material, thinness, screen-to-body, size, color and proportions – judged against what people expect this year.",
+    "tech": "Tech 0–10: chip, display, battery, camera, storage and RAM – judged against what the market expects this year.",
+    "review": "Where the critics will probably land (±0.5). Better reviews sell a lot more phones.",
+    "unitCost": "What one phone costs you: parts, plastic, assembly, box.",
+    "price": "Shelf price. Set to a fair value for now – you get to pick it once you have an office.",
+    "margin": "What you keep from each phone sold.",
+    "devTime": "Game days until the prototype works (you, alone, at a workbench).",
+    "devCost": "Parts and prototypes. Paid up front.",
+    "weekly": "Likely sales in the first weeks. The garage can hand-build 50 phones a week.",
     "speed": "Game speed"
   },
   "tutorial": {
-    "color": "Pick a color – your phone gets painted live.",
-    "shape": "Now choose a shape.",
-    "display": "Pick a display size. Bigger looks great but drains the battery.",
-    "launch": "Ready! Launch your first phone.",
-    "skip": "Skip"
+    "color": "Okay. First decision of the empire: what color is it?",
+    "shape": "Nice. Now the silhouette – soft, sharp or skinny?",
+    "display": "Screen size. Bigger looks great. The battery will hate you for it.",
+    "launch": "It works. Mostly. Smash the button.",
+    "skip": "Skip intro"
   },
   "editor": {
-    "cat": {
-      "color": "Color",
-      "shape": "Shape",
-      "display": "Display"
-    },
-    "shape": {
-      "round": "Rounded",
-      "boxy": "Boxy",
-      "slim": "Slim"
-    },
-    "trend": "Trend",
-    "new": "New",
+    "cat": { "color": "Paint", "shape": "Shape", "display": "Screen" },
+    "shape": { "round": "Pebble", "boxy": "Brick", "slim": "Wafer" },
+    "trend": "HOT",
+    "new": "NEW",
     "design": "Design",
     "tech": "Tech",
-    "review": "Review forecast",
+    "review": "Critics will say",
     "unitCost": "Unit cost",
     "price": "Price",
     "margin": "Margin",
-    "devTime": "Development",
+    "devTime": "Build time",
     "devTimeValue": "{days} days",
-    "devCost": "Dev cost",
-    "weekly": "Sales forecast",
-    "weeklyValue": "≈ {n}/week",
-    "startDev": "Start development",
-    "launch": "Launch!",
+    "devCost": "Prototype cost",
+    "weekly": "Expected sales",
+    "weeklyValue": "~{n}/week",
+    "startDev": "Start building",
+    "launch": "LAUNCH",
     "close": "Close",
     "inches": "{n}″",
     "thinner": "thinner",
-    "pricier": "pricier"
+    "pricier": "pricier",
+    "sheet": "Spec sheet",
+    "forecast": "Forecast"
   },
   "color": {
-    "graphite": "Graphite",
-    "snow": "Snow",
-    "silver": "Silver",
-    "crimson": "Crimson",
-    "ocean": "Ocean",
-    "lime": "Lime",
-    "midnight": "Midnight Blue",
-    "coral": "Coral",
-    "mint": "Mint",
-    "gold": "Champagne"
+    "graphite": "Graphite", "snow": "Snow", "silver": "Silver", "crimson": "Crimson", "ocean": "Ocean",
+    "lime": "Lime", "midnight": "Midnight", "coral": "Coral", "mint": "Mint", "gold": "Champagne"
   },
   "launch": {
-    "overnight": "Working through the night…",
+    "overnight": "Coffee number seven. Soldering. Questionable decisions.",
     "launching": "Launching {name}",
+    "now": "Hot off the workbench",
     "preorders": "Pre-orders",
     "units": "{n} phones",
     "revenue": "Revenue",
     "profit": "Profit",
-    "reviews": "The reviews are in!",
-    "score": "Review score",
+    "reviews": "The press has opinions.",
+    "score": "Average",
     "brand": "Brand +{n}",
-    "continue": "Continue",
-    "next": "Up next",
-    "unlockColor": "New color unlocked: {color}",
-    "now": "Now launching"
+    "continue": "Back to work",
+    "next": "Next up",
+    "unlockColor": "New paint unlocked: {color}"
   },
   "review": {
-    "good": {
-      "color": "That color is spot-on for this season.",
-      "shape": "Beautifully balanced proportions.",
-      "thin": "Impressively thin – it slides into any pocket.",
-      "screen": "The screen dominates the front. Gorgeous.",
-      "display": "A display that's just the right size.",
-      "battery": "Battery easily lasts the whole day.",
-      "performance": "Snappy and smooth in everyday use.",
-      "price": "Great value for the money."
+    "pocketbyte": {
+      "good": {
+        "color": "THAT COLOR! We'd steal it off a table.",
+        "shape": "Feels like it was carved for a human hand. WOW.",
+        "thin": "SO thin it slid out of our pocket. Worth it.",
+        "screen": "ALL SCREEN, NO NONSENSE.",
+        "display": "Screen size? Spot on. No notes.",
+        "battery": "Battery lasted our whole office party. And the after-party.",
+        "performance": "FAST. Like, actually fast.",
+        "price": "Cheap AND good? Who let this happen?"
+      },
+      "bad": {
+        "color": "That color is giving… last year.",
+        "shape": "Holding it feels like holding a doorstop.",
+        "thin": "CHUNKY. We used it as a paperweight.",
+        "screen": "Bezels you could park a car on.",
+        "display": "The screen size is just… odd.",
+        "battery": "Died before lunch. RIP.",
+        "performance": "Opened an app. Made a sandwich. Still loading.",
+        "price": "For THAT price? Absolutely not."
+      }
     },
-    "bad": {
-      "color": "The color feels a bit out of fashion.",
-      "shape": "The proportions look awkward.",
-      "thin": "Chunky compared with the competition.",
-      "screen": "Too much bezel, too little screen.",
-      "display": "The display size feels off.",
-      "battery": "The battery struggles to last a day.",
-      "performance": "Sluggish when apps pile up.",
-      "price": "Overpriced for what you get."
+    "gadgetwelt": {
+      "good": {
+        "color": "A palette with genuine restraint – rare at this price.",
+        "shape": "The proportions are quietly confident.",
+        "thin": "A lesson in slimness, without the compromise.",
+        "screen": "The display reads as one calm, unbroken surface.",
+        "display": "Its size feels considered, not chased.",
+        "battery": "Endurance that lets you forget about the charger.",
+        "performance": "Unhurried, fluid, pleasant.",
+        "price": "Honest value, honestly made."
+      },
+      "bad": {
+        "color": "The color choice feels like a committee's.",
+        "shape": "The proportions never quite resolve.",
+        "thin": "Sadly, it is rather thick.",
+        "screen": "Too much frame, too little picture.",
+        "display": "The screen size seems undecided.",
+        "battery": "Anxious about its own battery, and so are we.",
+        "performance": "It hesitates. Often.",
+        "price": "Ambitiously priced for what it is."
+      }
+    },
+    "techblitz": {
+      "good": {
+        "color": "color_score: high. trend_match: true.",
+        "shape": "ergonomics test: PASS (14/15 testers).",
+        "thin": "caliper reading: impressively low.",
+        "screen": "screen-to-body ratio: above segment average.",
+        "display": "panel size within optimal range for segment.",
+        "battery": "battery rundown: 26h. well above average.",
+        "performance": "benchmark: top of its class. no throttling.",
+        "price": "price/perf ratio: excellent."
+      },
+      "bad": {
+        "color": "color_score: low. trend_match: false.",
+        "shape": "ergonomics test: FAIL (thumb cramp reported).",
+        "thin": "caliper reading: thick. segment avg is thinner.",
+        "screen": "screen-to-body ratio: below segment average.",
+        "display": "panel size outside optimal range.",
+        "battery": "battery rundown: 9h. below average.",
+        "performance": "benchmark: frame drops under load.",
+        "price": "price/perf ratio: poor. wait for a sale."
+      }
     }
   },
   "goals": {
-    "title": "Goals",
-    "done": "Goal complete!",
-    "firstLaunch": "Launch your first phone",
-    "earn10k": "Have $10K in cash",
-    "secondLaunch": "Launch a second phone",
-    "sell500": "Sell 500 phones in total",
-    "office": "Save $25K for your first office",
-    "review8": "Get a review score of 8.0",
-    "fans100": "Win 100 fans",
+    "title": "To do",
+    "done": "Done:",
+    "firstLaunch": "Ship your first phone",
+    "earn10k": "Get $10K in the bank",
+    "secondLaunch": "Ship a second phone",
+    "sell500": "Sell 500 phones",
+    "office": "Save $25K for a real office",
+    "review8": "Get an 8.0 review",
+    "fans100": "Find 100 fans",
     "rewardCash": "+{amount}",
-    "rewardColor": "New color"
+    "rewardColor": "new paint"
   },
   "teaser": {
-    "office": "Only {amount} to go until your first office!",
-    "secondLaunch": "Design your next phone – each one makes your brand stronger.",
-    "officeReady": "Your startup office is ready. Hiring and research arrive in the next update!",
+    "office": "{amount} more and you can stop working in a garage.",
+    "secondLaunch": "One phone is a fluke. Two is a company. Build the next one.",
+    "officeReady": "You can afford a real office. Hiring and research arrive in the next update.",
     "generic": "Next goal: {goal}"
   },
   "action": {
-    "newPhone": "Design new phone",
-    "developing": "Developing… {p}%",
-    "ready": "Launch {name}!"
+    "newPhone": "New phone",
+    "developing": "Building… {p}%",
+    "ready": "Launch {name}"
   },
   "products": {
-    "title": "Your phones",
+    "title": "On sale",
     "perWeek": "{n}/wk",
     "sold": "{n} sold",
     "retired": "Discontinued",
-    "capped": "Garage at capacity"
+    "capped": "Garage maxed out"
   },
   "toast": {
-    "noCash": "Not enough cash for development.",
-    "devDone": "Prototype finished – ready to launch!",
-    "officeReady": "Startup office unlocked!",
-    "retired": "{name} has been discontinued."
+    "noCash": "Not enough cash for the prototype parts.",
+    "devDone": "Prototype works. Mostly. Ready to launch!",
+    "officeReady": "You can afford a real office now!",
+    "retired": "{name} has quietly left the shelves."
+  },
+  "barks": {
+    "idle": [
+      "Should the next one be thinner? It should be thinner.",
+      "Note to self: buy a chair with a back.",
+      "Somewhere, a competitor is copying me. Probably.",
+      "Is that the cat on the prototype again?",
+      "This garage smells like solder and ambition.",
+      "Maybe red. People like red. Right?",
+      "Mom asked when I'm getting a real job.",
+      "Fifty phones a week by hand. My thumbs hurt."
+    ],
+    "dev": [
+      "Why does it boot into the calculator?",
+      "Fixed one bug. Made three. Progress.",
+      "If I tape this down, does it count as a hinge?",
+      "Prototype number four. Nobody saw numbers one to three."
+    ],
+    "sold": [
+      "Someone actually paid for that!",
+      "Another order. I should frame the receipts.",
+      "Ka-ching. Back to the soldering iron."
+    ]
   },
   "settings": {
     "title": "Settings",
@@ -163,8 +215,8 @@
     "sound": "Sound",
     "on": "On",
     "off": "Off",
-    "reset": "Start over",
-    "resetConfirm": "Delete your company and start over?",
-    "close": "Close"
+    "reset": "Burn it all down (new game)",
+    "resetConfirm": "Really? Your company will be gone.",
+    "close": "Done"
   }
 }

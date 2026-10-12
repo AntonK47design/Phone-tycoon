@@ -17,6 +17,11 @@ import { installJuice } from './ui/juice';
 import { installAutosave, loadSave, SAVE_KEY, writeSave } from './ui/persistence';
 import { loadPrefs } from './ui/hud/Settings';
 import { installTooltips } from './ui/tooltip';
+import '@fontsource/bungee/latin-400.css';
+import '@fontsource/barlow-semi-condensed/latin-600.css';
+import '@fontsource/barlow-semi-condensed/latin-800.css';
+import '@fontsource/space-mono/latin-400.css';
+import '@fontsource/space-mono/latin-700.css';
 import './ui/styles/main.css';
 
 async function boot() {
@@ -59,7 +64,9 @@ async function boot() {
 
   engine.start(() => {
     mark('firstFrame');
-    document.getElementById('loader')?.classList.add('hide');
+    const loader = document.getElementById('loader');
+    loader?.classList.add('hide');
+    setTimeout(() => loader?.remove(), 700);
     platform.loadingStop();
     // Intro camera move: straight to the turntable for new players.
     engine.goToView(inTutorial ? 'editor' : 'overview', 2.4, () => {

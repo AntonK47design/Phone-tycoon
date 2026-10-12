@@ -166,7 +166,7 @@ export class Engine {
     gtao.updateGtaoMaterial({ radius: 0.35, distanceExponent: 1.5, thickness: 1.2, scale: 1.1, samples: 12 });
     gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12 });
     gtao.blendIntensity = 0.9;
-    const bloom = new UnrealBloomPass(new Vector2(256, 256), 0.35, 0.5, 1.6);
+    const bloom = new UnrealBloomPass(new Vector2(256, 256), 0.4, 0.5, 2.4);
     const output = new OutputPass();
     const tiltH = createTiltShiftPass(true);
     const tiltV = createTiltShiftPass(false);
@@ -383,11 +383,14 @@ export class Engine {
   }
 
   /** Projects a named anchor to CSS pixel coordinates. */
-  project(anchor: 'phone' | 'bench'): { x: number; y: number; visible: boolean } {
+  project(anchor: 'phone' | 'bench' | 'founder'): { x: number; y: number; visible: boolean } {
     const p = new Vector3();
     if (anchor === 'phone') {
       this.phone.group.getWorldPosition(p);
       p.y += this.phone.sceneHeight * 0.6;
+    } else if (anchor === 'founder') {
+      this.garage.founder.root.getWorldPosition(p);
+      p.y += 1.62;
     } else p.copy(this.garage.benchLabelPos);
     p.project(this.rig.camera);
     const el = this.renderer.domElement;

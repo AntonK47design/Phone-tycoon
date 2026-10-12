@@ -9,7 +9,7 @@ export interface ColorDef {
 
 export const COLORS: ColorDef[] = [
   { id: 'graphite', hex: '#2c3038', starter: true },
-  { id: 'snow', hex: '#eeeeea', starter: true },
+  { id: 'snow', hex: '#e6e3da', starter: true },
   { id: 'silver', hex: '#c3c7cd', starter: true },
   { id: 'crimson', hex: '#c42f3d', starter: true },
   { id: 'ocean', hex: '#2c6fd8', starter: true },

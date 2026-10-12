@@ -5,8 +5,8 @@ import { colorById } from '../data/design';
 import { GOALS } from '../data/goals';
 import type { SimEvent } from '../sim/events';
 import { money } from './format';
-import { game, launchData, toast } from './game';
-import { lang, t } from './i18n';
+import { game, launchData, sayBark, toast } from './game';
+import { lang, t, tList } from './i18n';
 
 let lastCoin = 0;
 const deferred: (() => void)[] = [];
@@ -84,19 +84,20 @@ export function installJuice() {
           if (p.visible) flyCoins(p, Math.min(4, 1 + Math.floor(e.units / 4)));
           floatMoney(e.profit);
           sfx.coin(0.9 + Math.random() * 0.2);
+          if (Math.random() < 0.06) sayBark(tList('barks.sold'));
           break;
         }
         case 'goalCompleted': {
           later(() => {
             const g = GOALS.find((x) => x.id === e.goalId);
             if (!g) return;
-            toast(`${t('goals.done')} ${t(`goals.${g.id}`)}`, '🏆', true);
+            toast(`${t('goals.done')} ${t(`goals.${g.id}`)}`, 'trophy', true);
             sfx.unlock2();
           });
           break;
         }
         case 'colorUnlocked':
-          later(() => toast(t('launch.unlockColor', { color: t(`color.${e.colorId}`) }), '🎨'));
+          later(() => toast(t('launch.unlockColor', { color: t(`color.${e.colorId}`) }), 'paint'));
           void colorById(e.colorId);
           break;
         case 'devStarted':
@@ -104,25 +105,25 @@ export function installJuice() {
           break;
         case 'devDone':
           if (store.getState().stats.launches > 0) {
-            toast(t('toast.devDone'), '✨', true);
+            toast(t('toast.devDone'), 'spark', true);
             sfx.unlock2();
             engine.confettiAt('bench');
           }
           break;
         case 'officeReady':
           later(() => {
-            toast(t('toast.officeReady'), '🏢', true);
+            toast(t('toast.officeReady'), 'building', true);
             sfx.fanfare();
             platform.happytime();
           });
           break;
         case 'productRetired': {
           const p = store.getState().products.find((x) => x.id === e.productId);
-          if (p) toast(t('toast.retired', { name: p.design.name }), '📦');
+          if (p) toast(t('toast.retired', { name: p.design.name }), 'box');
           break;
         }
         case 'rejected':
-          if (e.reason === 'noCash') toast(t('toast.noCash'), '⚠️');
+          if (e.reason === 'noCash') toast(t('toast.noCash'), 'warn');
           break;
         default:
           break;

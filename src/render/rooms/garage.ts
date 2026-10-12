@@ -27,6 +27,7 @@ import {
   type Material,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { Cat } from '../characters/Cat';
 import { Founder } from '../characters/Founder';
 import { PhoneModel } from '../phone/PhoneModel';
 import {
@@ -369,6 +370,11 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
   const beanGeo = keep(new SphereGeometry(0.42, 24, 18));
   beanGeo.scale(1, 0.62, 1);
   place(beanGeo, M.fabric, -2.35, 0.26, 2.15);
+  const cat = new Cat();
+  cat.root.position.set(-2.38, 0.5, 2.1);
+  cat.root.rotation.y = 0.9;
+  root.add(cat.root);
+  disposables.push(cat);
   cyl(0.2, 0.15, 0.36, M.pot, -3.05, 0.18, 2.6, 20);
   const leaves: [number, number, number, number][] = [
     [0, 0.65, 0, 0.22],
@@ -431,7 +437,7 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
   pendantBulb.position.set(tt.x, lampY - 0.08, tt.z);
   root.add(pendantBulb);
 
-  const spot = new SpotLight('#fff1dc', 4, 6, 0.42, 0.65, 1.6);
+  const spot = new SpotLight('#fff1dc', 2.6, 6, 0.42, 0.65, 1.6);
   spot.position.set(tt.x, lampY - 0.1, tt.z);
   spot.target.position.set(tt.x, 0.3, tt.z);
   spot.castShadow = quality === 'high';
@@ -441,7 +447,7 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
   root.add(spot, spot.target);
 
   // Showroom key light from the front, so the hero phone's face reads well.
-  const heroKey = new SpotLight('#ffffff', 2.6, 6, 0.32, 0.8, 1.4);
+  const heroKey = new SpotLight('#fff6ea', 1.5, 6, 0.32, 0.8, 1.4);
   heroKey.position.set(tt.x + 1.1, 1.9, tt.z + 2.0);
   heroKey.target.position.set(tt.x, 0.55, tt.z);
   root.add(heroKey, heroKey.target);
@@ -470,7 +476,7 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
   place(new TubeGeometry(wireCurve, 80, 0.006, 4), M.cable, 0, 0, 0, undefined, { castShadow: false });
   const wireCurve2 = new CatmullRomCurve3(bulbsPts.slice(24));
   place(new TubeGeometry(wireCurve2, 80, 0.006, 4), M.cable, 0, 0, 0, undefined, { castShadow: false });
-  const fairyMat = keep(new MeshStandardMaterial({ color: '#000', emissive: '#ffffff', emissiveIntensity: 3 }));
+  const fairyMat = keep(new MeshStandardMaterial({ color: '#000', emissive: '#ffffff', emissiveIntensity: 4 }));
   const fairy = new InstancedMesh(keep(new SphereGeometry(0.03, 10, 8)), fairyMat, bulbsPts.length);
   const dummy = new Object3D();
   const warm = new Color('#ffc46b');
@@ -493,9 +499,10 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
     ledMaterial,
     spot,
     founder,
-    benchLabelPos: new Vector3(founderPos.x - 0.3, 1.95, founderPos.z),
+    benchLabelPos: new Vector3(benchX + 0.1, 1.25, benchZ1 - 0.3),
     update(t, dt, dayFraction, launchBoost) {
       founder.update(t, dt);
+      cat.update(t);
       // Clock: one full revolution of the hour hand per game day.
       hourHand.rotation.z = -dayFraction * Math.PI * 4;
       minHand.rotation.z = -dayFraction * Math.PI * 48;
@@ -511,7 +518,7 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
       }
       fairy.instanceColor!.needsUpdate = true;
       ledMaterial.emissiveIntensity = 3.2 + Math.sin(t * 2) * 0.4 + launchBoost * 5;
-      spot.intensity = 4 + launchBoost * 12;
+      spot.intensity = 2.6 + launchBoost * 10;
     },
     dispose() {
       batch.dispose();

@@ -106,15 +106,45 @@ export function pegboardTexture(): Texture {
   return t;
 }
 
+/** Self-healing cutting mat: the diorama sits on the workbench of a giant. */
 export function backgroundTexture(): Texture {
-  const [c, ctx] = canvas(16, 512);
-  const g = ctx.createLinearGradient(0, 0, 0, 512);
-  g.addColorStop(0, '#2b3160');
-  g.addColorStop(0.55, '#1a1d3b');
-  g.addColorStop(1, '#0c0e1d');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 16, 512);
-  return tex(c);
+  const W = 1024;
+  const H = 640;
+  const [c, ctx] = canvas(W, H);
+  ctx.fillStyle = '#1f4a3c';
+  ctx.fillRect(0, 0, W, H);
+  const rnd = prng(19);
+  for (let i = 0; i < 2500; i++) {
+    ctx.fillStyle = `rgba(0,0,0,${rnd() * 0.06})`;
+    ctx.fillRect(rnd() * W, rnd() * H, 2, 2);
+  }
+  const step = 24;
+  for (let x = 0; x <= W; x += step) {
+    const major = (x / step) % 5 === 0;
+    ctx.fillStyle = major ? 'rgba(214,236,220,0.22)' : 'rgba(214,236,220,0.09)';
+    ctx.fillRect(x, 0, major ? 2 : 1, H);
+  }
+  for (let y = 0; y <= H; y += step) {
+    const major = (y / step) % 5 === 0;
+    ctx.fillStyle = major ? 'rgba(214,236,220,0.22)' : 'rgba(214,236,220,0.09)';
+    ctx.fillRect(0, y, W, major ? 2 : 1);
+  }
+  // 45° and 60° cutting guides plus ruler numbers along the edge.
+  ctx.strokeStyle = 'rgba(214,236,220,0.13)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(H, 0);
+  ctx.moveTo(W, H);
+  ctx.lineTo(W - H * 0.58, 0);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(214,236,220,0.35)';
+  ctx.font = '700 11px monospace';
+  for (let i = 1; i * step * 5 < W; i++) ctx.fillText(String(i * 5), i * step * 5 + 4, 14);
+  for (let i = 1; i * step * 5 < H; i++) ctx.fillText(String(i * 5), 4, i * step * 5 - 4);
+  const t = tex(c);
+  t.anisotropy = 1;
+  return t;
 }
 
 export function skyTexture(): Texture {
