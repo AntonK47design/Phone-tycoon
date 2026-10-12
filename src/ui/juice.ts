@@ -154,6 +154,43 @@ export function installJuice() {
             platform.happytime();
           });
           break;
+        case 'hired': {
+          const p = store.getState().team.staff.find((x) => x.id === e.id);
+          if (p) toast(t('toast.hired', { name: p.first, role: t(`team.role.${p.role}`) }), 'spark');
+          break;
+        }
+        case 'trainingDone': {
+          const p = store.getState().team.staff.find((x) => x.id === e.id);
+          if (p) toast(t('toast.trained', { name: p.first, skill: e.skill }), 'trophy');
+          sfx.unlock2();
+          break;
+        }
+        case 'staffQuit':
+          toast(t('toast.quit', { name: e.name }), 'warn');
+          break;
+        case 'officeUpgraded':
+          toast(t('toast.officeUpgraded', { level: e.level }), 'building', true);
+          platform.happytime();
+          break;
+        case 'labBuilt':
+          toast(t('toast.labBuilt', { level: e.level }), 'building', true);
+          break;
+        case 'studioBuilt':
+          toast(t('toast.studioBuilt', { level: e.level }), 'building', true);
+          break;
+        case 'bonusPaid':
+          toast(t('toast.bonus'), 'spark');
+          break;
+        case 'dailyDone':
+          later(() => toast(t('toast.dailyDone'), 'trophy', true));
+          break;
+        case 'calendarClaimed':
+          floatMoney(e.cash);
+          if (e.cosmetic) later(() => toast(t('toast.aurora'), 'paint', true));
+          break;
+        case 'dailyClaimed':
+          if (e.reward.cash) floatMoney(e.reward.cash);
+          break;
         case 'rejected':
           if (e.reason === 'noCash') toast(t('toast.noCash'), 'warn');
           break;

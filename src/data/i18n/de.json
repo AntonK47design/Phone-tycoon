@@ -191,7 +191,11 @@
     "fans500": "Gewinne 500 Fans",
     "revenue1m": "Erreiche 1 Mio. $ Umsatz",
     "brand35": "Bau deine Marke auf 35 aus",
-    "valuation10m": "Erreiche 10 Mio. $ Firmenwert"
+    "valuation10m": "Erreiche 10 Mio. $ Firmenwert",
+    "firstHire": "Stell deine erste Person ein",
+    "team4": "Wachse auf 4 Leute",
+    "train1": "Schick jemanden auf einen Kurs",
+    "office2": "Bau das Büro aus"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
@@ -223,7 +227,16 @@
     "soldOut": "{name} ist ausverkauft!",
     "loan": "Die Bank springt ein: {amount} Kredit.",
     "phase3": "Firmenwert-Meilenstein! Designstudio & Fabrik kommen im nächsten Update.",
-    "researchStarted": "Das Labor legt los."
+    "researchStarted": "Das Labor legt los.",
+    "hired": "{name} ist dabei als {role}!",
+    "trained": "{name} ist zurück vom Kurs: Skill {skill}",
+    "quit": "{name} hat gekündigt. Die Stimmung war zu schlecht.",
+    "officeUpgraded": "Büro-Stufe {level}! Mehr Plätze, besserer Kaffee.",
+    "labBuilt": "Forschungslabor Stufe {level} ist offen",
+    "studioBuilt": "Designstudio Stufe {level} ist offen",
+    "bonus": "Bonus gezahlt. Das Büro riecht nach Pizza.",
+    "dailyDone": "Job erledigt! Unter „Täglich“ abholen.",
+    "aurora": "Freigeschaltet: Aurora-Finish (Lackmenü)"
   },
   "barks": {
     "idle": [
@@ -266,12 +279,18 @@
   "tabs": {
     "company": "Firma",
     "research": "Forschung",
-    "market": "Markt"
+    "market": "Markt",
+    "team": "Team"
   },
   "office": {
     "rent": "Ins Büro ziehen · {price}",
     "rented": "Willkommen im Büro! Forschung, Marketing und echte Produktion sind offen.",
-    "label": "Startup-Büro"
+    "label": "Startup-Büro",
+    "viewGarage": "Garage",
+    "viewOffice": "Büro",
+    "idle": "Kaffee & Ideen",
+    "researching": "forscht",
+    "hypeBoost": "+{pct} % Hype"
   },
   "segment": {
     "title": "Positionierung",
@@ -313,7 +332,8 @@
   },
   "finish": {
     "gloss": "Glänzend",
-    "matte": "Matt"
+    "matte": "Matt",
+    "aurora": "Aurora"
   },
   "feature": {
     "wifi": "WLAN",
@@ -482,5 +502,106 @@
     "rollable": "Rollbar",
     "holo": "Holo-Zeit",
     "neural": "Neural-Zeit"
+  },
+  "team": {
+    "title": "Team",
+    "seats": "{n}/{max} Plätze",
+    "points": "Punkte / Tag",
+    "ratesTip": "Design · Technik · Software pro Tag (inkl. Gründer)",
+    "rp": "Forschung / Tag",
+    "quality": "Bauqualität",
+    "qualityTip": "Im Vergleich zu dem, was ein Handy-Team dieses Jahr können sollte. Unter null kostet Review-Punkte.",
+    "qualityHint": "Dein Team hinkt hinterher. Schick Leute auf Kurse oder stell Stärkere ein: schlampige Builds kosten Review-Punkte.",
+    "hype": "Hype-Bonus",
+    "payroll": "Gehälter / Wo",
+    "moraleAvg": "Stimmung",
+    "payrollWarn": "Gehälter fressen {pct} % deines Wochengewinns. Vorsicht.",
+    "staff": "Deine Leute",
+    "empty": "Noch niemand da. Stell Designer, Ingenieurin und Programmierer ein: Handys werden schneller und besser.",
+    "applicants": "Bewerbungen",
+    "newIn": "neue Gesichter in {days} T",
+    "noApplicants": "Gerade bewirbt sich niemand. Bald kommen neue.",
+    "roleHint": "Design → Designpunkte · Ingenieure → Technik · Programmierer → Software · Forscher → Forschung · Marketing (Büro 2) → Hype.",
+    "hire": "Einstellen · {amount}",
+    "train": "Kurs · {amount}",
+    "trainTip": "Zwei Wochen weg, kommt besser zurück.",
+    "training": "Im Kurs · {days} T",
+    "fire": "Entlassen",
+    "bonus": "Pizza & Bonus für alle · {amount}",
+    "bonusWait": "Bonus erst kürzlich gezahlt",
+    "noSeats": "Büro ist voll. Erst ausbauen.",
+    "busy": "Gerade nicht.",
+    "skill": "Skill",
+    "perWeek": "{amount}/Wo",
+    "buildings": "Gebäude",
+    "officeNext": "Größeres Büro (Stufe {level})",
+    "officeMax": "Büro: oberste Etage erreicht",
+    "officeDesc": "{seats} Plätze · +{bonus} % Leistung · Miete {rent}/Wo",
+    "labNext": "Forschungslabor (Stufe {level})",
+    "labMax": "Labor voll ausgestattet",
+    "labDesc": "+{pct} % Forschungstempo · Miete 1 %/Wo",
+    "studioNext": "Designstudio (Stufe {level})",
+    "studioMax": "Studio voll ausgestattet",
+    "studioDesc": "+{pct} % Designpunkte · +{polish} Review-Feinschliff",
+    "needOffice2": "Labor und Studio brauchen Büro-Stufe 2.",
+    "maxed": "voll",
+    "role": {
+      "designer": "Designer",
+      "engineer": "Ingenieur",
+      "programmer": "Programmierer",
+      "researcher": "Forscher",
+      "marketer": "Marketing"
+    },
+    "roles": {
+      "designer": "Design",
+      "engineer": "Hardware",
+      "programmer": "Software",
+      "researcher": "Labor",
+      "marketer": "Marketing"
+    },
+    "trait": {
+      "fast": "Flink",
+      "perfectionist": "Perfektionist",
+      "nightOwl": "Nachteule",
+      "cheerful": "Sonnenschein",
+      "frugal": "Bescheiden",
+      "mentor": "Mentor"
+    },
+    "traitTip": {
+      "fast": "+15 % Tempo, etwas schlampiger",
+      "perfectionist": "−10 % Tempo, zählt mehr für die Bauqualität",
+      "nightOwl": "+5 % Tempo, meist nach 22 Uhr",
+      "cheerful": "Hebt die Stimmung aller",
+      "frugal": "10 % günstiger",
+      "mentor": "Kollegen lernen mehr im Kurs"
+    },
+    "morale": {
+      "great": "blüht auf",
+      "ok": "passt",
+      "meh": "grummelig",
+      "bad": "schreibt Lebenslauf"
+    }
+  },
+  "daily": {
+    "title": "Täglich",
+    "calendarHint": "Schau einmal am Tag rein. Einen Tag verpasst? Egal, deine Serie wartet einfach.",
+    "day": "Tag {n}",
+    "aurora": "Aurora-Finish",
+    "claim": "{amount} abholen",
+    "comeBack": "Abgeholt. Bis morgen!",
+    "orders": "Heutige Gelegenheitsjobs",
+    "noOrders": "Jobs tauchen auf, sobald die Uhr läuft.",
+    "collect": "Abholen",
+    "hype": "{n} Hype",
+    "resetHint": "Jeden Tag um Mitternacht neue Jobs.",
+    "order": {
+      "sell": "Verkaufe {n} Handys",
+      "revenue": "Mache {amount} Umsatz",
+      "launch": "Launche ein Handy mit Wertung {score}+",
+      "research": "Schließe eine Forschung ab",
+      "hire": "Stell jemanden ein",
+      "train": "Schick jemanden auf einen Kurs",
+      "reorder": "Bestelle eine Produktionscharge"
+    }
   }
 }

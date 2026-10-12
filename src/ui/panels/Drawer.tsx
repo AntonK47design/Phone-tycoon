@@ -1,4 +1,4 @@
-// Phase-2 side panels: Company, Research, Market.
+// Phase-2 side panels: Company, Team, Research, Market.
 
 import { sfx } from '../../audio/sfx';
 import { LAB_BUDGETS, LAB_COST_PER_RP, OEM_MIN_BATCH } from '../../data/components';
@@ -16,7 +16,9 @@ import { priceAnchor } from '../../sim/scoring/score';
 import type { GameState } from '../../sim/state';
 import { calendar, yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
-import { drawer, game, toast, useGameState, type DrawerTab } from '../game';
+import { drawer, game, hubView, toast, useGameState, type DrawerTab } from '../game';
+import { seats } from '../../sim/team';
+import { TeamPanel } from './TeamPanel';
 import { lang, t } from '../i18n';
 import { IconClose } from '../icons';
 import { researchEffect, researchName, researchNameById } from '../labels';
@@ -24,7 +26,7 @@ import { researchEffect, researchName, researchNameById } from '../labels';
 export function DrawerTabs() {
   const state = useGameState();
   if (state.phase < 2) return null;
-  const tabs: DrawerTab[] = ['company', 'research', 'market'];
+  const tabs: DrawerTab[] = ['company', 'team', 'research', 'market'];
   const busy = researchProgress(state);
   return (
     <div class="tabs">
@@ -35,10 +37,16 @@ export function DrawerTabs() {
           onClick={() => {
             sfx.click();
             drawer.value = drawer.value === tab ? null : tab;
+            // The team lives in the office: show it.
+            if (drawer.value === 'team' && hubView.value !== 'office') {
+              hubView.value = 'office';
+              game().engine.goToView('office', 1.2);
+            }
           }}
         >
           {t(`tabs.${tab}`)}
           {tab === 'research' && !busy && <i class="dot-alert" />}
+          {tab === 'team' && state.team.staff.length < seats(state) && state.team.applicants.length > 0 && state.team.staff.length < 2 && <i class="dot-alert" />}
         </button>
       ))}
     </div>
@@ -55,6 +63,7 @@ export function Drawer() {
         <IconClose />
       </button>
       {tab === 'company' && <CompanyPanel state={state} />}
+      {tab === 'team' && <TeamPanel state={state} />}
       {tab === 'research' && <ResearchPanel state={state} />}
       {tab === 'market' && <MarketPanel state={state} />}
     </div>

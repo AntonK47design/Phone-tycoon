@@ -49,9 +49,22 @@ export interface LaunchData {
   options?: LaunchOptions;
 }
 
-export type DrawerTab = 'company' | 'research' | 'market';
+export type DrawerTab = 'company' | 'team' | 'research' | 'market';
 /** Open side panel (Phase 2+). */
 export const drawer = signal<DrawerTab | null>(null);
+/** Which room the hub camera shows (Phase 2+). */
+export const hubView = signal<'garage' | 'office'>('garage');
+/** Camera view for the hub, depending on the chosen room. */
+export function hubCamera(): 'overview' | 'office' {
+  return hubView.value === 'office' ? 'office' : 'overview';
+}
+/** Daily calendar & orders dialog. */
+export const dailyOpen = signal(false);
+/** Today's real-world date (YYYY-MM-DD, local time) for the daily calendar. */
+export function today(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 /** Launch setup dialog open (Phase 2+). */
 export const launchSetupOpen = signal(false);
 /** "While you were away" report shown after loading. */

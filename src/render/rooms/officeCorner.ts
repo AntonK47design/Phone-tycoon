@@ -16,7 +16,7 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import { mergeChildren } from '../mergeChildren';
 import { roundRect } from '../textures';
 
-function neonTexture(text: string): CanvasTexture {
+export function neonTexture(text: string): CanvasTexture {
   const c = document.createElement('canvas');
   c.width = 512;
   c.height = 160;

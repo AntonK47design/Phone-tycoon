@@ -32,10 +32,12 @@ import { PhoneModel, type PhoneVisual } from './phone/PhoneModel';
 import { createGradePass, createTiltShiftPass } from './post/passes';
 import { AutoQuality, initialQuality, isMobileDevice, PROFILES, type Quality, type QualitySetting } from './quality';
 import { buildGarage, TURNTABLE_POS, type GarageRoom } from './rooms/garage';
+import { Office, OFFICE_ORIGIN, type OfficeVisual } from './rooms/office';
 import { OfficeCorner } from './rooms/officeCorner';
+import type { Role } from '../data/team';
 import { backgroundTexture } from './textures';
 
-export type ViewName = 'intro' | 'overview' | 'editor' | 'launch';
+export type ViewName = 'intro' | 'overview' | 'editor' | 'launch' | 'office';
 
 const TT = TURNTABLE_POS;
 const VIEWS: Record<ViewName, View> = {
@@ -43,6 +45,7 @@ const VIEWS: Record<ViewName, View> = {
   overview: { target: new Vector3(0.15, 0.95, -0.1), azimuth: 0.62, elevation: 0.5, distance: 11.8, fov: 30, tiltShift: 1 },
   editor: { target: new Vector3(TT.x, 0.56, TT.z), azimuth: 0.3, elevation: 0.2, distance: 1.6, fov: 30, tiltShift: 0.45 },
   launch: { target: new Vector3(TT.x, 0.6, TT.z), azimuth: 0.3, elevation: 0.24, distance: 2.3, fov: 32, tiltShift: 0.5 },
+  office: { target: OFFICE_ORIGIN.clone().add(new Vector3(0, 0.7, 0)), azimuth: 0.55, elevation: 0.55, distance: 12, fov: 30, tiltShift: 1 },
 };
 
 export interface EngineStats {
@@ -70,6 +73,9 @@ export class Engine {
   private key: DirectionalLight;
   private garage: GarageRoom;
   private office: OfficeCorner;
+  private hq = new Office();
+  private hqLevel = 0;
+  private view: ViewName = 'intro';
   private phone: PhoneModel;
   private confetti = new Confetti();
   private quality: Quality;
@@ -157,6 +163,7 @@ export class Engine {
     this.scene.add(this.garage.root);
     this.office = new OfficeCorner();
     this.scene.add(this.office.group);
+    this.scene.add(this.hq.root);
 
     this.phone = new PhoneModel({ colorHex: null, shapeId: 'round', displaySize: 3.5, kitYear: 2007, finishId: 'gloss', lenses: 1 });
     this.garage.heroAnchor.add(this.phone.group);
@@ -269,6 +276,7 @@ export class Engine {
 
     this.garage.update(t, dt, this.dayFraction, this.launchBoost);
     this.office.update(t);
+    if (this.view === 'office') animating = this.hq.update(t, dt) || animating;
     const tilt = this.rig.view.tiltShift * (PROFILES[this.quality].tiltShift ? 1 : 0);
     this.passes.tiltH.uniforms.strength.value = tilt;
     this.passes.tiltV.uniforms.strength.value = tilt;
@@ -342,6 +350,9 @@ export class Engine {
   goToView(name: ViewName, duration = 1.2, onDone?: () => void) {
     this.phoneMode = name === 'editor' ? 'present' : 'spin';
     if (name !== 'editor') this.yawOffset = 0;
+    this.view = name;
+    if (name === 'office') VIEWS.office.distance = 9.5 + Math.max(1, this.hqLevel) * 2.1;
+    this.aimShadows(name === 'office');
     this.rig.goTo(VIEWS[name], duration, onDone);
     this.lastInput = performance.now();
   }
@@ -354,6 +365,31 @@ export class Engine {
 
   spin() {
     this.flourish = { t: 0, from: 0 };
+  }
+
+  /** Moves the shadow frustum to the room the camera looks at. */
+  private aimShadows(office: boolean) {
+    const off = office ? OFFICE_ORIGIN : new Vector3();
+    this.key.position.set(5.5, 9, 6.5).add(off);
+    this.key.target.position.copy(off);
+    const sc = this.key.shadow.camera;
+    const r = office ? 8 : 5.5;
+    sc.left = -r;
+    sc.right = r;
+    sc.top = r;
+    sc.bottom = -r;
+    sc.updateProjectionMatrix();
+  }
+
+  get currentView(): ViewName {
+    return this.view;
+  }
+
+  /** Office diorama: level, buildings and staff. */
+  setOffice(v: OfficeVisual) {
+    this.hqLevel = v.level;
+    this.hq.setVisual(v);
+    this.lastInput = performance.now();
   }
 
   /** Shows the Phase-2 office corner with the company's neon sign. */
@@ -393,9 +429,11 @@ export class Engine {
   }
 
   /** Projects a named anchor to CSS pixel coordinates. */
-  project(anchor: 'phone' | 'bench' | 'founder'): { x: number; y: number; visible: boolean } {
+  project(anchor: 'phone' | 'bench' | 'founder' | `team:${Role}`): { x: number; y: number; visible: boolean } {
     const p = new Vector3();
-    if (anchor === 'phone') {
+    if (anchor.startsWith('team:')) {
+      if (this.view !== 'office' || !this.hq.teamAnchor(anchor.slice(5) as Role, p)) return { x: 0, y: 0, visible: false };
+    } else if (anchor === 'phone') {
       this.phone.group.getWorldPosition(p);
       p.y += this.phone.sceneHeight * 0.6;
     } else if (anchor === 'founder') {

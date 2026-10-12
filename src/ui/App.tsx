@@ -10,6 +10,9 @@ import { LaunchSequence } from './launch/LaunchSequence';
 import { LaunchSetup } from './launch/LaunchSetup';
 import { Drawer, DrawerTabs } from './panels/Drawer';
 import { WelcomeBack } from './hud/WelcomeBack';
+import { DailyModal, useDailySync } from './hud/Daily';
+import { TeamLabels, ViewToggle } from './hud/Office';
+import { isWorking } from '../sim/team';
 
 const DevPanel = import.meta.env.DEV ? lazy(() => import('./debug/DevPanel').then((m) => ({ default: m.DevPanel }))) : null;
 
@@ -24,11 +27,20 @@ function usePhoneSync() {
     const design = m === 'editor' || m === 'tutorial' ? state.draft : state.dev?.design ?? last?.design ?? state.draft;
     engine.setPhone(toVisual(design));
     engine.setPhase(state.phase, state.company.name);
+    engine.setOffice({
+      level: state.team.office,
+      lab: state.team.lab,
+      studio: state.team.studio,
+      companyName: state.company.name,
+      staff: state.team.staff.map((e) => ({ id: e.id, role: e.role, look: e.look, morale: e.morale, away: !isWorking(e, state.day) })),
+      busy: !!state.dev && !state.dev.done,
+    });
   });
 }
 
 export function App() {
   usePhoneSync();
+  useDailySync();
   void lang.value; // re-render on language change
   const m = mode.value;
   return (
@@ -38,6 +50,8 @@ export function App() {
       {m === 'free' && <Products />}
       {m === 'free' && <ActionBar />}
       {m === 'free' && <BenchLabel />}
+      {m === 'free' && <TeamLabels />}
+      {m === 'free' && <ViewToggle />}
       {m === 'free' && <DrawerTabs />}
       {m === 'free' && <Drawer />}
       <FounderBark />
@@ -46,6 +60,7 @@ export function App() {
       <Toasts />
       {launchSetupOpen.value && <LaunchSetup />}
       <WelcomeBack />
+      <DailyModal />
       {settingsOpen.value && <Settings />}
       <div id="fx-layer" class="passthrough" />
       {DevPanel && (

@@ -191,7 +191,11 @@
     "fans500": "Win 500 fans",
     "revenue1m": "Reach $1M revenue",
     "brand35": "Grow your brand to 35",
-    "valuation10m": "Reach a $10M valuation"
+    "valuation10m": "Reach a $10M valuation",
+    "firstHire": "Hire your first employee",
+    "team4": "Grow the team to 4",
+    "train1": "Train someone",
+    "office2": "Upgrade the office"
   },
   "teaser": {
     "office": "{amount} more and you can stop working in a garage.",
@@ -223,7 +227,16 @@
     "soldOut": "{name} is sold out!",
     "loan": "The bank stepped in: {amount} loan.",
     "phase3": "Valuation milestone! Design studio & factory arrive in the next update.",
-    "researchStarted": "The lab is on it."
+    "researchStarted": "The lab is on it.",
+    "hired": "{name} joins as {role}!",
+    "trained": "{name} is back from training: skill {skill}",
+    "quit": "{name} quit. Morale was too low.",
+    "officeUpgraded": "Office level {level}! More desks, better coffee.",
+    "labBuilt": "Research lab level {level} is open",
+    "studioBuilt": "Design studio level {level} is open",
+    "bonus": "Bonus paid. The office smells like pizza.",
+    "dailyDone": "Odd job done! Collect it in Daily.",
+    "aurora": "Unlocked: Aurora finish (paint menu)"
   },
   "barks": {
     "idle": [
@@ -266,12 +279,18 @@
   "tabs": {
     "company": "Company",
     "research": "Research",
-    "market": "Market"
+    "market": "Market",
+    "team": "Team"
   },
   "office": {
     "rent": "Move into an office · {price}",
     "rented": "Welcome to the office! Research, marketing and real production are open.",
-    "label": "Startup office"
+    "label": "Startup office",
+    "viewGarage": "Garage",
+    "viewOffice": "Office",
+    "idle": "coffee & ideas",
+    "researching": "researching",
+    "hypeBoost": "+{pct}% hype"
   },
   "segment": {
     "title": "Position",
@@ -313,7 +332,8 @@
   },
   "finish": {
     "gloss": "Gloss",
-    "matte": "Matte"
+    "matte": "Matte",
+    "aurora": "Aurora"
   },
   "feature": {
     "wifi": "Wi-Fi",
@@ -482,5 +502,106 @@
     "rollable": "Rollables",
     "holo": "Holo age",
     "neural": "Neural age"
+  },
+  "team": {
+    "title": "Team",
+    "seats": "{n}/{max} desks",
+    "points": "Points / day",
+    "ratesTip": "Design · Tech · Software points per day (founder included)",
+    "rp": "Research / day",
+    "quality": "Build quality",
+    "qualityTip": "Compared to what a phone team should know this year. Below zero costs review points.",
+    "qualityHint": "Your team is behind the times. Train people or hire stronger applicants: sloppy builds cost review points.",
+    "hype": "Hype boost",
+    "payroll": "Payroll / wk",
+    "moraleAvg": "Mood",
+    "payrollWarn": "Payroll eats {pct}% of your weekly profit. Careful.",
+    "staff": "Your people",
+    "empty": "Nobody here yet. Hire a designer, an engineer and a programmer: phones get built faster and better.",
+    "applicants": "Applicants",
+    "newIn": "new faces in {days} d",
+    "noApplicants": "Nobody's applying right now. Next batch soon.",
+    "roleHint": "Designers → design points · Engineers → tech · Programmers → software · Researchers → research · Marketing (office 2) → hype.",
+    "hire": "Hire · {amount}",
+    "train": "Train · {amount}",
+    "trainTip": "Two weeks away, comes back better.",
+    "training": "At a course · {days} d",
+    "fire": "Let go",
+    "bonus": "Pizza & bonus for everyone · {amount}",
+    "bonusWait": "Bonus paid recently",
+    "noSeats": "Office is full. Upgrade it first.",
+    "busy": "Not right now.",
+    "skill": "Skill",
+    "perWeek": "{amount}/wk",
+    "buildings": "Buildings",
+    "officeNext": "Bigger office (level {level})",
+    "officeMax": "Office: top floor reached",
+    "officeDesc": "{seats} desks · +{bonus}% output · rent {rent}/wk",
+    "labNext": "Research lab (level {level})",
+    "labMax": "Lab fully kitted out",
+    "labDesc": "+{pct}% research speed · rent 1%/wk",
+    "studioNext": "Design studio (level {level})",
+    "studioMax": "Studio fully kitted out",
+    "studioDesc": "+{pct}% design points · +{polish} review polish",
+    "needOffice2": "Lab and studio need office level 2.",
+    "maxed": "maxed",
+    "role": {
+      "designer": "Designer",
+      "engineer": "Engineer",
+      "programmer": "Programmer",
+      "researcher": "Researcher",
+      "marketer": "Marketing"
+    },
+    "roles": {
+      "designer": "Design",
+      "engineer": "Hardware",
+      "programmer": "Software",
+      "researcher": "Lab",
+      "marketer": "Marketing"
+    },
+    "trait": {
+      "fast": "Speedy",
+      "perfectionist": "Perfectionist",
+      "nightOwl": "Night owl",
+      "cheerful": "Sunshine",
+      "frugal": "Modest",
+      "mentor": "Mentor"
+    },
+    "traitTip": {
+      "fast": "+15% speed, a bit sloppier",
+      "perfectionist": "−10% speed, counts more for build quality",
+      "nightOwl": "+5% speed, mostly after 10 pm",
+      "cheerful": "Lifts everyone's mood",
+      "frugal": "10% cheaper",
+      "mentor": "Colleagues learn more in training"
+    },
+    "morale": {
+      "great": "thriving",
+      "ok": "fine",
+      "meh": "grumpy",
+      "bad": "updating CV"
+    }
+  },
+  "daily": {
+    "title": "Daily",
+    "calendarHint": "Drop by once a day. Miss a day? No problem, your streak just waits.",
+    "day": "Day {n}",
+    "aurora": "Aurora finish",
+    "claim": "Collect {amount}",
+    "comeBack": "Collected. See you tomorrow!",
+    "orders": "Today's odd jobs",
+    "noOrders": "Odd jobs show up once the clock is running.",
+    "collect": "Collect",
+    "hype": "{n} hype",
+    "resetHint": "New odd jobs every day at midnight.",
+    "order": {
+      "sell": "Sell {n} phones",
+      "revenue": "Make {amount} in sales",
+      "launch": "Launch a phone that scores {score}+",
+      "research": "Finish a research project",
+      "hire": "Hire someone",
+      "train": "Send someone to a course",
+      "reorder": "Order a production batch"
+    }
   }
 }

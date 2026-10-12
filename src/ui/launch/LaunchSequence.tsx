@@ -10,7 +10,7 @@ import type { SimEvent } from '../../sim/events';
 import { goalProgress, visibleGoals } from '../../sim/goals';
 import { decimal, money, shortNum } from '../format';
 import { mark } from '../funnel';
-import { cashOverride, game, launchData, mode, speed, useGameState } from '../game';
+import { cashOverride, game, hubCamera, launchData, mode, speed, useGameState } from '../game';
 import { lang, t } from '../i18n';
 import { nextResearchTeaser } from '../../sim/research';
 import { researchName } from '../labels';
@@ -120,7 +120,7 @@ export function LaunchSequence() {
     launchData.value = null;
     mode.value = 'free';
     if (store.getState().tutorial !== 'done') store.dispatch({ type: 'setTutorial', step: 'done' });
-    engine.goToView('overview', 1.4);
+    engine.goToView(hubCamera(), 1.4);
     if (speed.value === 0) speed.value = 1;
     flushDeferred();
     save();

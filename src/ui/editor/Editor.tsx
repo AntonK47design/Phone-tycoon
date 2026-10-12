@@ -7,7 +7,7 @@ import type { TutorialStep } from '../../sim/state';
 import { yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
 import { mark } from '../funnel';
-import { game, mode, toVisual, useGameState } from '../game';
+import { game, hubCamera, mode, toVisual, useGameState } from '../game';
 import { lang, t } from '../i18n';
 import { startLaunch } from '../launch/flow';
 import { AdvancedEditor } from './AdvancedEditor';
@@ -206,14 +206,14 @@ export function Editor() {
   const close = () => {
     sfx.click();
     mode.value = 'free';
-    engine.goToView('overview', 1.1);
+    engine.goToView(hubCamera(), 1.1);
   };
 
   const startDev = () => {
     const ev = store.dispatch({ type: 'startDev' });
     if (ev.some((e) => e.type === 'devStarted')) {
       mode.value = 'free';
-      engine.goToView('overview', 1.2);
+      engine.goToView(hubCamera(), 1.2);
     }
   };
 

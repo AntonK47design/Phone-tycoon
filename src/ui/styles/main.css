@@ -459,6 +459,59 @@ svg { flex: none; }
 .lab-budget { margin-bottom: 10px; }
 .lab-budget .seg button { font-family: var(--mono); font-size: 11px; min-height: 34px; }
 
+/* ── M3: office, team, daily ─────────────────────────────────────────── */
+.view-toggle { position: absolute; top: 70px; left: 50%; transform: translateX(-50%) rotate(-.6deg); display: flex; padding: 4px; gap: 4px; background: var(--paper); border: var(--border); border-radius: 10px; box-shadow: var(--shadow-sm); z-index: 5; }
+.view-toggle button { position: relative; min-height: 38px; padding: 0 16px; font-family: var(--display); font-size: 13px; border-radius: 7px; color: var(--ink-2); }
+.view-toggle button.on { background: var(--ink); color: var(--paper); }
+.team-label { min-width: 120px; background: var(--paper); border: 2px solid var(--ink); border-radius: 6px; box-shadow: var(--shadow-sm); transition: opacity .2s; }
+.team-label .team-name { font-family: var(--display); font-size: 12px; -webkit-text-stroke: .3px var(--ink); }
+.team-label .team-what { color: var(--muted); font-size: 10px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+.team-label .bar { height: 7px; }
+.person { display: grid; grid-template-columns: 38px 1fr; gap: 4px 10px; border: 2px solid var(--ink); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: #fffdf6; box-shadow: var(--shadow-sm); }
+.person.away { opacity: .62; background: repeating-linear-gradient(-45deg, #fffdf6 0 8px, #f3ead6 8px 16px); }
+.avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-family: var(--display); font-size: 13px; color: #fff; -webkit-text-stroke: .4px var(--ink); }
+.person-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.person-head { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
+.person-head b { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.role-chip { font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; filter: brightness(.8); }
+.person-sub { font-size: 12px; color: var(--muted); }
+.morale.great { color: #12915f; }
+.morale.meh { color: var(--warn); }
+.morale.bad { color: var(--red); }
+.skill { display: grid; grid-template-columns: auto 1fr 28px; gap: 6px; align-items: center; font-size: 11px; }
+.skill b { font-family: var(--mono); text-align: right; }
+.person-actions { grid-column: 1 / -1; display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.person-actions .btn-secondary { min-height: 32px; padding: 0 10px; font-size: 11px; }
+.kpi .rates { display: flex; gap: 8px; }
+.kpi .rates i { font-style: normal; }
+.bonus-btn { width: 100%; margin: 2px 0 6px; font-size: 12px; }
+.building { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 2px dashed var(--ink); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 14px; }
+.building .muted { font-size: 12px; }
+.building .btn-secondary { min-height: 36px; padding: 0 12px; font-size: 12px; white-space: nowrap; }
+.small { font-size: 11px; }
+.daily-btn { position: relative; }
+.daily-btn.pending { background: var(--tape); }
+.modal.daily { width: min(460px, calc(100vw - 24px)); position: relative; gap: 10px; }
+.cal-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal-day { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 2px solid var(--ink); border-radius: 6px; background: #fffdf6; font-family: var(--mono); min-height: 64px; justify-content: center; }
+.cal-day .cal-n { font-size: 9px; text-transform: uppercase; color: var(--muted); }
+.cal-day .cal-r { font-size: 11px; font-weight: 700; text-align: center; line-height: 1.1; }
+.cal-day.done { background: var(--paper-2); color: var(--muted); }
+.cal-day.now { background: var(--tape); box-shadow: var(--shadow-sm); transform: rotate(-2deg) scale(1.06); }
+.cal-day.big .cal-r { font-size: 9px; }
+.cal-swatch { width: 18px; height: 8px; border-radius: 4px; border: 1.5px solid var(--ink); background: linear-gradient(90deg, #7fdcff, #b18cff, #ff7aa8, #ffd23f); }
+.cal-claim { width: 100%; }
+.order { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border: 2px solid var(--ink); border-radius: 8px; padding: 8px 10px; background: #fffdf6; }
+.order.claimed { opacity: .55; }
+.order-main { display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+.order-main .muted { font-family: var(--mono); font-size: 11px; }
+.order .btn-secondary { min-height: 36px; padding: 0 12px; font-size: 12px; }
+@media (max-width: 640px) {
+  .view-toggle { top: 116px; }
+  .cal-day { min-height: 54px; }
+  .cal-day .cal-r { font-size: 9px; }
+}
+
 /* Respect the OS "reduce motion" setting: no entrance animations or bobbing. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

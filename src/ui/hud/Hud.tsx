@@ -6,6 +6,7 @@ import { cashOverride, dayFraction, drawer, game, mode, settingsOpen, speed, use
 import { researchProgress } from '../../sim/research';
 import { researchName } from '../labels';
 import { lang, t } from '../i18n';
+import { DailyButton } from './Daily';
 
 /** Smoothly rolls a displayed number towards `target`. */
 export function useRolling(target: number, tau = 0.35): number {
@@ -118,6 +119,7 @@ export function Hud() {
           <span class="val">{money(cash, l)}</span>
           {state.company.debt > 0 && <span class="debt">−{money(state.company.debt, l)}</span>}
         </div>
+        <DailyButton />
         <button class="glass icon-btn" aria-label={t('hud.settings')} onClick={() => ((settingsOpen.value = true), sfx.click())}>
           <GearIcon />
         </button>
