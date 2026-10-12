@@ -10,6 +10,7 @@ import {
   GARAGE_CAPACITY_WEEK,
   GARAGE_UPKEEP_WEEK,
   OEM_LEAD_DAYS,
+  OPERATIONS_RATE,
   OEM_MIN_BATCH,
   OFFICE_PRICE,
   OFFICE_RENT_WEEK,
@@ -53,10 +54,10 @@ import { createRng, type Rng } from './rng';
 import {
   clamp,
   designScore,
-  effectivePrice,
   featureAdjustment,
   overallRating,
   reviewAspects,
+  roundPrice,
   reviewEstimate,
   suggestedPrice,
   techScore,
@@ -109,7 +110,7 @@ export function newGame(seed: number): GameState {
     nextProductId: 1,
     unlockedColors: COLORS.filter((c) => c.starter).map((c) => c.id),
     completedGoals: [],
-    research: { done: [], current: null },
+    research: { done: [], current: null, budget: 0 },
     stats: { launches: 0, unitsTotal: 0, revenueTotal: 0, profitTotal: 0, bestReview: 0, bestLaunchHype: 0 },
     history: { cash: [], revenue: [], profit: [], playerUnits: [], compUnits: {} },
     week: { revenue: 0, profit: 0, units: 0 },
@@ -137,6 +138,7 @@ export type Action =
   | { type: 'startResearch'; id: string }
   | { type: 'orderBatch'; productId: number; units: number }
   | { type: 'discontinue'; productId: number }
+  | { type: 'setLabBudget'; amount: number }
   | { type: 'debugCash'; amount: number };
 
 export function isFirstLaunch(state: GameState): boolean {
@@ -169,7 +171,23 @@ export function normalizeDraft(state: GameState, d: PhoneDesign): void {
   if (!availableShapes(state).includes(d.shapeId)) d.shapeId = 'round';
   if (!availableSizes(state).includes(d.displaySize)) d.displaySize = 3.5;
   if (d.customPrice !== null) d.customPrice = clamp(Math.round(d.customPrice), 29, 4999);
-  d.price = effectivePrice(d, year);
+  d.price = d.customPrice ?? autoPrice(state, d);
+}
+
+/** Minimum margin the automatic price keeps after the shops' cut. */
+export const AUTO_MARGIN = 1.3;
+
+/**
+ * Automatic shelf price: the market's fair suggestion, but never below what it costs
+ * to build and sell the phone (unit cost / (1 − channel cut) × margin).
+ */
+export function autoPrice(state: GameState, d: PhoneDesign): number {
+  const year = yearOf(state.day);
+  const fair = suggestedPrice(d, year);
+  if (state.phase < 2) return fair;
+  const cost = unitCost(d, year, 'oem');
+  const floor = roundPrice((cost / (1 - channelCut(state))) * AUTO_MARGIN);
+  return Math.max(fair, floor);
 }
 
 /** Applies a player action. Mutates `state` and returns emitted events. */
@@ -205,6 +223,9 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
       return orderBatch(state, action.productId, action.units, OEM_LEAD_DAYS);
     case 'discontinue':
       return discontinue(state, action.productId);
+    case 'setLabBudget':
+      state.research.budget = Math.max(0, Math.round(action.amount));
+      return [];
   }
 }
 
@@ -605,8 +626,10 @@ export function advanceDay(state: GameState): SimEvent[] {
     let storage = 0;
     for (const p of state.products) if (p.active && !p.madeToOrder) storage += p.stock * p.unitCost * STORAGE_RATE;
     const interest = state.company.debt * LOAN_INTEREST_WEEK;
-    state.company.cash -= rent + storage + interest;
-    state.week.profit -= rent + storage + interest;
+    const operations = state.phase >= 2 ? state.week.revenue * OPERATIONS_RATE : 0;
+    const lab = state.phase >= 2 ? state.research.budget : 0;
+    state.company.cash -= rent + storage + interest + operations + lab;
+    state.week.profit -= rent + storage + interest + operations + lab;
     // Good weeks pay the bank back automatically.
     if (state.company.debt > 0 && state.week.profit > 0) {
       const repay = Math.min(state.company.debt, state.week.profit * LOAN_REPAY_SHARE, Math.max(0, state.company.cash));

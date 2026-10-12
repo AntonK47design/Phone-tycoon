@@ -34,7 +34,13 @@ export const OFFICE_RENT_WEEK = 3_000;
 export const OFFICE_REACH = 0.0025;
 /** Share of the shelf price kept by sales channels: online shop, retail, carriers. */
 export const CHANNEL_CUT = { online: 0.1, retail: 0.25, carrier: 0.3 } as const;
+/** Operations (support, logistics, warranty) as a share of revenue, from the office on. */
+export const OPERATIONS_RATE = 0.12;
 export const FOUNDER_RP_PER_DAY = 4;
+/** Lab budget: weekly $ (2007) per extra research point per day. */
+export const LAB_COST_PER_RP = 2_500;
+/** Lab budget steps offered in the UI (2007 $ per week). */
+export const LAB_BUDGETS = [0, 5_000, 20_000, 50_000, 150_000, 500_000];
 /** Contract manufacturer: markup on unit cost, lead time for re-orders, minimum batch. */
 export const OEM_MARKUP = 1.2;
 export const OEM_ASSEMBLY_COST = 12;

@@ -22,7 +22,7 @@ const DEV_TYPE: Record<TechCategory, 'tech' | 'software'> = {
 const BASE_DEV: Record<TechCategory, number> = { chip: 3, display: 2, battery: 1, camera: 2, storage: 1, ram: 1 };
 
 export const FIRST_GEN = START_YEAR;
-export const LAST_GEN = 2016;
+export const LAST_GEN = 2024;
 
 export interface PartDef {
   id: string;
@@ -51,7 +51,7 @@ function label(category: TechCategory, gen: number, tier: Tier): string {
     case 'chip':
       return `Vexa V${k + 1}${tierName} · ${Math.round((420 * Math.pow(1.22, k) * m) / 10) * 10} MHz`;
     case 'display': {
-      const tech = gen < 2010 ? 'TFT' : gen < 2013 ? 'IPS' : 'OLED';
+      const tech = gen < 2010 ? 'TFT' : gen < 2013 ? 'IPS' : gen < 2018 ? 'OLED' : 'LTPO';
       const ppi = Math.round((150 * Math.pow(1.13, k) * m) / 5) * 5;
       return `${tech} ${ppi} ppi`;
     }
@@ -135,6 +135,10 @@ export const FEATURES: FeatureDef[] = [
   { id: 'frontCam', cost: 6, devPoints: 1, expected: { budget: 2013, mid: 2011, flagship: 2010 }, drain: 1 },
   { id: 'net4g', cost: 16, devPoints: 3, expected: { budget: 2016, mid: 2014, flagship: 2012 }, drain: 1.08 },
   { id: 'fingerprint', cost: 12, devPoints: 2, expected: { budget: 2017, mid: 2015, flagship: 2014 }, drain: 1 },
+  { id: 'waterproof', cost: 10, devPoints: 2, expected: { budget: 2021, mid: 2018, flagship: 2016 }, drain: 1 },
+  { id: 'wireless', cost: 14, devPoints: 2, expected: { budget: 9999, mid: 2021, flagship: 2018 }, drain: 1 },
+  { id: 'faceUnlock', cost: 18, devPoints: 3, expected: { budget: 2022, mid: 2019, flagship: 2018 }, drain: 1.02 },
+  { id: 'net5g', cost: 24, devPoints: 3, expected: { budget: 2023, mid: 2021, flagship: 2020 }, drain: 1.1 },
 ];
 
 export function featureById(id: string): FeatureDef | undefined {

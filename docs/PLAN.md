@@ -142,7 +142,7 @@ interface SaveFile {
   |---|---|---|---|
   | Pixel-Ratio-Cap | 1,0 | 1,5 | 2,0 |
   | Schatten | 1 Map 1024, harte Kanten | 2048 PCFSoft | 2048 PCFSoft + Kontaktschatten |
-  | AO | – | GTAO 8 Samples | GTAO 16 Samples |
+  | AO | – | – (Draw-Call-Budget) | GTAO 16 Samples |
   | Bloom | – | ✓ | ✓ |
   | SMAA | – (FXAA-frei, MSAA aus) | ✓ | ✓ |
   | Tilt-Shift/Vignette | Vignette | ✓ | ✓ |
@@ -169,7 +169,7 @@ interface SaveFile {
 | Dateien | ≤ 300 | 1500 |
 | JS initial (gz) | ≤ 400 KB | – (Warnung) |
 | FPS | 60 Laptop / 30+ Mittelklasse-Handy | – |
-| Draw Calls Garage | ≤ 150 | – |
+| Draw Calls Garage | ≤ 150 (M2: Low 120, Medium 135, High 274 inkl. AO-Pass) | – |
 
 `scripts/check-size.mjs` läuft in `npm run build` nach Vite: summiert `dist/`, ermittelt
 Initial-Set (index.html + statisch importierte Chunks aus dem Vite-Manifest + Preloads),

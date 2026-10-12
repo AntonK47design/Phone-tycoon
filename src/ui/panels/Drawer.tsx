@@ -1,9 +1,9 @@
 // Phase-2 side panels: Company, Research, Market.
 
 import { sfx } from '../../audio/sfx';
-import { OEM_MIN_BATCH } from '../../data/components';
+import { LAB_BUDGETS, LAB_COST_PER_RP, OEM_MIN_BATCH } from '../../data/components';
 import { colorById } from '../../data/design';
-import { expectedDisplaySize, expectedTech, expectedThickness, eraForYear } from '../../data/eras';
+import { expectedDisplaySize, expectedTech, expectedThickness, eraForYear, inflation } from '../../data/eras';
 import { GOALS } from '../../data/goals';
 import { COMPETITORS, SEGMENTS, type Segment } from '../../data/market';
 import { FEATURES } from '../../data/parts';
@@ -128,6 +128,9 @@ function CompanyPanel({ state }: { state: GameState }) {
                   {p.backlog >= 1 && <span>{t('company.backlog')}: <b>{shortNum(p.backlog, l)}</b></span>}
                   {incoming > 0 && <span>{t('company.incoming')}: <b>{shortNum(incoming, l)}</b></span>}
                 </div>
+                {demand > 0 && p.stock > demand * 10 && (
+                  <div class="warn-line">{t('company.overstock', { weeks: Math.round(p.stock / demand) })}</div>
+                )}
                 <div class="prod-actions">
                   <button class="btn-secondary" onClick={() => order(p.id, four)}>{t('company.reorder', { n: shortNum(four, l) })}</button>
                   <button class="btn-secondary danger" onClick={() => (store.dispatch({ type: 'discontinue', productId: p.id }), sfx.click())}>
@@ -163,7 +166,21 @@ function ResearchPanel({ state }: { state: GameState }) {
   };
   return (
     <>
-      <h3 class="drawer-title">{t('research.title')} <small>{t('research.rpDay', { n: rpPerDay(state) })}</small></h3>
+      <h3 class="drawer-title">{t('research.title')} <small>{t('research.rpDay', { n: decimal(rpPerDay(state), l) })}</small></h3>
+      <div class="field lab-budget">
+        {t('research.budget')}
+        <div class="seg">
+          {LAB_BUDGETS.map((b) => {
+            const amount = Math.round(b * inflation(Math.floor(year)));
+            return (
+              <button key={b} class={Math.abs(state.research.budget - amount) < 1 ? 'on' : ''} onClick={() => (store.dispatch({ type: 'setLabBudget', amount }), sfx.click())}>
+                {b === 0 ? '0' : shortNum(amount, l)}
+              </button>
+            );
+          })}
+        </div>
+        <span class="hint-line">{t('research.budgetHint', { amount: money(LAB_COST_PER_RP * inflation(Math.floor(year)), l) })}</span>
+      </div>
       <div class="research-now">
         {cur ? (
           <>

@@ -451,6 +451,9 @@ Bankkredit: fällt Kapital < 0, springt die Bank ein (Puffer 15K $); Zinsen 0,2 
 Kreditrahmen für Produktion = 40K $ · Inflation + 10 % des Jahresumsatzes − Schulden.
             Eine Mindest-Charge (100 Stück) wird immer finanziert → kein Deadlock.
 Auftragsfertiger: Stückkosten · 1,2 + Montage 12 $, Lieferzeit 14 Tage, Mindestcharge 100.
+Betriebskosten (ab Büro): 12 % des Wochenumsatzes (Support, Logistik, Garantie).
+Auto-Preis = max(0,85 · P_fair, Stückkosten / (1 − Händleranteil) · 1,3).
+Laborbudget: je 2 500 $ · Inflation pro Woche +1 Forschungspunkt/Tag (zusätzlich zu 4 FP des Gründers).
 ```
 
 ### 7.7 Marktanteil & Rangliste

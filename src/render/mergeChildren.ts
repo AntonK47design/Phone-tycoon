@@ -30,6 +30,9 @@ export function mergeChildren(group: Group) {
     if (!merged) continue;
     const m = new Mesh(merged, mat);
     m.castShadow = cast;
+    merged.computeBoundingSphere();
+    // Tiny parts are invisible in the shadow map; skip them there.
+    if ((merged.boundingSphere?.radius ?? 1) < 0.08) m.castShadow = false;
     m.receiveShadow = true;
     group.add(m);
   }

@@ -1,7 +1,8 @@
 // Research rules (GDD §11) and everything derived from completed research.
 
 import type { TechCategory } from '../data/components';
-import { CHANNEL_CUT, FOUNDER_RP_PER_DAY, OFFICE_REACH } from '../data/components';
+import { CHANNEL_CUT, FOUNDER_RP_PER_DAY, LAB_COST_PER_RP, OFFICE_REACH } from '../data/components';
+import { inflation } from '../data/eras';
 import { DISPLAY_SIZES, FINISHES, MATERIALS, SHAPES } from '../data/design';
 import { GARAGE_REACH } from '../data/market';
 import { FEATURES, FIRST_GEN, PARTS, type PartDef } from '../data/parts';
@@ -100,7 +101,9 @@ export function researchStatus(state: GameState, node: ResearchNode): ResearchSt
 }
 
 export function rpPerDay(state: GameState): number {
-  return state.phase >= 2 ? FOUNDER_RP_PER_DAY : 0;
+  if (state.phase < 2) return 0;
+  const lab = state.research.budget / (LAB_COST_PER_RP * inflation(Math.floor(yearOf(state.day))));
+  return FOUNDER_RP_PER_DAY + lab;
 }
 
 export function startResearch(state: GameState, id: string): SimEvent[] {

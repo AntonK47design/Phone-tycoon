@@ -32,7 +32,7 @@ export function researchEffect(node: ResearchNode, currentReach: number): string
 }
 
 export function shapeName(id: string): string {
-  if (id === 'blade') return t('shapeName.blade');
+  if (id === 'blade' || id === 'edge' || id === 'fullscreen') return t(`shapeName.${id}`);
   void shapeById(id);
   return t(`editor.shape.${id}`);
 }

@@ -58,6 +58,8 @@ export function LaunchSetup() {
           </span>
         </div>
 
+        {weeks > 8 && <div class="warn-line">{t('launchSetup.bigBatch')}</div>}
+
         <div class="field">
           {t('launchSetup.marketing')}
           {canMarket(state) ? (

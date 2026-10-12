@@ -1,13 +1,15 @@
 // The garage cat. Sleeps on the beanbag, breathes, flicks its tail, twitches an ear.
 
-import { ConeGeometry, Group, Mesh, MeshStandardMaterial, SphereGeometry, type Material } from 'three';
+import { Color, ConeGeometry, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, SphereGeometry, type Material } from 'three';
+import { mergeChildren } from '../mergeChildren';
 
 export class Cat {
   readonly root = new Group();
   private body: Mesh;
   private head = new Group();
   private earL!: Mesh;
-  private tail: Mesh[] = [];
+  private tail: InstancedMesh;
+  private dummy = new Object3D();
   private mats: Material[] = [];
   private twitchAt = 4;
 
@@ -57,12 +59,20 @@ export class Cat {
     }
     this.earL ??= this.head.children[this.head.children.length - 1] as Mesh;
 
-    // Tail: a chain of shrinking spheres wrapped around the body.
-    for (let i = 0; i < 9; i++) {
-      const seg = m(new SphereGeometry(0.03 - i * 0.0015, 10, 8), i > 6 ? dark : fur);
-      this.root.add(seg);
-      this.tail.push(seg);
-    }
+    // The ear that twitches stays separate; the rest of the head is merged.
+    this.head.remove(this.earL);
+    mergeChildren(this.head);
+    this.head.add(this.earL);
+
+    // Tail: one instanced chain of spheres (white base colour, tinted per instance).
+    const tailMat = new MeshStandardMaterial({ color: '#ffffff', roughness: 0.9 });
+    this.mats.push(tailMat);
+    this.tail = new InstancedMesh(new SphereGeometry(0.03, 10, 8), tailMat, 9);
+    this.tail.castShadow = true;
+    const furC = new Color('#e58a33');
+    const darkC = new Color('#2a1d14');
+    for (let i = 0; i < 9; i++) this.tail.setColorAt(i, i > 6 ? darkC : furC);
+    this.root.add(this.tail);
   }
 
   update(t: number) {
@@ -70,11 +80,15 @@ export class Cat {
     this.body.scale.set(1.25 * breathe, 0.62 * breathe, 1 * breathe);
     // Tail curls around the front, the tip flicks lazily.
     const flick = Math.sin(t * 0.9) * 0.5 + Math.sin(t * 2.3) * 0.15;
-    this.tail.forEach((seg, i) => {
+    for (let i = 0; i < 9; i++) {
       const a = -0.6 - i * 0.28 + (i > 5 ? flick * (i - 5) * 0.12 : 0);
       const r = 0.2 + i * 0.004;
-      seg.position.set(Math.cos(a) * r * 1.1 - 0.02, 0.04 + i * 0.002, Math.sin(a) * r);
-    });
+      this.dummy.position.set(Math.cos(a) * r * 1.1 - 0.02, 0.04 + i * 0.002, Math.sin(a) * r);
+      this.dummy.scale.setScalar(1 - i * 0.05);
+      this.dummy.updateMatrix();
+      this.tail.setMatrixAt(i, this.dummy.matrix);
+    }
+    this.tail.instanceMatrix.needsUpdate = true;
     if (t > this.twitchAt) {
       const k = t - this.twitchAt;
       this.earL.rotation.z = Math.sin(k * 40) * 0.25 * Math.max(0, 1 - k * 4);

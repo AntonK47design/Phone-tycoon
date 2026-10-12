@@ -49,6 +49,10 @@ export const MIGRATIONS: Record<number, Migration> = {
     s.week ??= { revenue: 0, profit: 0, units: 0 };
     return s;
   },
+  2: (s: Obj) => {
+    s.research.budget ??= 0;
+    return s;
+  },
 };
 
 export function serialize(state: GameState, now: number): string {

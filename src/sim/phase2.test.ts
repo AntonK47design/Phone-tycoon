@@ -3,7 +3,7 @@ import { OEM_LEAD_DAYS } from '../data/components';
 import { RESEARCH } from '../data/research';
 import { advanceDay, applyAction, creditAvailable, forecast, newGame } from './game';
 import { applyOffline, OFFLINE_MAX_DAYS } from './offline';
-import { availableParts, researchCost, researchStatus } from './research';
+import { availableParts, researchCost, researchStatus, rpPerDay } from './research';
 import { deserialize } from './save/save';
 import type { GameState } from './state';
 
@@ -105,7 +105,7 @@ describe('scoring with features', () => {
 });
 
 describe('saves & offline', () => {
-  it('migrates a v1 save to v2', () => {
+  it('migrates a v1 save to the current version', () => {
     const v1 = newGame(5) as unknown as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     delete v1.draft.parts;
     delete v1.draft.features;
@@ -116,7 +116,8 @@ describe('saves & offline', () => {
     v1.cashHistory = [1, 2, 3];
     v1.version = 1;
     const out = deserialize(JSON.stringify({ version: 1, savedAt: 0, state: v1 })).state;
-    expect(out.version).toBe(2);
+    expect(out.version).toBe(3);
+    expect(out.research.budget).toBe(0);
     expect(out.draft.parts.chip).toBe('chip-2007-std');
     expect(out.research.done).toEqual([]);
     expect(out.history.cash).toEqual([1, 2, 3]);
@@ -130,6 +131,21 @@ describe('saves & offline', () => {
     expect(report.days).toBe(OFFLINE_MAX_DAYS);
     expect(s.day - day0).toBe(OFFLINE_MAX_DAYS);
     expect(applyOffline(s, 10)).toBeNull();
+  });
+
+  it('a lab budget speeds up research', () => {
+    const s = officeGame();
+    const base = rpPerDay(s);
+    applyAction(s, { type: 'setLabBudget', amount: 50_000 });
+    expect(rpPerDay(s)).toBeGreaterThan(base * 4);
+  });
+
+  it('auto price never sells below cost after the shop cut', () => {
+    const s = officeGame();
+    s.research.done.push('retail', 'carrier');
+    applyAction(s, { type: 'setDraft', patch: { segment: 'mid', features: ['wifi'], materialId: 'plastic' } });
+    const f = forecast(s);
+    expect(f.margin).toBeGreaterThan(0);
   });
 
   it('offline credit finishes research the calendar alone would not', () => {

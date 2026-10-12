@@ -16,7 +16,7 @@ export interface QualityProfile {
 
 export const PROFILES: Record<Quality, QualityProfile> = {
   low: { pixelRatioCap: 1, shadowMap: 1024, ao: false, aoSamples: 0, bloom: false, tiltShift: false, smaa: true, spotShadow: false },
-  medium: { pixelRatioCap: 1.5, shadowMap: 2048, ao: true, aoSamples: 8, bloom: true, tiltShift: true, smaa: true, spotShadow: false },
+  medium: { pixelRatioCap: 1.5, shadowMap: 2048, ao: false, aoSamples: 8, bloom: true, tiltShift: true, smaa: true, spotShadow: false },
   high: { pixelRatioCap: 2, shadowMap: 2048, ao: true, aoSamples: 16, bloom: true, tiltShift: true, smaa: true, spotShadow: true },
 };
 

@@ -308,7 +308,8 @@
   "material": {
     "plastic": "Kunststoff",
     "aluminium": "Aluminium",
-    "glass": "Glas"
+    "glass": "Glas",
+    "titanium": "Titan"
   },
   "finish": {
     "gloss": "Glänzend",
@@ -320,14 +321,20 @@
     "gps": "GPS",
     "frontCam": "Selfie-Kamera",
     "net4g": "4G",
-    "fingerprint": "Fingerabdruck"
+    "fingerprint": "Fingerabdruck",
+    "waterproof": "Wasserdicht",
+    "wireless": "Kabellos laden",
+    "faceUnlock": "Face-Unlock",
+    "net5g": "5G"
   },
   "os": {
     "leafline": "Leafline (gratis)",
     "mosaic": "Mosaic (+8 $/Stück)"
   },
   "shapeName": {
-    "blade": "Klinge"
+    "blade": "Klinge",
+    "edge": "Edge",
+    "fullscreen": "Vollbild"
   },
   "research": {
     "title": "Forschungslabor",
@@ -383,8 +390,20 @@
       "carrier": "Mobilfunker-Deals",
       "mosaic": "Mosaic-OS-Lizenz",
       "bigStage": "Die große Bühne",
-      "national": "Landesweiter Vertrieb"
-    }
+      "national": "Landesweiter Vertrieb",
+      "screen60": "6″-Displays",
+      "screen65": "6,5″-Displays",
+      "screen68": "6,8″-Displays",
+      "edge": "Randlos",
+      "fullscreen": "Nur Display",
+      "titanium": "Titanrahmen",
+      "waterproof": "Wasserschutz",
+      "wireless": "Kabelloses Laden",
+      "faceUnlock": "Face-Unlock",
+      "net5g": "5G-Modem"
+    },
+    "budget": "Laborbudget",
+    "budgetHint": "Geld kauft Forschungstempo: je {amount}/Woche +1 FP/Tag."
   },
   "market": {
     "title": "Der Markt",
@@ -421,7 +440,8 @@
     "none": "Gerade ist nichts im Verkauf.",
     "credit": "Kreditrahmen frei",
     "phase3": "Nächster Schritt: {goal}",
-    "channel": "Händleranteil"
+    "channel": "Händleranteil",
+    "overstock": "Überlager: ~{weeks} Wochen Handys im Lager. Lagerkosten laufen, und das Handy veraltet beim Warten."
   },
   "launchSetup": {
     "title": "Launch planen",
@@ -439,7 +459,8 @@
     "go": "Launchen",
     "cancel": "Noch nicht",
     "tooPoor": "Zu wenig Geld – weniger Marketing oder kleineres Event.",
-    "overhype": "Vorsicht: Hype über dem, was das Handy kann, kostet Fans."
+    "overhype": "Vorsicht: Hype über dem, was das Handy kann, kostet Fans.",
+    "bigBatch": "Das ist viel. Handys veralten schnell – unverkaufte Ware verliert an Wert."
   },
   "welcome": {
     "title": "Während du weg warst…",

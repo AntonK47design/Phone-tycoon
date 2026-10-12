@@ -39,6 +39,8 @@ function surface(v: PhoneVisual): { roughness: number; metalness: number; clearc
   switch (v.materialId) {
     case 'aluminium':
       return { roughness: matte ? 0.5 : 0.3, metalness: 0.85, clearcoat: matte ? 0 : 0.4 };
+    case 'titanium':
+      return { roughness: matte ? 0.55 : 0.38, metalness: 0.9, clearcoat: 0 };
     case 'glass':
       return { roughness: matte ? 0.35 : 0.06, metalness: 0.1, clearcoat: 1 };
     default:
@@ -399,7 +401,6 @@ export class PhoneModel {
     const island = new Mesh(islandGeo, m.dark);
     island.rotation.y = Math.PI;
     island.position.set(ix, iy, back - 0.05);
-    island.castShadow = true;
     this.island.add(island);
     const s = 5.6;
     const layouts: Record<number, [number, number][]> = {
@@ -436,7 +437,6 @@ export class PhoneModel {
     const btn = (h: number, x: number, y: number) => {
       const b = new Mesh(new RoundedBoxGeometry(1.6, h, Math.min(3.2, d.thickness * 0.4), 2, 0.6), this.bodyMat);
       b.position.set(x, y, 0);
-      b.castShadow = true;
       this.buttons.add(b);
     };
     btn(10, d.width / 2 + 0.3, d.height / 2 - 26);

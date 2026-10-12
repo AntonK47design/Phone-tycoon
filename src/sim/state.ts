@@ -3,7 +3,7 @@
 import type { TechCategory } from '../data/components';
 import type { Segment } from '../data/market';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export interface PhoneDesign {
   name: string;
@@ -121,6 +121,8 @@ export interface GameState {
   research: {
     done: string[];
     current: { id: string; progress: number } | null;
+    /** Weekly lab budget in today's $ (buys extra research points). */
+    budget: number;
   };
   stats: {
     launches: number;

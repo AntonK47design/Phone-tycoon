@@ -60,7 +60,8 @@ export class StaticBatcher {
       geos.forEach((g) => g.dispose());
       if (!merged) continue;
       const mesh = new Mesh(merged, mat);
-      mesh.castShadow = !this.shadowless.has(mat);
+      merged.computeBoundingSphere();
+      mesh.castShadow = !this.shadowless.has(mat) && (merged.boundingSphere?.radius ?? 1) > 0.08;
       mesh.receiveShadow = true;
       mesh.matrixAutoUpdate = false;
       mesh.updateMatrix();

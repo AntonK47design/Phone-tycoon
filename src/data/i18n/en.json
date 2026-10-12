@@ -308,7 +308,8 @@
   "material": {
     "plastic": "Plastic",
     "aluminium": "Aluminium",
-    "glass": "Glass"
+    "glass": "Glass",
+    "titanium": "Titanium"
   },
   "finish": {
     "gloss": "Gloss",
@@ -320,14 +321,20 @@
     "gps": "GPS",
     "frontCam": "Selfie cam",
     "net4g": "4G",
-    "fingerprint": "Fingerprint"
+    "fingerprint": "Fingerprint",
+    "waterproof": "Waterproof",
+    "wireless": "Wireless charging",
+    "faceUnlock": "Face unlock",
+    "net5g": "5G"
   },
   "os": {
     "leafline": "Leafline (free)",
     "mosaic": "Mosaic (+$8/unit)"
   },
   "shapeName": {
-    "blade": "Blade"
+    "blade": "Blade",
+    "edge": "Edge",
+    "fullscreen": "Fullscreen"
   },
   "research": {
     "title": "Research lab",
@@ -383,8 +390,20 @@
       "carrier": "Carrier deals",
       "mosaic": "Mosaic OS licence",
       "bigStage": "The big stage",
-      "national": "National distribution"
-    }
+      "national": "National distribution",
+      "screen60": "6″ screens",
+      "screen65": "6.5″ screens",
+      "screen68": "6.8″ screens",
+      "edge": "Edge-to-edge",
+      "fullscreen": "All screen",
+      "titanium": "Titanium frame",
+      "waterproof": "Waterproofing",
+      "wireless": "Wireless charging",
+      "faceUnlock": "Face unlock",
+      "net5g": "5G modem"
+    },
+    "budget": "Lab budget",
+    "budgetHint": "Money buys research speed: every {amount}/week adds 1 RP/day."
   },
   "market": {
     "title": "The market",
@@ -421,7 +440,8 @@
     "none": "Nothing on sale right now.",
     "credit": "Credit line left",
     "phase3": "Next step: {goal}",
-    "channel": "Shops keep"
+    "channel": "Shops keep",
+    "overstock": "Overstocked: ~{weeks} weeks of phones in the warehouse. Storage costs add up, and the phone ages while it waits."
   },
   "launchSetup": {
     "title": "Launch setup",
@@ -439,7 +459,8 @@
     "go": "Launch it",
     "cancel": "Not yet",
     "tooPoor": "Not enough cash – lower marketing or the event.",
-    "overhype": "Careful: hype above what the phone delivers costs fans."
+    "overhype": "Careful: hype above what the phone delivers costs fans.",
+    "bigBatch": "That’s a big run. Phones age fast – unsold stock loses value."
   },
   "welcome": {
     "title": "While you were away…",

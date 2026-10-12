@@ -47,6 +47,8 @@ export const SHAPES: ShapeDef[] = [
   { id: 'boxy', bezelSide: 4, bezelTop: 13, bezelBottom: 13, corner: 4.5, thickness: 11.5, cost: 3, devPoints: 1, starter: true },
   { id: 'slim', bezelSide: 3.5, bezelTop: 12, bezelBottom: 12, corner: 8, thickness: 9.8, cost: 12, devPoints: 3, starter: true },
   { id: 'blade', bezelSide: 2.8, bezelTop: 10, bezelBottom: 10, corner: 7, thickness: 8.4, cost: 22, devPoints: 5 },
+  { id: 'edge', bezelSide: 1.8, bezelTop: 7, bezelBottom: 7, corner: 9, thickness: 7.9, cost: 30, devPoints: 6 },
+  { id: 'fullscreen', bezelSide: 1.2, bezelTop: 3.5, bezelBottom: 3.5, corner: 10, thickness: 7.6, cost: 40, devPoints: 7 },
 ];
 
 export function shapeById(id: string): ShapeDef {
@@ -71,6 +73,7 @@ export const MATERIALS: MaterialDef[] = [
   { id: 'plastic', design: 6, year: 2007, cost: 6, metalness: 0, roughness: 0.35 },
   { id: 'aluminium', design: 8, year: 2010, cost: 22, metalness: 0.9, roughness: 0.35 },
   { id: 'glass', design: 8.6, year: 2012, cost: 30, metalness: 0.1, roughness: 0.08 },
+  { id: 'titanium', design: 9.2, year: 2020, cost: 48, metalness: 0.9, roughness: 0.4 },
 ];
 
 export function materialById(id: string): MaterialDef {

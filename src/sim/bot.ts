@@ -135,7 +135,7 @@ function pickResearch(state: GameState, profile: BotProfile): string | null {
     else if (u.marketing) prio = 5;
     else if (u.feature) prio = 4;
     else if (u.partGen) prio = u.partGen.category === 'chip' || u.partGen.category === 'display' ? 4 : 3;
-    else if (u.material || u.os) prio = 3;
+    else if (u.material || u.os || u.sizes || u.shape) prio = 3;
     else if (u.presentation) prio = 2;
     const score = prio / cost.rp;
     if (score > best) {
@@ -188,6 +188,13 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
 
   if (state.phase < 2 && state.officeReady && state.company.cash >= OFFICE_PRICE * inf * 1.3) {
     applyAction(state, { type: 'rentOffice' });
+  }
+  // Lab budget: a share of recent profit, never more than cash can carry.
+  if (state.phase >= 2 && state.day % 28 === 0) {
+    const recent = state.history.profit.slice(-4);
+    const avg = recent.length ? recent.reduce((a, b) => a + b, 0) / recent.length : 0;
+    const share = profile === 'optimizer' ? 0.35 : profile === 'weak' ? 0.1 : 0.25;
+    applyAction(state, { type: 'setLabBudget', amount: Math.max(0, Math.min(avg * share, state.company.cash / 30)) });
   }
   const reserve = 4 * 3000 * inf;
   if (state.phase >= 2 && !state.research.current && state.company.cash > reserve) {
