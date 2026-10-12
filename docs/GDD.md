@@ -386,7 +386,7 @@ Units_i,r(t) = M(y) · m_s · m_r · ρ_i,r · share_i
 
 | Stufe | ρ |
 |---|---|
-| Garage (Onlineshop) | 0,01 |
+| Garage (Onlineshop) | 0,0025 |
 | Büro + Händlervertrag | 0,04 |
 | Nationaler Vertrieb | 0,10 |
 | Region erschlossen | 0,25 |
@@ -504,7 +504,7 @@ und unlesbare Zahlen zu vermeiden; die UI zeigt nur Ratings.)
 
 | Weg | Freischaltung | Kapazität | Montage/Stück | Vorlauf | Mindestmenge |
 |---|---|---|---|---|---|
-| Garage (Handarbeit, Made-to-Order) | Phase 1 | 150/Woche | 18 $ | 0 | 0 – kein Lagerrisiko |
+| Garage (Handarbeit, Made-to-Order) | Phase 1 | 50/Woche | 18 $ | 0 | 0 – kein Lagerrisiko |
 | Auftragsfertiger | Phase 2 | unbegrenzt | 12 $ · 1,25 Aufschlag | 2 Wochen | 500 |
 | Eigene Fabrik | Phase 3 | je Linie | `12 · 0,85^(L−1)` $ | 0 | 0 |
 
@@ -879,10 +879,11 @@ Lautstärke-Regler Musik/SFX, Stummschaltung bei Ads.
 
 ### 24.2 Plausibilitätsrechnung Phase 1
 
-2007, Mittelklasse, ρ = 0,01: Segmentmarkt ≈ 0,48 M · 0,35 ≈ 167K/Woche → × ρ ≈ 1 670.
-Spieler-A ≈ (6,8/10)³ · 1 · 0,46 ≈ 0,14; Konkurrenz ΣA ≈ 1,6; A_0 = 1,5 → Anteil ≈ 4,3 %
-→ **≈ 70 Einheiten/Woche** · 249 $ ≈ 17K $ Umsatz, ≈ 8K $ Marge pro Woche (35 s).
-Gate „25 000 $ + 2 Launches" ist damit nach 3–5 min erreichbar.
+Werte nach dem M1-Tuning (Bot-Report `docs/balancing/M1.md`): 2007, Mittelklasse,
+ρ = 0,0025, Garage 50 Einheiten/Woche, Wochenmiete 500 $.
+Erster Launch ≈ 40 Vorbestellungen (≈ 10K $ Umsatz), danach läuft die Garage am
+Kapazitätslimit (≈ 50/Woche · ≈ 115 $ Marge). Gate „25K $ + 2 Launches“ nach ≈ 5,4 min
+(average), 7,0 min (weak).
 
 ### 24.3 Bot
 `npm run sim:bot -- --hours 2 --speed mix --seed 42` läuft headless über `src/sim/` und

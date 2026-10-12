@@ -254,8 +254,13 @@ button:focus-visible { outline: 2px solid var(--tech); outline-offset: 2px; }
   .editor-left { top: 58px; bottom: 76px; padding: 10px; gap: 10px; width: 220px; }
   .editor-right { top: 58px; padding: 10px; gap: 6px; width: 200px; }
   .review-big .num { font-size: 26px; }
-  .option { min-height: 58px; }
-  .option svg { height: 28px; }
+  .option { min-height: 50px; padding: 4px; font-size: 11px; }
+  .option svg { height: 22px; }
+  .option .meta { display: none; }
+  .swatches { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .cat h5 { margin-bottom: 5px; }
+  .stat-row { font-size: 12px; padding: 0; }
+  .bar-row { font-size: 12px; }
   .launch-title { font-size: 30px; top: 8%; }
   .review-card { width: 170px; padding: 10px 12px; }
   .review-card .score { font-size: 34px; }

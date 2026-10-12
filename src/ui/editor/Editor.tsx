@@ -175,7 +175,8 @@ export function Editor() {
         if (b) setHint({ x: b.left + b.width / 2, y: b.top - 14, side: 'bottom' });
       } else {
         const c = document.querySelector('.cat.active')?.getBoundingClientRect();
-        if (c) setHint({ x: c.right + 16, y: c.top + Math.min(c.height / 2, 46), side: 'left' });
+        const panel = document.querySelector('.editor-left')?.getBoundingClientRect();
+        if (c && panel) setHint({ x: panel.right + 14, y: c.top + Math.min(c.height / 2, 46), side: 'left' });
       }
     };
     place();
@@ -204,6 +205,14 @@ export function Editor() {
   const skip = () => {
     sfx.click();
     clearTimeout(advanceTimer.current);
+    // Never launch an unpainted prototype: pick this season's first trend color.
+    if (!state.draft.colorId) {
+      const trend = COLORS.find((c) => state.unlockedColors.includes(c.id) && isTrendColor(c.id, year));
+      if (trend) {
+        store.dispatch({ type: 'setDraft', patch: { colorId: trend.id } });
+        engine.setPhone(toVisual(store.getState().draft));
+      }
+    }
     store.dispatch({ type: 'setTutorial', step: 'done' });
   };
 
