@@ -262,6 +262,14 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
   prozedural oder CC0) mit Tipp-/Lauf-/Idle-Animation, leuchtende Monitore.
 - Entwicklungspunkte sichtbar (Fortschrittsbalken über Teams, Monitor-Inhalte).
 - 7-Tage-Kalender, tägliche Mini-Aufträge.
+- **Stand:** fertig. Büro als eigenes Diorama neben der Garage (Umschalter Garage/Büro,
+  Team-Tab fährt die Kamera hin). Figuren sind instanziert (5 Draw Calls für bis zu 24
+  Leute), Bildschirme instanziert und in Rollenfarbe getönt. Gerendert wird nur der Raum,
+  auf den die Kamera schaut: Büro Stufe 4 ≈ 82 Draw Calls (Medium). Schatten-Frustum
+  folgt der Kamera. Save v4 (Team, Daily, Kosmetik).
+- **Abweichungen:** Forscher schon ab Büro 1 (GDD: Phase 3), Marketing ab Büro 2. Labor/
+  Studio ab Büro-Stufe 2 statt eigener Phase. Laborbudget (Auftragsforschung) bleibt
+  neben den Forschern bestehen. Kein „Crunch“-Malus (Polish-Stufen kommen später).
 
 ### M4 – Fabrik
 - Fabrik-Diorama mit Linien, instanzierte Handys auf Bändern, Roboterarme, Prüfstation.

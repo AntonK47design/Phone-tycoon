@@ -159,6 +159,8 @@ export class Office {
   private staffBySeat: (StaffVisual | null)[] = [];
   private buildKey = '';
   private busy = false;
+  private shown = false;
+  private level = 0;
   private labGlow: MeshStandardMaterial;
 
   constructor() {
@@ -176,8 +178,15 @@ export class Office {
     this.root.visible = false;
   }
 
+  /** Whether the camera is in (or moving to) the office. */
+  setShown(on: boolean) {
+    this.shown = on;
+    this.root.visible = on && this.level > 0;
+  }
+
   setVisual(v: OfficeVisual) {
-    this.root.visible = v.level > 0;
+    this.level = v.level;
+    this.root.visible = this.shown && v.level > 0;
     if (v.level < 1) return;
     const key = `${v.level}|${v.lab}|${v.studio}`;
     if (key !== this.buildKey) {

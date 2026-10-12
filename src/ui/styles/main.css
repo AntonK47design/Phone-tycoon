@@ -418,6 +418,7 @@ svg { flex: none; }
 .node-eff { font-size: 12px; color: var(--muted); line-height: 1.2; }
 .node-go { min-height: 34px; font-size: 10px; padding: 0 6px; margin-top: auto; }
 .node-go[disabled] { opacity: .45; }
+.btn-secondary[disabled] { opacity: .45; box-shadow: none; cursor: default; }
 .node-note { font-family: var(--mono); font-size: 10px; color: var(--muted); }
 .node-note.ok { color: #12915f; font-weight: 700; }
 .ranking { display: flex; flex-direction: column; gap: 4px; }

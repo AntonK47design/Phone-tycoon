@@ -446,8 +446,10 @@ UI-Signal „Ausverkauft!" mit 1-Klick-Nachproduktion.
 
 ```
 Erlös je Einheit = Preis · (1 − Händleranteil)     Onlineshop 10 %, Händler 25 %, Mobilfunker 30 %
-Bankkredit: fällt Kapital < 0, springt die Bank ein (Puffer 15K $); Zinsen 0,2 %/Woche,
-            Tilgung automatisch mit 25 % jedes positiven Wochengewinns.
+Bankkredit: fällt Kapital < 0, springt die Bank ein (Puffer 15K $); Zinsen 0,2 %/Woche.
+            Tilgung (seit M3) wöchentlich: max(25 % des Wochengewinns, Kapital − Reserve),
+            Reserve = max(1,5 · 15K $ · Inflation, 4 Wochen laufende Kosten).
+            Zusätzlich manuelle Tilgung im Firmen-Tab.
 Kreditrahmen für Produktion = 40K $ · Inflation + 10 % des Jahresumsatzes − Schulden.
             Eine Mindest-Charge (100 Stück) wird immer finanziert → kein Deadlock.
 Auftragsfertiger: Stückkosten · 1,2 + Montage 12 $, Lieferzeit 14 Tage, Mindestcharge 100.
@@ -580,6 +582,33 @@ Traits (1 je Person, kosmetisch + kleiner Effekt): „Perfektionist" (+q, −Tem
 | Campus (Phase 5) | 1–3 | alle Boni +, Chip-/OS-Abteilung | 50 000 000 |
 
 Kosten skalieren mit Inflation. Laufende Kosten: Miete 1 %/Woche des Kaufpreises.
+
+### 10.4 Umsetzung M3 (Zahlen nach Bot-Balancing)
+
+```
+Rollen ab Büro 1: Designer (Design), Ingenieur (Technik), Programmierer (Software),
+                  Forscher (FP); Marketing ab Büro 2 (+5 % Hype je Ø-Kopf, max. +60 %).
+Punkte/Tag je Person = Skill/10 · Moralfaktor · Bürobonus · Trait-Tempo
+                       (+ Gründer 2/2/2 Punkte und 4 FP; Studio ×1,2–1,5 Design, Labor ×1,25–1,75 FP)
+Entwicklungspunkte ab Büro = 3 × Garagenwert (Büro-Handys sind ambitionierter → Team lohnt sich)
+Qualität q = clamp(1 + 0,3 · (Skill_Team / Skill_erwartet − 1), 0,90, 1,08)
+             Skill_erwartet(y) = min(95, 30 + 2,5 · (y − 2007)), Gründer zählt mit Skill 30
+Studio-Feinschliff: +0,1/0,2/0,3 Review-Punkte
+Büro-Stufen: Preis 25K/120K/600K/3M, Miete 3K/7K/18K/45K pro Woche, Komfort +0/5/10/15 Moral
+Labor 150K/500K/2M, Studio 250K/800K/3M (Miete 1 %/Woche), beide ab Büro-Stufe 2
+Bewerber: 4, neu jede Woche; Skill = 10 + min(45, Marke/4 + 2,5 · Jahre) + 0–30
+Moral-Ziel = 58 + Komfort + Sonnenscheine (max. 10) + Bonus + 10 · Erfolg letzter Launch
+             − 8 bei Schulden & knapper Kasse; Moral nähert sich wöchentlich um 30 %;
+             unter 25 kündigen Leute mit 25 %/Woche.
+Bonus: 1 Wochen-Gehaltssumme, +20 Moral-Ziel (klingt ab), Cooldown 4 Wochen
+Entlassen: 1 Wochengehalt Abfindung, −4 Moral für alle
+Traits: Flink (+15 % Tempo, −Qualität), Perfektionist, Nachteule, Sonnenschein, Bescheiden, Mentor
+```
+
+7-Tage-Kalender (§20.3): Belohnung max(Basis 500…4 000 $ · Inflation, 0,5 · Ø-Wochenumsatz ·
+0,5…1,5); Tag 7 schaltet einmalig das Aurora-Finish frei. Mini-Aufträge (§20.4): 3 pro
+Echtzeittag, deterministisch aus Datum + Seed (verkaufen, Umsatz, Launch ≥ X, Forschung,
+Einstellen, Training, Nachbestellen); Belohnung Geld (max(1 500 $, 0,3 · Ø-Wochenumsatz)) oder Hype.
 
 ---
 

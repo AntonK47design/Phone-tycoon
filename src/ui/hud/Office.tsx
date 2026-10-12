@@ -21,7 +21,7 @@ export function ViewToggle() {
     if (v === 'garage' && drawer.value === 'team') drawer.value = null;
   };
   return (
-    <div class="glass view-toggle">
+    <div class="view-toggle">
       <button class={hubView.value === 'garage' ? 'on' : ''} onClick={() => go('garage')}>{t('office.viewGarage')}</button>
       <button class={hubView.value === 'office' ? 'on' : ''} onClick={() => go('office')}>
         {t('office.viewOffice')}

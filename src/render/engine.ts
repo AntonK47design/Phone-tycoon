@@ -351,9 +351,19 @@ export class Engine {
     this.phoneMode = name === 'editor' ? 'present' : 'spin';
     if (name !== 'editor') this.yawOffset = 0;
     this.view = name;
-    if (name === 'office') VIEWS.office.distance = 9.5 + Math.max(1, this.hqLevel) * 2.1;
+    if (name === 'office') VIEWS.office.distance = [12, 14.5, 17, 20.5][Math.max(1, Math.min(4, this.hqLevel)) - 1];
     this.aimShadows(name === 'office');
-    this.rig.goTo(VIEWS[name], duration, onDone);
+    // Only draw the room the camera looks at (once it has arrived): saves ~40 draw calls.
+    const office = name === 'office';
+    if (office) this.hq.setShown(true);
+    else this.garage.root.visible = true;
+    this.rig.goTo(VIEWS[name], duration, () => {
+      if (this.view === name) {
+        this.garage.root.visible = !office;
+        if (!office) this.hq.setShown(false);
+      }
+      onDone?.();
+    });
     this.lastInput = performance.now();
   }
 
@@ -387,7 +397,10 @@ export class Engine {
 
   /** Office diorama: level, buildings and staff. */
   setOffice(v: OfficeVisual) {
+    const grew = v.level !== this.hqLevel;
     this.hqLevel = v.level;
+    // Bigger room: pull the camera back.
+    if (grew && this.view === 'office') this.goToView('office', 1);
     this.hq.setVisual(v);
     this.lastInput = performance.now();
   }
