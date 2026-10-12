@@ -54,7 +54,7 @@ import {
   studioCost,
   trainingCost,
 } from './team';
-import type { Role } from '../data/team';
+import { OFFICE_LEVELS, type Role } from '../data/team';
 import type { GameState, PhoneDesign } from './state';
 import { SECONDS_PER_DAY, calendar, yearOf } from './time';
 
@@ -156,12 +156,15 @@ function chooseDesign(state: GameState, pick: number, profile: BotProfile): Phon
 
 function pickResearch(state: GameState, profile: BotProfile): string | null {
   const year = yearOf(state.day);
+  const chipGen = Math.max(...availableParts(state, 'chip').map((p) => p.gen));
+  const behind = chipGen < Math.floor(year) - 1;
   let bestId: string | null = null;
   let best = -Infinity;
   for (const n of RESEARCH) {
     if (researchStatus(state, n) !== 'available') continue;
     const cost = researchCost(n, year, state);
-    if (cost.money > state.company.cash * (profile === 'optimizer' ? 0.25 : 0.2)) continue;
+    // Behind on parts? Then research is the priority and may take most of the cash.
+    if (cost.money > state.company.cash * (behind ? 0.6 : profile === 'optimizer' ? 0.25 : 0.2)) continue;
     // Seasoned (phase 4+) average players research one year ahead when it's cheap; weak ones never.
     if (n.year > year && (profile === 'weak' || (profile === 'average' && (state.phase < 4 || cost.money > state.company.cash * 0.08)))) continue;
     const u = n.unlock;
@@ -244,7 +247,9 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
   if (pending) {
     const care = profile === 'weak' ? 8 : 3;
     const pay = pending.options[0];
-    applyAction(state, { type: 'eventChoice', option: state.company.cash > (pending.amount ?? 0) * care ? pay : pending.options[pending.options.length - 1] });
+    // A rescue is always taken; other cards are paid when there's cash to spare.
+    const choice = pending.id === 'rescue' ? 'accept' : state.company.cash > (pending.amount ?? 0) * care ? pay : pending.options[pending.options.length - 1];
+    applyAction(state, { type: 'eventChoice', option: choice });
   }
   const reserve = 4 * 3000 * inf;
   if (state.phase >= 2 && !state.research.current && state.company.cash > reserve) {
@@ -314,14 +319,16 @@ function manageTeam(state: GameState, profile: BotProfile): void {
     const affordable = !!pick && avgProfit > salary(pick, year) * (profile === 'optimizer' ? 1 : 1.5);
     if (pick && affordable && state.company.cash - hireFee(pick, year) > reserve()) applyAction(state, { type: 'hire', id: pick.id });
   }
-  // Losing money with an empty bank account: let the least productive person go.
-  if (team.staff.length && avgProfit < 0 && recent.length >= 8 && state.company.cash < payroll(state) * 3) {
+  // Losing money for two months and the cushion is thin: let the least productive person go.
+  if (team.staff.length && avgProfit < 0 && recent.length >= 8 && state.company.cash < payroll(state) * 26) {
     const worst = [...team.staff].sort((a, b) => a.skill / salary(a, year) - b.skill / salary(b, year))[0];
     applyAction(state, { type: 'fire', id: worst.id });
   }
   // Grow the office once it is full.
   const up = officeUpgradeCost(state);
-  if (up !== null && team.staff.length >= seats(state) && state.company.cash > up * (profile === 'optimizer' ? 1.8 : profile === 'weak' ? 4 : 2.5)) {
+  // Only when the weekly profit easily carries the higher rent.
+  const nextRent = OFFICE_LEVELS[team.office] ? (OFFICE_LEVELS[team.office].rent - OFFICE_LEVELS[team.office - 1].rent) * inflation(Math.floor(year)) : 0;
+  if (up !== null && team.staff.length >= seats(state) && avgProfit > nextRent * 3 && state.company.cash > up * (profile === 'optimizer' ? 1.8 : profile === 'weak' ? 4 : 2.5)) {
     applyAction(state, { type: 'upgradeOffice' });
   }
   const lab = labCost(state);

@@ -771,7 +771,8 @@
       "breakthrough": "Durchbruch im Labor: die Forschung springt voran",
       "influencer": "Ein großer Influencer schwärmt von {name}",
       "recallDone": "{name} zurückgerufen. Kunden schätzen die Ehrlichkeit",
-      "recallIgnored": "Defekte {name} machen Schlagzeilen"
+      "recallIgnored": "Defekte {name} machen Schlagzeilen",
+      "rescue": "Investoren retten einen angeschlagenen Handyhersteller"
     },
     "acquired": "{rival} wurde aufgekauft",
     "ownChip": "Gerücht: Ein Eigen-Chip, Generation {score}, kommt",
@@ -821,6 +822,14 @@
     },
     "breakthrough": {
       "toast": "Durchbruch im Labor! Die aktuelle Forschung ist zur Hälfte fertig."
+    },
+    "rescue": {
+      "title": "Ein Investor ruft an",
+      "text": "Deine Schulden sind außer Kontrolle. Ein Fonds bietet an, sie zu tilgen und {amount} einzuschießen – gegen einen großen Anteil. Marke und Fans merken das.",
+      "accept": "Deal annehmen · +{amount}",
+      "acceptHint": "Schulden weg, Marke −10, Fans −30 %",
+      "decline": "Allein weiterkämpfen",
+      "declineHint": "Die Schulden bleiben"
     }
   },
   "region": {

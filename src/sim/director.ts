@@ -79,7 +79,11 @@ export function tickDirector(state: GameState): SimEvent[] {
   }
   if (ev.tradeFair && (ev.cooldown.tradeFairEnd ?? 0) <= state.day) ev.tradeFair = false;
   // Unanswered cards take their default.
-  if (ev.pending && state.day >= ev.pending.deadline) events.push(...choose(state, ev.pending.options[ev.pending.options.length - 1]));
+  if (ev.pending && state.day >= ev.pending.deadline) {
+    // Defaults: the cautious option; a rescue is accepted (it's the way out).
+    const fallback = ev.pending.id === 'rescue' ? 'accept' : ev.pending.options[ev.pending.options.length - 1];
+    events.push(...choose(state, fallback));
+  }
   if (!state.clockStarted || state.stats.launches < 2) return events;
 
   const rng = createRng(state.rng);
@@ -140,6 +144,16 @@ export function tickDirector(state: GameState): SimEvent[] {
     addNews(state, { kind: 'event.breakthrough' });
     fire('breakthrough');
   }
+  // Investor rescue: deep in debt and losing money for a quarter → a way back (no game over).
+  const quarter = state.history.profit.slice(-13);
+  const losing = quarter.length >= 13 && quarter.reduce((a, b) => a + b, 0) < 0;
+  const deep = state.company.debt > Math.max(5_000_000 * inflation(Math.floor(year)), 2 * revenue52(state));
+  if (!ev.pending && losing && deep && ready('rescue')) {
+    const amount = Math.round(2_000_000 * inflation(Math.floor(year)));
+    ev.pending = { id: 'rescue', options: ['accept', 'decline'], deadline: state.day + 4 * DAYS_PER_WEEK, amount };
+    ev.cooldown.rescue = state.day + 5 * 52 * DAYS_PER_WEEK;
+    fire('rescue');
+  }
   // Own recall: scrap above 5 % slips through as faulty phones.
   const worst = state.products.filter((p) => p.active && (p.defectRate ?? 0) > 0.05).sort((a, b) => (b.defectRate ?? 0) - (a.defectRate ?? 0))[0];
   if (worst && !ev.pending && ready('recall') && roll(((worst.defectRate ?? 0) - 0.05) * 2)) {
@@ -184,6 +198,14 @@ export function choose(state: GameState, option: string): SimEvent[] {
       state.company.brand = clamp(state.company.brand - 15, 0, 100);
       addNews(state, { kind: 'event.recallIgnored', text: product?.design.name });
     }
+  }
+  if (p.id === 'rescue' && option === 'accept') {
+    // The investor clears the debt and brings cash; they take a big slice (brand and fans suffer).
+    state.company.debt = 0;
+    state.company.cash = Math.max(0, state.company.cash) + amount;
+    state.company.brand = clamp(state.company.brand - 10, 0, 100);
+    state.company.fans *= 0.7;
+    addNews(state, { kind: 'event.rescue' });
   }
   state.events.pending = null;
   return [{ type: 'eventChoice', id: p.id }];

@@ -771,7 +771,8 @@
       "breakthrough": "Breakthrough in your lab: research jumps ahead",
       "influencer": "A big influencer can't stop talking about {name}",
       "recallDone": "{name} recalled. Customers appreciate the honesty",
-      "recallIgnored": "Faulty {name} units make headlines"
+      "recallIgnored": "Faulty {name} units make headlines",
+      "rescue": "Investors rescue a struggling phone maker"
     },
     "acquired": "{rival} has been bought up",
     "ownChip": "Rumour: an in-house chip, generation {score}, is coming",
@@ -821,6 +822,14 @@
     },
     "breakthrough": {
       "toast": "Lab breakthrough! Your current research is halfway done."
+    },
+    "rescue": {
+      "title": "An investor calls",
+      "text": "Your debts have grown out of hand. A fund offers to clear them and add {amount} in cash, in exchange for a big stake. Your brand and fans will notice.",
+      "accept": "Take the deal · +{amount}",
+      "acceptHint": "Debt gone, brand −10, fans −30%",
+      "decline": "Keep fighting alone",
+      "declineHint": "The debt stays"
     }
   },
   "region": {

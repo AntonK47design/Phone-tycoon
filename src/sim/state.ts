@@ -159,7 +159,8 @@ export type EventId =
   | 'influencer'
   | 'starApplicant'
   | 'tariff'
-  | 'breakthrough';
+  | 'breakthrough'
+  | 'rescue';
 
 export interface ActiveEvent {
   id: EventId;

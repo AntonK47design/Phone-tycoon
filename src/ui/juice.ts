@@ -178,7 +178,7 @@ export function installJuice() {
           toast(t('toast.priceCut', { rival: rivalName(e.rival), segment: t(`segment.${e.segment}`) }), 'warn');
           break;
         case 'eventStarted':
-          if (e.id !== 'chipShortage' && e.id !== 'recall') later(() => toast(t(`event.${e.id}.toast`, { rival: e.target ? rivalName(e.target) : '', region: e.target ? t(`region.${e.target}`) : '' }), e.id === 'recession' || e.id === 'tariff' ? 'warn' : 'spark', true));
+          if (e.id !== 'chipShortage' && e.id !== 'recall' && e.id !== 'rescue') later(() => toast(t(`event.${e.id}.toast`, { rival: e.target ? rivalName(e.target) : '', region: e.target ? t(`region.${e.target}`) : '' }), e.id === 'recession' || e.id === 'tariff' ? 'warn' : 'spark', true));
           else sfx.unlock2();
           break;
         case 'eventEnded':
