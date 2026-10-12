@@ -36,6 +36,8 @@ import { isTrendColor } from './scoring/score';
 import { buildFactoryCost, factorySizeCost, lineRate, lineUpgradeCost, newLineCost, stockTotal, warehouseCost } from './factory';
 import { warehouseCapacity } from '../data/factory';
 import { REGIONS } from '../data/regions';
+import { chipProjectCost, osProjectCost, SIDE_KINDS, SIDE_PRODUCTS } from '../data/giant';
+import { campusCost, canAcquire, osScore, rivalValue } from './giant';
 import { contractProblem, entryCost, storeCost } from './world';
 import {
   bonusCost,
@@ -88,6 +90,8 @@ export interface BotResult {
   phase3Min: number | null;
   factoryMin: number | null;
   phase4Min: number | null;
+  phase5Min: number | null;
+  phase6Min: number | null;
   final: GameState;
 }
 
@@ -118,7 +122,7 @@ function designFor(state: GameState, segment: Segment, pick: number, profile: Bo
     d.materialId = segment === 'budget' ? 'plastic' : mats[mats.length - 1];
     const fins = availableFinishes(state);
     d.finishId = fins[fins.length - 1];
-    const os = availableOs(state);
+    const os = availableOs(state).filter((o) => o !== 'own' || osScore(state) >= 7);
     d.osId = segment === 'budget' ? 'leafline' : os[os.length - 1];
   }
   let best = d;
@@ -156,9 +160,10 @@ function pickResearch(state: GameState, profile: BotProfile): string | null {
   let best = -Infinity;
   for (const n of RESEARCH) {
     if (researchStatus(state, n) !== 'available') continue;
-    const cost = researchCost(n, year);
+    const cost = researchCost(n, year, state);
     if (cost.money > state.company.cash * (profile === 'optimizer' ? 0.25 : 0.2)) continue;
-    if (profile !== 'optimizer' && n.year > year) continue; // no pioneering
+    // Seasoned (phase 4+) average players research one year ahead when it's cheap; weak ones never.
+    if (n.year > year && (profile === 'weak' || (profile === 'average' && (state.phase < 4 || cost.money > state.company.cash * 0.08)))) continue;
     const u = n.unlock;
     let prio = 1;
     if (u.reach) prio = 6;
@@ -167,6 +172,7 @@ function pickResearch(state: GameState, profile: BotProfile): string | null {
     else if (u.partGen) prio = u.partGen.category === 'chip' || u.partGen.category === 'display' ? 4 : 3;
     else if (u.material || u.os || u.sizes || u.shape) prio = 3;
     else if (u.presentation) prio = 2;
+    else if (u.frontier) prio = 4;
     const score = prio / cost.rp;
     if (score > best) {
       best = score;
@@ -180,7 +186,7 @@ export function runBot(opts: { minutes: number; seed: number; profile?: BotProfi
   const profile = opts.profile ?? 'average';
   const state = newGame(opts.seed);
   const samples: BotSample[] = [];
-  const marks = { officeReadyMin: null as number | null, officeRentedMin: null as number | null, phase3Min: null as number | null, factoryMin: null as number | null, phase4Min: null as number | null };
+  const marks = { officeReadyMin: null as number | null, officeRentedMin: null as number | null, phase3Min: null as number | null, factoryMin: null as number | null, phase4Min: null as number | null, phase5Min: null as number | null, phase6Min: null as number | null };
   let pick = opts.seed;
 
   // First minute: three taps in the tutorial (~8 s each), then launch.
@@ -205,6 +211,8 @@ export function runBot(opts: { minutes: number; seed: number; profile?: BotProfi
       if (state.phase3Ready && marks.phase3Min === null) marks.phase3Min = min;
       if (state.factory.size > 0 && marks.factoryMin === null) marks.factoryMin = min;
       if (state.phase4Ready && marks.phase4Min === null) marks.phase4Min = min;
+      if (state.phase5Ready && marks.phase5Min === null) marks.phase5Min = min;
+      if (state.phase6Ready && marks.phase6Min === null) marks.phase6Min = min;
     }
     if (sec >= nextSample) {
       samples.push(sample(state, sec / 60));
@@ -231,6 +239,7 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
   if (state.phase >= 2) manageTeam(state, profile);
   if (state.phase3Ready) manageFactory(state, profile);
   if (state.phase4Ready) manageWorld(state, profile);
+  if (state.phase5Ready) manageGiant(state, profile);
   const pending = state.events.pending;
   if (pending) {
     const care = profile === 'weak' ? 8 : 3;
@@ -400,13 +409,38 @@ function manageWorld(state: GameState, profile: BotProfile): void {
   }
 }
 
+function manageGiant(state: GameState, profile: BotProfile): void {
+  if (state.day % 7 !== 6) return;
+  const care = profile === 'optimizer' ? 1.5 : profile === 'weak' ? 4 : 2.5;
+  const g = state.giant;
+  const year = yearOf(state.day);
+  const inf = inflation(Math.floor(year));
+  const campus = campusCost(state);
+  if (campus !== null && (g.campus === 0 || profile !== 'weak') && state.company.cash > campus * care) applyAction(state, { type: 'buildCampus' });
+  if (g.campus < 1) return;
+  if (!g.chip.project && state.company.cash > chipProjectCost(g.chip.level).money * inf * care) applyAction(state, { type: 'startChip' });
+  if (!g.os.project && state.company.cash > osProjectCost(g.os.level).money * inf * care) applyAction(state, { type: 'startOs' });
+  if (!g.chip.licensing) applyAction(state, { type: 'setLicensing', what: 'chip', on: true });
+  if (!g.os.licensing) applyAction(state, { type: 'setLicensing', what: 'os', on: true });
+  for (const kind of SIDE_KINDS) {
+    const p = g.side[kind];
+    const old = !p || state.day - p.launchDay > 2 * 52 * 7;
+    const def = SIDE_PRODUCTS[kind];
+    if (old && year >= def.year && state.company.cash > def.dev * inf * 2 * care * 3) applyAction(state, { type: 'launchSide', kind, tier: profile === 'weak' ? 'std' : 'pro', price: 'normal' });
+  }
+  const own = valuation(state);
+  for (const r of state.rivals) {
+    if (canAcquire(state, r.id, own) && state.company.cash > rivalValue(state, r.id) * 1.3 * care) applyAction(state, { type: 'acquire', id: r.id });
+  }
+}
+
 function sample(state: GameState, minute: number): BotSample {
   const cal = calendar(state.day);
   const reviews = state.products.slice(-5).map((p) => p.review.score);
   return {
     minute: Math.round(minute * 10) / 10,
     date: `W${cal.week} ${cal.year}`,
-    phase: state.phase >= 4 ? 4 : state.phase3Ready ? 3 : state.phase,
+    phase: state.phase >= 4 ? state.phase : state.phase3Ready ? 3 : state.phase,
     cash: Math.round(state.company.cash),
     valuation: Math.round(valuation(state)),
     launches: state.stats.launches,

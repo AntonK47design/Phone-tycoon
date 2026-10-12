@@ -2,7 +2,8 @@
 
 import { GOALS, VISIBLE_GOALS, type GoalDef } from '../data/goals';
 import type { SimEvent } from './events';
-import { valuation } from './game';
+import { marketShare, valuation } from './game';
+import { yearOf } from './time';
 import type { GameState } from './state';
 
 export function goalProgress(state: GameState, goal: GoalDef): number {
@@ -47,6 +48,21 @@ export function goalProgress(state: GameState, goal: GoalDef): number {
       return Object.values(state.regions.stores).reduce((a, b) => a + b, 0);
     case 'contracts':
       return state.contracts.done;
+    case 'campus':
+      return state.giant.campus;
+    case 'chipLevel':
+      return state.giant.chip.level;
+    case 'osLevel':
+      return state.giant.os.level;
+    case 'sideProducts':
+      return Object.values(state.giant.side).filter(Boolean).length;
+    case 'acquired':
+      return state.giant.acquired.length;
+    case 'endgame': {
+      const share = marketShare(state) / 0.2;
+      const big = yearOf(state.day) >= 2045 ? valuation(state) / 50_000_000_000 : 0;
+      return Math.min(1, Math.max(share, big));
+    }
   }
 }
 
@@ -82,6 +98,15 @@ export function checkGoals(state: GameState): SimEvent[] {
       if (goal.gate === 'phase4' && !state.phase4Ready) {
         state.phase4Ready = true;
         events.push({ type: 'phase4Ready' });
+      }
+      if (goal.gate === 'phase5' && !state.phase5Ready) {
+        state.phase5Ready = true;
+        events.push({ type: 'phase5Ready' });
+      }
+      if (goal.gate === 'phase6' && !state.phase6Ready) {
+        state.phase6Ready = true;
+        if (state.phase < 6) state.phase = 6;
+        events.push({ type: 'phase6Ready' });
       }
       changed = true;
     }

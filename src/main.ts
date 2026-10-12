@@ -54,6 +54,12 @@ async function boot() {
       window.removeEventListener('pagehide', save);
       location.reload();
     },
+    startOver(next) {
+      // Prestige: the new company replaces the save, then a fresh boot runs the tutorial.
+      writeSave(platform, next);
+      window.removeEventListener('pagehide', save);
+      location.reload();
+    },
   });
 
   store.subscribe(() => (storeRev.value = store.revision()));

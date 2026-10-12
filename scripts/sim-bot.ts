@@ -18,7 +18,7 @@ for (const profile of profiles) {
   const res = runBot({ minutes, seed, profile, sampleEveryMin: every });
   console.log(`\n## Bot "${profile}" – seed ${seed}, ${minutes} min`);
   const m = (x: number | null) => (x === null ? 'never' : `${x.toFixed(1)} min`);
-  console.log(`first launch: ${res.firstLaunchSec}s · office gate: ${m(res.officeReadyMin)} · office rented: ${m(res.officeRentedMin)} · phase-3 gate: ${m(res.phase3Min)} · factory: ${m(res.factoryMin)} · phase-4 gate: ${m(res.phase4Min)}`);
+  console.log(`first launch: ${res.firstLaunchSec}s · office gate: ${m(res.officeReadyMin)} · office rented: ${m(res.officeRentedMin)} · phase-3 gate: ${m(res.phase3Min)} · factory: ${m(res.factoryMin)} · phase-4 gate: ${m(res.phase4Min)} · phase-5 gate: ${m(res.phase5Min)} · phase-6 gate: ${m(res.phase6Min)}`);
   console.log('\n| min | date | phase | cash | valuation | launches | Ø review (last 5) | units/wk | brand | fans | research | share % | staff | payroll/wk | office | line lvls | built | regions | stores |');
   console.log('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
   for (const s of res.samples) {

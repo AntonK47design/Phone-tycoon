@@ -20,7 +20,13 @@ export type GoalKind =
   | 'lines'
   | 'regions'
   | 'stores'
-  | 'contracts';
+  | 'contracts'
+  | 'campus'
+  | 'chipLevel'
+  | 'osLevel'
+  | 'sideProducts'
+  | 'acquired'
+  | 'endgame';
 
 export interface GoalReward {
   cash?: number;
@@ -33,7 +39,7 @@ export interface GoalDef {
   target: number;
   reward: GoalReward;
   /** Goal that opens a phase gate. */
-  gate?: 'office' | 'phase3' | 'phase4';
+  gate?: 'office' | 'phase3' | 'phase4' | 'phase5' | 'phase6';
   /** Goals that must be completed before this one can complete. */
   requires?: string[];
 }
@@ -74,7 +80,17 @@ export const GOALS: GoalDef[] = [
   { id: 'contracts3', kind: 'contracts', target: 3, reward: { cash: 2_000_000 } },
   { id: 'regions5', kind: 'regions', target: 5, reward: { cash: 5_000_000 } },
   { id: 'stores10', kind: 'stores', target: 10, reward: { cash: 10_000_000 } },
-  { id: 'valuation1b', kind: 'valuation', target: 1_000_000_000, reward: {} },
+  { id: 'valuation1b', kind: 'valuation', target: 1_000_000_000, reward: { cash: 20_000_000 } },
+  { id: 'valuation5b', kind: 'valuation', target: 5_000_000_000, reward: {}, gate: 'phase5' },
+  // Phase 5 – tech giant.
+  { id: 'campus', kind: 'campus', target: 1, reward: { cash: 200_000_000 } },
+  { id: 'ownChip', kind: 'chipLevel', target: 1, reward: { cash: 300_000_000 } },
+  { id: 'ownOs', kind: 'osLevel', target: 1, reward: { cash: 400_000_000 } },
+  { id: 'side3', kind: 'sideProducts', target: 3, reward: { cash: 500_000_000 } },
+  { id: 'acquire1', kind: 'acquired', target: 1, reward: { cash: 500_000_000 } },
+  { id: 'valuation20b', kind: 'valuation', target: 20_000_000_000, reward: {} },
+  // Phase 6 – endgame: 20 % market share, or from 2045 a $50B company.
+  { id: 'endgame', kind: 'endgame', target: 1, reward: {}, gate: 'phase6' },
 ];
 
 /** How many goals are visible at once. */

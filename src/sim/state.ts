@@ -5,7 +5,7 @@ import type { Segment } from '../data/market';
 import type { Tempo } from '../data/factory';
 import type { Role, TraitId } from '../data/team';
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 export interface PhoneDesign {
   name: string;
@@ -26,6 +26,12 @@ export interface PhoneDesign {
   parts: Record<TechCategory, string>;
   /** Extra feature ids (wifi, net3g, gps, …). */
   features: string[];
+  /** Tech multiplier from frontier research (snapshot when the design is made). */
+  techBoost?: number;
+  /** Own chip: TI as a share of the year's flagship expectation, and unit cost. */
+  ownChip?: { ratio: number; cost: number };
+  /** Own OS score 0–10 (snapshot). */
+  osScore?: number;
 }
 
 export interface ReviewCard {
@@ -205,6 +211,53 @@ export interface RegionState {
   stores: Record<string, number>;
 }
 
+export interface SideProduct {
+  tier: string;
+  priceLevel: string;
+  launchDay: number;
+  gen: number;
+  units: number;
+  revenue: number;
+}
+
+export interface DeptProject {
+  progress: number;
+  need: number;
+}
+
+export interface GiantState {
+  campus: number;
+  chip: { level: number; project: DeptProject | null; licensing: boolean; licensees: string[] };
+  os: { level: number; project: DeptProject | null; installed: number; licensing: boolean; licensees: string[] };
+  side: { watch: SideProduct | null; earbuds: SideProduct | null; tablet: SideProduct | null };
+  /** Rival ids taken over. */
+  acquired: string[];
+  /** Licence income last week (for the UI). */
+  licenceWeek: number;
+}
+
+export interface HallEntry {
+  kind: string;
+  name: string;
+  value: number;
+  year: number;
+  color?: string | null;
+}
+
+/** Carried over to every new company (prestige). */
+export interface Legacy {
+  /** Legacy points available to spend. */
+  points: number;
+  /** Bonus levels bought. */
+  bonuses: Record<string, number>;
+  runs: number;
+  /** Peak valuation over all runs. */
+  peakValuation: number;
+  hall: HallEntry[];
+  achievements: string[];
+  scenario: string | null;
+}
+
 export interface FactoryLine {
   id: number;
   /** 1–10. */
@@ -313,6 +366,8 @@ export interface GameState {
     current: { id: string; progress: number } | null;
     /** Weekly lab budget in today's $ (buys extra research points). */
     budget: number;
+    /** Completed frontier research levels (+2 % tech each). */
+    frontier?: number;
   };
   stats: {
     launches: number;
@@ -332,6 +387,14 @@ export interface GameState {
   events: EventState;
   regions: RegionState;
   contracts: { offers: Contract[]; nextId: number; nextOfferDay: number; done: number };
+  giant: GiantState;
+  phase5Ready: boolean;
+  phase6Ready: boolean;
+  /** Records of this run (best review, best seller …). */
+  hall: HallEntry[];
+  achievements: string[];
+  peakValuation: number;
+  legacy: Legacy;
   /** Phase-4 gate reached (expansion – next update). */
   phase4Ready: boolean;
   daily: DailyState;
@@ -347,5 +410,5 @@ export interface GameState {
     compUnits: Record<string, number[]>;
   };
   /** Running week accumulators. */
-  week: { revenue: number; profit: number; units: number };
+  week: { revenue: number; profit: number; units: number; ownOs?: number };
 }

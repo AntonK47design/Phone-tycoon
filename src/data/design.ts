@@ -49,6 +49,10 @@ export const SHAPES: ShapeDef[] = [
   { id: 'blade', bezelSide: 2.8, bezelTop: 10, bezelBottom: 10, corner: 7, thickness: 8.4, cost: 22, devPoints: 5 },
   { id: 'edge', bezelSide: 1.8, bezelTop: 7, bezelBottom: 7, corner: 9, thickness: 7.9, cost: 30, devPoints: 6 },
   { id: 'fullscreen', bezelSide: 1.2, bezelTop: 3.5, bezelBottom: 3.5, corner: 10, thickness: 7.6, cost: 40, devPoints: 7 },
+  // Foldable: a book that opens into a small tablet (thicker, pricey, very striking).
+  { id: 'fold', bezelSide: 1.4, bezelTop: 3.5, bezelBottom: 3.5, corner: 9, thickness: 11.5, cost: 120, devPoints: 10 },
+  // Rollable: the screen unrolls from a slim body.
+  { id: 'roll', bezelSide: 0.9, bezelTop: 2.5, bezelBottom: 2.5, corner: 11, thickness: 7.0, cost: 160, devPoints: 12 },
 ];
 
 export function shapeById(id: string): ShapeDef {
@@ -73,6 +77,9 @@ export const MATERIALS: MaterialDef[] = [
   { id: 'plastic', design: 6, year: 2007, cost: 6, metalness: 0, roughness: 0.35 },
   { id: 'aluminium', design: 8, year: 2010, cost: 22, metalness: 0.9, roughness: 0.35 },
   { id: 'glass', design: 8.6, year: 2012, cost: 30, metalness: 0.1, roughness: 0.08 },
+  { id: 'ceramic', design: 9.4, year: 2024, cost: 55, metalness: 0.05, roughness: 0.15 },
+  { id: 'transparent', design: 9.8, year: 2041, cost: 70, metalness: 0.0, roughness: 0.05 },
+  { id: 'nano', design: 10, year: 2047, cost: 80, metalness: 0.6, roughness: 0.25 },
   { id: 'titanium', design: 9.2, year: 2020, cost: 48, metalness: 0.9, roughness: 0.4 },
 ];
 

@@ -61,6 +61,15 @@ export type SimEvent =
   | { type: 'contractOffered'; id: number }
   | { type: 'contractDone'; id: number; payout: number }
   | { type: 'contractFailed'; id: number }
+  | { type: 'campusBuilt'; level: number }
+  | { type: 'projectStarted'; what: 'chip' | 'os' }
+  | { type: 'projectDone'; what: 'chip' | 'os'; level: number }
+  | { type: 'sideLaunched'; kind: string }
+  | { type: 'acquired'; rival: string; price: number }
+  | { type: 'phase5Ready' }
+  | { type: 'phase6Ready' }
+  | { type: 'achievement'; id: string }
+  | { type: 'record'; kind: string }
   | { type: 'dailyDone'; index: number }
   | { type: 'dailyClaimed'; index: number; reward: { cash?: number; hype?: number } }
   | { type: 'calendarClaimed'; step: number; cash: number; cosmetic?: string }

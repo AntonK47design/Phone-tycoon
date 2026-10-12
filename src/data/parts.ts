@@ -22,7 +22,7 @@ const DEV_TYPE: Record<TechCategory, 'tech' | 'software'> = {
 const BASE_DEV: Record<TechCategory, number> = { chip: 3, display: 2, battery: 1, camera: 2, storage: 1, ram: 1 };
 
 export const FIRST_GEN = START_YEAR;
-export const LAST_GEN = 2024;
+export const LAST_GEN = 2050;
 
 export interface PartDef {
   id: string;
@@ -44,14 +44,16 @@ function pow2(x: number) {
 }
 
 function label(category: TechCategory, gen: number, tier: Tier): string {
-  const k = gen - START_YEAR;
+  // Spec numbers grow more slowly after 2024 (like the expectation curve).
+  const raw = gen - START_YEAR;
+  const k = raw <= 17 ? raw : 17 + (raw - 17) * 0.45;
   const m = TIER_MUL[tier];
   const tierName = tier === 'lite' ? ' Lite' : tier === 'pro' ? ' Pro' : '';
   switch (category) {
     case 'chip':
       return `Vexa V${k + 1}${tierName} · ${Math.round((420 * Math.pow(1.22, k) * m) / 10) * 10} MHz`;
     case 'display': {
-      const tech = gen < 2010 ? 'TFT' : gen < 2013 ? 'IPS' : gen < 2018 ? 'OLED' : 'LTPO';
+      const tech = gen < 2010 ? 'TFT' : gen < 2013 ? 'IPS' : gen < 2018 ? 'OLED' : gen < 2030 ? 'LTPO' : gen < 2040 ? 'MicroLED' : 'QuantumLED';
       const ppi = Math.round((150 * Math.pow(1.13, k) * m) / 5) * 5;
       return `${tech} ${ppi} ppi`;
     }
@@ -81,7 +83,7 @@ function build(): PartDef[] {
           tier,
           ti: TIER_SHARE[tier] * expectedTech(gen),
           cost: BASE_COST[category] * TIER_COST[tier] * inflation(gen),
-          dev: { type: DEV_TYPE[category], points: Math.round(BASE_DEV[category] * TIER_DEV[tier] * (1 + 0.08 * (gen - START_YEAR))) },
+          dev: { type: DEV_TYPE[category], points: Math.round(BASE_DEV[category] * TIER_DEV[tier] * (1 + 0.08 * Math.min(gen - START_YEAR, 25))) },
           label: label(category, gen, tier),
         });
       }
@@ -146,6 +148,12 @@ export const FEATURES: FeatureDef[] = [
   { id: 'wireless', cost: 14, devPoints: 2, expected: { budget: 9999, mid: 2021, flagship: 2018 }, drain: 1 },
   { id: 'faceUnlock', cost: 18, devPoints: 3, expected: { budget: 2022, mid: 2019, flagship: 2018 }, drain: 1.02 },
   { id: 'net5g', cost: 24, devPoints: 3, expected: { budget: 2023, mid: 2021, flagship: 2020 }, drain: 1.1 },
+  { id: 'satellite', cost: 14, devPoints: 2, expected: { budget: 2031, mid: 2028, flagship: 2026 }, drain: 1.03 },
+  { id: 'aiCore', cost: 18, devPoints: 3, expected: { budget: 2030, mid: 2027, flagship: 2025 }, drain: 1.05 },
+  { id: 'underCam', cost: 20, devPoints: 3, expected: { budget: 2036, mid: 2032, flagship: 2030 }, drain: 1.0 },
+  // Solid-state cells: the battery lasts longer (drain below 1).
+  { id: 'solidState', cost: 26, devPoints: 3, expected: { budget: 2040, mid: 2036, flagship: 2034 }, drain: 0.82 },
+  { id: 'holo', cost: 45, devPoints: 5, expected: { budget: 2052, mid: 2046, flagship: 2042 }, drain: 1.12 },
 ];
 
 export function featureById(id: string): FeatureDef | undefined {

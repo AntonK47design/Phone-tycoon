@@ -134,7 +134,7 @@ export function tickDirector(state: GameState): SimEvent[] {
   }
   const cur = state.research.current;
   if (cur && ready('breakthrough') && roll(0.005)) {
-    const need = researchCost(researchById(cur.id)!, year).rp;
+    const need = researchCost(researchById(cur.id)!, year, state).rp;
     cur.progress += (need - cur.progress) * 0.5;
     ev.cooldown.breakthrough = state.day + 13 * DAYS_PER_WEEK;
     addNews(state, { kind: 'event.breakthrough' });

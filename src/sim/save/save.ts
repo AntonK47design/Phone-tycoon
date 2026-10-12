@@ -2,6 +2,8 @@
 
 import { defaultParts, LAST_GEN } from '../../data/parts';
 import { newRivals } from '../competitors';
+import { newGiant } from '../giant';
+import { newLegacy } from '../legacy';
 import { SAVE_VERSION, type GameState } from '../state';
 
 export interface SaveFile {
@@ -77,6 +79,17 @@ export const MIGRATIONS: Record<number, Migration> = {
     s.events ??= { active: [], cooldown: {}, pending: null, tradeFair: false };
     s.regions ??= { entered: ['home'], stores: {} };
     s.contracts ??= { offers: [], nextId: 1, nextOfferDay: 0, done: 0 };
+    return s;
+  },
+  6: (s: Obj) => {
+    // M6: tech giant, endgame, legacy.
+    s.giant ??= newGiant();
+    s.phase5Ready ??= false;
+    s.phase6Ready ??= false;
+    s.hall ??= [];
+    s.achievements ??= [];
+    s.peakValuation ??= 0;
+    s.legacy ??= newLegacy();
     return s;
   },
 };

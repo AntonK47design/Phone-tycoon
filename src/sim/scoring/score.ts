@@ -34,8 +34,13 @@ export function batteryDrain(design: PhoneDesign): number {
   return drain;
 }
 
+export const OWN_CHIP_ID = 'own-chip';
+
 export function partTi(design: PhoneDesign, category: TechCategory): number {
-  return partById(design.parts[category])?.ti ?? 0;
+  const boost = design.techBoost ?? 1;
+  // Own chip: a share of the flagship expectation of the design year (GDD §15.1).
+  if (category === 'chip' && design.parts.chip === OWN_CHIP_ID && design.ownChip) return design.ownChip.ratio * expectedTech(design.kitYear) * boost;
+  return (partById(design.parts[category])?.ti ?? 0) * boost;
 }
 
 export function techScore(design: PhoneDesign, year: number): TechBreakdown {
@@ -109,6 +114,7 @@ export function designScore(design: PhoneDesign, year: number): DesignBreakdown 
 }
 
 export function osAdjustment(design: PhoneDesign): number {
+  if (design.osId === 'own') return ((design.osScore ?? 5) - 6) * 0.15;
   const os = LICENSED_OS[design.osId as keyof typeof LICENSED_OS] ?? LICENSED_OS.leafline;
   return (os.score - 6) * 0.15;
 }

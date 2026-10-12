@@ -1,7 +1,7 @@
 // Living competitors (GDD §12): eight rivals launch models on their own cadence, age,
 // react to the player and drift up or down with their success.
 
-import { DAYS_PER_WEEK } from '../data/eras';
+import { DAYS_PER_WEEK, expectedTech } from '../data/eras';
 import { COMPETITORS, curveAt, SEGMENTS, type CompetitorDef, type Segment } from '../data/market';
 import { brandFactor, KAPPA, marketSize, type RivalEntry } from './economy/market';
 import type { SimEvent } from './events';
@@ -45,17 +45,19 @@ export function newRivals(state: GameState): RivalState[] {
     // Everyone starts with a model already on the shelf in each of their segments.
     for (const seg of def.segments) {
       const age = -Math.floor(rng.range(0, def.cadence * DAYS_PER_WEEK));
-      rival.models.push(launchModel(rng, rival, seg, age));
+      rival.models.push(launchModel(rng, rival, seg, state.day + age));
     }
-    rival.nextLaunch = Math.floor(rng.range(2, def.cadence) * DAYS_PER_WEEK);
+    rival.nextLaunch = state.day + Math.floor(rng.range(2, def.cadence) * DAYS_PER_WEEK);
     return rival;
   });
 }
 
 /** Current review of a rival model: launch review minus how much it has aged. */
 export function rivalModelReview(m: RivalModel, day: number): number {
-  const years = Math.max(0, day - m.launchDay) / (DAYS_PER_WEEK * 52);
-  return clamp(m.review - RIVAL_AGING_PER_YEAR * years, 0, 10);
+  // Ages with the expectation curve: 3 · log2(E_now / E_launch) ≈ 1.14 points/year until 2024.
+  const now = yearOf(Math.max(day, m.launchDay));
+  const then = yearOf(m.launchDay);
+  return clamp(m.review - 3 * Math.log2(expectedTech(now) / expectedTech(then)), 0, 10);
 }
 
 /** Effective attractiveness of every rival in a segment right now. */

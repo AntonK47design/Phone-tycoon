@@ -2,10 +2,11 @@
 
 import type { TechCategory } from '../data/components';
 import { CHANNEL_CUT, LAB_COST_PER_RP, OFFICE_REACH } from '../data/components';
-import { inflation } from '../data/eras';
+import { expectedTech, inflation } from '../data/eras';
 import { DISPLAY_SIZES, FINISHES, MATERIALS, SHAPES } from '../data/design';
 import { ALL_SEGMENTS, BASE_SEGMENTS, GARAGE_REACH, type Segment } from '../data/market';
-import { FEATURES, FIRST_GEN, PARTS, type PartDef } from '../data/parts';
+import { FEATURES, FIRST_GEN, LAST_GEN, PARTS, type PartDef } from '../data/parts';
+import { CAMPUS_LEVELS, chipRatio } from '../data/giant';
 import { RESEARCH, researchById, type ResearchNode } from '../data/research';
 import type { SimEvent } from './events';
 import { teamRates } from './team';
@@ -34,7 +35,23 @@ export function editorUnlocked(state: GameState): boolean {
 
 export function availableParts(state: GameState, category: TechCategory): PartDef[] {
   const gens = new Set([FIRST_GEN, ...unlocks(state, 'partGen').filter((g) => g.category === category).map((g) => g.gen)]);
-  return PARTS.filter((p) => p.category === category && gens.has(p.gen));
+  const list = PARTS.filter((p) => p.category === category && gens.has(p.gen));
+  // Own chip (phase 5): always the newest generation, a share of the flagship expectation.
+  if (category === 'chip' && state.giant.chip.level > 0) {
+    const year = Math.min(LAST_GEN, Math.floor(yearOf(state.day)));
+    const market = PARTS.find((p) => p.id === `chip-${year}-pro`);
+    list.push({
+      id: 'own-chip',
+      category: 'chip',
+      gen: year,
+      tier: 'pro',
+      ti: chipRatio(state.giant.chip.level, state.giant.campus) * expectedTech(year),
+      cost: (market?.cost ?? 50) * 0.6,
+      dev: { type: 'tech', points: market?.dev.points ?? 5 },
+      label: `${state.company.name} Silicon ${state.giant.chip.level}`,
+    });
+  }
+  return list;
 }
 
 export function availableMaterials(state: GameState): string[] {
@@ -47,6 +64,7 @@ export function availableFinishes(state: GameState): string[] {
 
 /** Market segments the company can target (senior & gaming open with the expansion). */
 export function availableSegments(state: GameState): Segment[] {
+  if (state.legacy.scenario === 'budgetOnly') return state.phase >= 4 ? ['budget', 'senior'] : ['budget'];
   return state.phase >= 4 ? ALL_SEGMENTS : BASE_SEGMENTS;
 }
 
@@ -65,7 +83,9 @@ export function availableSizes(state: GameState): number[] {
 }
 
 export function availableOs(state: GameState): string[] {
-  return ['leafline', ...unlocks(state, 'os')];
+  const list = ['leafline', ...unlocks(state, 'os')];
+  if (state.giant.os.level > 0) list.push('own');
+  return list;
 }
 
 export function reach(state: GameState): number {
@@ -81,6 +101,7 @@ export function channelCut(state: GameState): number {
 }
 
 export function canMarket(state: GameState): boolean {
+  if (state.legacy.scenario === 'noMarketing') return false;
   return unlocks(state, 'marketing').length > 0;
 }
 
@@ -93,13 +114,15 @@ export function pioneerFactor(node: ResearchNode, year: number): number {
   return 1 + 1.5 * Math.max(0, node.year - year);
 }
 
-export function researchCost(node: ResearchNode, year: number): { rp: number; money: number } {
-  const f = pioneerFactor(node, year);
+export function researchCost(node: ResearchNode, year: number, state?: GameState): { rp: number; money: number } {
+  let f = pioneerFactor(node, year);
+  // Frontier research gets 6 % dearer with every level.
+  if (node.unlock.frontier && state) f *= Math.pow(1.06, state.research.frontier ?? 0);
   return { rp: Math.round(node.rp * f), money: Math.round(node.money * f) };
 }
 
 export function researchStatus(state: GameState, node: ResearchNode): ResearchStatus {
-  if (isDone(state, node.id)) return 'done';
+  if (!node.unlock.frontier && isDone(state, node.id)) return 'done';
   if (state.research.current?.id === node.id) return 'active';
   if (node.requires.some((r) => !isDone(state, r))) return 'locked';
   if (yearOf(state.day) < node.year - 1) return 'tooEarly';
@@ -109,7 +132,9 @@ export function researchStatus(state: GameState, node: ResearchNode): ResearchSt
 export function rpPerDay(state: GameState): number {
   if (state.phase < 2) return 0;
   const lab = state.research.budget / (LAB_COST_PER_RP * inflation(Math.floor(yearOf(state.day))));
-  return teamRates(state).rp + lab;
+  // Campus and legacy research bonus.
+  const campus = state.giant.campus > 0 ? CAMPUS_LEVELS[state.giant.campus - 1].bonus : 0;
+  return (teamRates(state).rp + lab) * (1 + campus + 0.05 * (state.legacy.bonuses.research ?? 0));
 }
 
 export function startResearch(state: GameState, id: string): SimEvent[] {
@@ -117,7 +142,7 @@ export function startResearch(state: GameState, id: string): SimEvent[] {
   if (!node || state.phase < 2) return [{ type: 'rejected', reason: 'notReady' }];
   if (state.research.current) return [{ type: 'rejected', reason: 'busy' }];
   if (researchStatus(state, node) !== 'available') return [{ type: 'rejected', reason: 'notReady' }];
-  const cost = researchCost(node, yearOf(state.day));
+  const cost = researchCost(node, yearOf(state.day), state);
   if (state.company.cash < cost.money) return [{ type: 'rejected', reason: 'noCash' }];
   state.company.cash -= cost.money;
   state.research.current = { id, progress: 0 };
@@ -129,10 +154,11 @@ export function tickResearch(state: GameState, days = 1): SimEvent[] {
   const cur = state.research.current;
   if (!cur) return [];
   const node = researchById(cur.id)!;
-  const need = researchCost(node, yearOf(state.day)).rp;
+  const need = researchCost(node, yearOf(state.day), state).rp;
   cur.progress += rpPerDay(state) * days;
   if (cur.progress < need) return [];
-  state.research.done.push(cur.id);
+  if (node.unlock.frontier) state.research.frontier = (state.research.frontier ?? 0) + 1;
+  else state.research.done.push(cur.id);
   state.research.current = null;
   return [{ type: 'researchDone', id: cur.id }];
 }
@@ -141,7 +167,7 @@ export function researchProgress(state: GameState): { node: ResearchNode; progre
   const cur = state.research.current;
   if (!cur) return null;
   const node = researchById(cur.id)!;
-  const need = researchCost(node, yearOf(state.day)).rp;
+  const need = researchCost(node, yearOf(state.day), state).rp;
   const rate = Math.max(0.01, rpPerDay(state));
   return { node, progress: cur.progress, need, daysLeft: Math.ceil((need - cur.progress) / rate) };
 }

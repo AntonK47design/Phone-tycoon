@@ -167,13 +167,15 @@ export function tickContracts(state: GameState): SimEvent[] {
   const mine = state.products.filter((p) => p.active && p.design.segment === segment);
   const weekly = mine.reduce((a, p) => a + p.lastWeekDemand, 0);
   const typicalCost = mine.length ? Math.min(...mine.map((p) => p.unitCost)) : priceAnchor({ segment }, year) * 0.45;
+  const currentBest = mine.length ? Math.max(...mine.map((p) => p.review.score - (p.review.p - overallRating(p.design, year).p))) : 6.5;
   const units = nice(clamp(Math.max(weekly, 500) * rng.range(2, 5), 1000, 200_000));
   const maxCost = Math.round(typicalCost * rng.range(1.05, 1.25));
   const offer: Contract = {
     id: c.nextId++,
     client: rng.pick(CLIENTS),
     segment,
-    minReview: clamp(Math.round((state.stats.bestReview - rng.range(0.8, 2)) * 2) / 2, 5, 8.5),
+    // Asks for roughly what the company builds today (not its all-time best).
+    minReview: clamp(Math.round((currentBest - rng.range(0.3, 1.2)) * 2) / 2, 5, 8.5),
     maxCost,
     units,
     deadline: state.day + Math.round(rng.range(6, 12)) * DAYS_PER_WEEK,

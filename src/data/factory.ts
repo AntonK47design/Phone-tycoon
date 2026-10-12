@@ -55,7 +55,7 @@ export function warehouseUpgradePrice(level: number): number {
 /** Stock above warehouse capacity costs this share of unit cost per week (GDD §7.6). */
 export const OVERFLOW_RATE = 0.01;
 /** Weekly upkeep: share of everything invested in the factory. */
-export const FACTORY_UPKEEP_RATE = 0.01;
+export const FACTORY_UPKEEP_RATE = 0.0025;
 /** Default stock target of the lines, in weeks of demand. */
 export const DEFAULT_TARGET_WEEKS = 4;
 /** Review penalty per scrap share that slips through as returns: 0.1 per 2 %. */

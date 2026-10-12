@@ -23,6 +23,8 @@ export interface GameContext {
   gameplay: { start(): void; stop(): void };
   save(): void;
   reset(): void;
+  /** Replaces the game with a new company (prestige) and restarts. */
+  startOver(next: import('../sim/state').GameState): void;
 }
 
 let ctx: GameContext | null = null;
@@ -50,7 +52,7 @@ export interface LaunchData {
   options?: LaunchOptions;
 }
 
-export type DrawerTab = 'company' | 'team' | 'factory' | 'research' | 'market' | 'world';
+export type DrawerTab = 'company' | 'team' | 'factory' | 'research' | 'market' | 'world' | 'empire' | 'legacy';
 /** Open side panel (Phase 2+). */
 export const drawer = signal<DrawerTab | null>(null);
 /** Which room the hub camera shows (Phase 2+). */

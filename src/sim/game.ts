@@ -33,10 +33,13 @@ import {
 } from './economy/market';
 import type { SimEvent } from './events';
 import { checkDaily, claimCalendar, claimDaily, dailySync, newDaily } from './daily';
+import { FACTORY_UPKEEP_RATE } from '../data/factory';
 import { applyFactoryAction, autoAssign, factoryWeek, newFactory, produceDay, returnsPenalty, type FactoryAction } from './factory';
 import { addNews, newRivals, rivalEntries, tickRivalsDay, tickRivalsWeek } from './competitors';
 import { cameraHype, choose, elasticityMultiplier, marketMultiplier, newEvents, productionCostMultiplier, tariffRegion, tickDirector } from './director';
 import { applyWorldAction, newContracts, newRegions, productFit, regionReach, storeRent, tickContracts, type WorldAction } from './world';
+import { applyGiantAction, ecosystemComplete, newGiant, osScore, ownChipRatio, tickGiantDay, tickGiantWeek, type GiantAction } from './giant';
+import { bonus, checkLegacy, newLegacy } from './legacy';
 import { checkGoals } from './goals';
 import {
   availableFeatures,
@@ -62,13 +65,14 @@ import {
   overallRating,
   reviewAspects,
   roundPrice,
+  OWN_CHIP_ID,
   reviewEstimate,
   suggestedPrice,
   techScore,
   type FeatureCheck,
   type ReviewAspect,
 } from './scoring/score';
-import { SAVE_VERSION, type GameState, type PhoneDesign, type Product, type ReviewCard, type ReviewResult } from './state';
+import { SAVE_VERSION, type GameState, type Legacy, type PhoneDesign, type Product, type ReviewCard, type ReviewResult } from './state';
 import {
   applyTeamAction,
   buildingRent,
@@ -94,7 +98,7 @@ function garageParts(year: number) {
   return defaultParts('std', Math.min(LAST_GEN, Math.floor(year)));
 }
 
-export function newGame(seed: number): GameState {
+export function newGame(seed: number, legacy: Legacy = newLegacy()): GameState {
   const rng = createRng(seed);
   const company = `${rng.pick(COMPANY_PREFIXES)} ${rng.pick(COMPANY_SUFFIXES)}`;
   const word = rng.pick(PHONE_WORDS);
@@ -145,9 +149,37 @@ export function newGame(seed: number): GameState {
     events: newEvents(),
     regions: newRegions(),
     contracts: newContracts(),
+    giant: newGiant(),
+    phase5Ready: false,
+    phase6Ready: false,
+    hall: [],
+    achievements: [],
+    peakValuation: 0,
+    legacy,
   };
+  applyLegacy(state);
   state.rivals = newRivals(state);
   return state;
+}
+
+/** Legacy bonuses and the chosen scenario (GDD §16). */
+function applyLegacy(state: GameState): void {
+  state.company.cash = START_CASH * (1 + 0.25 * bonus(state, 'cash'));
+  state.company.brand = 5 * bonus(state, 'brand');
+  if (bonus(state, 'colors') > 0) state.unlockedColors = COLORS.map((c) => c.id);
+  switch (state.legacy.scenario) {
+    case 'lateStart':
+      // Start in 2016: the market is already big, rivals are established.
+      state.day = 9 * 364;
+      state.draft.kitYear = 2016;
+      state.draft.parts = garageParts(2016);
+      state.draft.displaySize = 4.0;
+      state.draft.price = suggestedPrice(state.draft, 2016);
+      break;
+    case 'recession':
+      state.events.active.push({ id: 'recession', start: 0, until: Number.MAX_SAFE_INTEGER });
+      break;
+  }
 }
 
 export type DraftPatch = Partial<
@@ -180,7 +212,10 @@ export type Action =
   | { type: 'eventChoice'; option: string }
   | TeamAction
   | FactoryAction
-  | WorldAction;
+  | WorldAction
+  | GiantAction;
+
+const GIANT_ACTIONS = new Set(['buildCampus', 'startChip', 'startOs', 'setLicensing', 'launchSide', 'acquire']);
 
 const WORLD_ACTIONS = new Set(['enterRegion', 'openStore', 'fulfilContract', 'declineContract']);
 
@@ -197,7 +232,7 @@ export function normalizeDraft(state: GameState, d: PhoneDesign): void {
   if (state.phase < 2) {
     d.parts = garageParts(year);
     d.features = ['wifi'];
-    d.segment = 'mid';
+    d.segment = defaultSegment(state);
     d.customPrice = null;
     d.materialId = 'plastic';
     d.finishId = 'gloss';
@@ -212,12 +247,25 @@ export function normalizeDraft(state: GameState, d: PhoneDesign): void {
     if (!availableMaterials(state).includes(d.materialId)) d.materialId = 'plastic';
     if (!availableFinishes(state).includes(d.finishId)) d.finishId = 'gloss';
     if (!availableOs(state).includes(d.osId)) d.osId = 'leafline';
-    if (!availableSegments(state).includes(d.segment)) d.segment = 'mid';
+    if (!availableSegments(state).includes(d.segment)) d.segment = defaultSegment(state);
   }
+  // Frontier research, own chip and own OS are snapshotted into the design.
+  d.techBoost = Math.pow(1.02, state.research.frontier ?? 0);
+  if (d.parts.chip === OWN_CHIP_ID) {
+    const market = partById(`chip-${Math.min(LAST_GEN, d.kitYear)}-pro`);
+    d.ownChip = { ratio: ownChipRatio(state), cost: (market?.cost ?? 50) * 0.6 };
+  } else delete d.ownChip;
+  if (d.osId === 'own') d.osScore = Math.round(osScore(state) * 10) / 10;
+  else delete d.osScore;
   if (!availableShapes(state).includes(d.shapeId)) d.shapeId = 'round';
   if (!availableSizes(state).includes(d.displaySize)) d.displaySize = 3.5;
   if (d.customPrice !== null) d.customPrice = clamp(Math.round(d.customPrice), 29, 4999);
   d.price = d.customPrice ?? autoPrice(state, d);
+}
+
+function defaultSegment(state: GameState): Segment {
+  const segs = availableSegments(state);
+  return segs.includes('mid') ? 'mid' : segs[0];
 }
 
 /** Minimum margin the automatic price keeps after the shops' cut. */
@@ -283,6 +331,11 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
     case 'eventChoice':
       return choose(state, action.option).concat(checkGoals(state));
     default:
+      if (GIANT_ACTIONS.has(action.type)) {
+        const ev = applyGiantAction(state, action as GiantAction, valuation(state));
+        if (ev.some((e) => e.type === 'projectDone' || e.type === 'campusBuilt')) normalizeDraft(state, state.draft);
+        return ev.concat(checkGoals(state));
+      }
       if (WORLD_ACTIONS.has(action.type)) {
         const year = yearOf(state.day);
         return applyWorldAction(state, action as WorldAction, (p) => currentReview(p, year)).concat(checkGoals(state), checkDaily(state));
@@ -347,7 +400,7 @@ function makeCards(rng: Rng, est: ReturnType<typeof reviewEstimate>): ReviewCard
 /** Weekly running costs (rent, payroll, lab budget) – used for the cash reserve. */
 export function weeklyCosts(state: GameState): number {
   const inf = inflation(Math.floor(yearOf(state.day)));
-  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget + state.factory.invested * 0.01 + storeRent(state) : GARAGE_UPKEEP_WEEK * inf;
+  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget + state.factory.invested * FACTORY_UPKEEP_RATE + storeRent(state) : GARAGE_UPKEEP_WEEK * inf;
 }
 
 /** Cash the company keeps before spare money goes to the bank. */
@@ -600,6 +653,7 @@ function sell(state: GameState, product: Product, units: number, preorder = fals
   state.week.revenue += revenue;
   state.week.profit += profit;
   state.week.units += units;
+  if (product.design.osId === 'own') state.week.ownOs = (state.week.ownOs ?? 0) + units;
   void preorder;
   return { revenue, profit };
 }
@@ -627,6 +681,8 @@ function productA(state: GameState, product: Product, year: number): { a: number
   );
   // Camera hype event: phones with a pro camera are the talk of the town.
   if (cameraHype(state) && partById(product.design.parts.camera)?.tier === 'pro') parts.a *= 1.2;
+  // Ecosystem: watch + earbuds + tablet on sale → phones +5 % (GDD §15.3).
+  if (ecosystemComplete(state)) parts.a *= 1.05;
   return parts;
 }
 
@@ -676,7 +732,7 @@ export function valuation(state: GameState): number {
     LAB_LEVELS.slice(0, t.lab).reduce((a, l) => a + l.price, 0) +
     STUDIO_LEVELS.slice(0, t.studio).reduce((a, l) => a + l.price, 0);
   const assets = built * 0.5 * inflation(Math.floor(year));
-  const factory = state.factory.invested * 0.5;
+  const factory = state.factory.invested * 0.5 + state.giant.campus * 50_000_000 * inflation(Math.floor(year)) * 0.5;
   const stockValue = state.products.reduce((a, p) => a + (p.active && !p.madeToOrder ? p.stock * p.unitCost * 0.5 : 0), 0);
   return state.company.cash - state.company.debt + 4 * Math.max(0, profit52) + 2000 * state.company.brand * Math.sqrt(marketSize(year) / marketSize(2007)) + assets + factory + stockValue;
 }
@@ -716,6 +772,7 @@ export function advanceDay(state: GameState): SimEvent[] {
   events.push(...tickResearch(state));
   events.push(...tickTeamDay(state));
   events.push(...tickRivalsDay(state));
+  events.push(...tickGiantDay(state));
 
   // Production orders arriving.
   for (const p of state.products) {
@@ -785,6 +842,9 @@ export function advanceDay(state: GameState): SimEvent[] {
     const interest = state.company.debt * LOAN_INTEREST_WEEK;
     const operations = state.phase >= 2 ? state.week.revenue * OPERATIONS_RATE : 0;
     const lab = state.phase >= 2 ? state.research.budget : 0;
+    const giantCash = tickGiantWeek(state, state.week.ownOs ?? 0);
+    state.company.cash += giantCash;
+    state.week.profit += giantCash;
     const factory = factoryWeek(state) + storeRent(state);
     const costs = rent + storage + interest + operations + lab + factory;
     state.company.cash -= costs;
@@ -847,6 +907,7 @@ export function advanceDay(state: GameState): SimEvent[] {
     pushHistory(state.history.profit, state.week.profit);
     pushHistory(state.history.cash, state.company.cash);
     state.week = { revenue: 0, profit: 0, units: 0 };
+    events.push(...checkLegacy(state, valuation(state)));
     events.push({ type: 'weekEnd', week: state.day / DAYS_PER_WEEK });
   }
 

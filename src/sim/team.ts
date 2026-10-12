@@ -2,6 +2,7 @@
 
 import { FOUNDER_RP_PER_DAY } from '../data/components';
 import { inflation } from '../data/eras';
+import { CAMPUS_LEVELS } from '../data/giant';
 import {
   APPLICANT_COUNT,
   APPLICANT_REFRESH_DAYS,
@@ -62,7 +63,10 @@ export function seats(state: GameState): number {
 }
 
 export function officeBonus(state: GameState): number {
-  return state.team.office > 0 ? OFFICE_LEVELS[state.team.office - 1].bonus : 1;
+  const office = state.team.office > 0 ? OFFICE_LEVELS[state.team.office - 1].bonus : 1;
+  // The campus (phase 5) lifts everyone's output.
+  const campus = state.giant.campus > 0 ? CAMPUS_LEVELS[state.giant.campus - 1].bonus : 0;
+  return office * (1 + campus);
 }
 
 export function moraleFactor(morale: number): number {
@@ -169,7 +173,8 @@ export function productionBoost(state: GameState): { speed: number; scrap: numbe
 
 function makePerson(state: GameState, rng: Rng, role: Role): Employee {
   const year = yearOf(state.day);
-  const lo = 10 + Math.min(45, state.company.brand / 4 + (year - 2007) * 2.5);
+  // Legacy "skill pool" bonus: +10 per level.
+  const lo = 10 + Math.min(45, state.company.brand / 4 + (year - 2007) * 2.5) + 10 * (state.legacy.bonuses.skill ?? 0);
   const skill = clamp(Math.round(lo + rng.next() * 30), 1, 100);
   return {
     id: state.team.nextId++,

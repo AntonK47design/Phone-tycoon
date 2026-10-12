@@ -51,8 +51,10 @@ export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'g
     if (!part) continue;
     parts += partCostAt(part, year) * (category === 'display' ? area : 1);
   }
+  // Own chip: 0.6 × the market chip of the same generation (GDD §15.1).
+  if (design.parts.chip === 'own-chip' && design.ownChip) parts += design.ownChip.cost * Math.max(0.25, Math.exp(-0.25 * Math.max(0, year - design.kitYear)));
   const extras = design.features.reduce((a, f) => a + (featureById(f)?.cost ?? 0), 0);
-  const os = LICENSED_OS[design.osId as keyof typeof LICENSED_OS] ?? LICENSED_OS.leafline;
+  const os = design.osId === 'own' ? { feePerUnit: 0 } : LICENSED_OS[design.osId as keyof typeof LICENSED_OS] ?? LICENSED_OS.leafline;
   const body =
     (materialById(design.materialId).cost + finishById(design.finishId).cost + shapeById(design.shapeId).cost + PACKAGING.basic.cost + extras) * inf;
   if (mode === 'garage') return parts + body + GARAGE_ASSEMBLY_COST * inf + os.feePerUnit;

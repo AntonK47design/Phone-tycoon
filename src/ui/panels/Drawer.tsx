@@ -19,6 +19,8 @@ import { drawer, game, hubView, toast, useGameState, type DrawerTab } from '../g
 import { seats } from '../../sim/team';
 import { TeamPanel } from './TeamPanel';
 import { FactoryPanel } from './FactoryPanel';
+import { EmpirePanel } from './EmpirePanel';
+import { LegacyPanel } from './LegacyPanel';
 import { WorldPanel } from '../hud/World';
 import { rivalModelReview } from '../../sim/competitors';
 import { newsText } from '../labels';
@@ -33,6 +35,8 @@ export function DrawerTabs() {
   if (state.phase3Ready || state.factory.size > 0) tabs.push('factory');
   tabs.push('research', 'market');
   if (state.phase4Ready) tabs.push('world');
+  if (state.phase5Ready) tabs.push('empire');
+  if (state.phase5Ready || state.legacy.runs > 0) tabs.push('legacy');
   const busy = researchProgress(state);
   return (
     <div class="tabs">
@@ -58,6 +62,7 @@ export function DrawerTabs() {
           {tab === 'research' && !busy && <i class="dot-alert" />}
           {tab === 'factory' && state.factory.size === 0 && <i class="dot-alert" />}
           {tab === 'world' && (state.phase < 4 || state.contracts.offers.length > 0) && <i class="dot-alert" />}
+          {tab === 'empire' && state.giant.campus === 0 && <i class="dot-alert" />}
           {tab === 'team' && state.team.staff.length < seats(state) && state.team.applicants.length > 0 && state.team.staff.length < 2 && <i class="dot-alert" />}
         </button>
       ))}
@@ -80,6 +85,8 @@ export function Drawer() {
       {tab === 'research' && <ResearchPanel />}
       {tab === 'market' && <MarketPanel />}
       {tab === 'world' && <WorldPanel />}
+      {tab === 'empire' && <EmpirePanel />}
+      {tab === 'legacy' && <LegacyPanel />}
     </div>
   );
 }
@@ -278,7 +285,7 @@ function ResearchPanel() {
             <div class="nodes">
               {nodes.map((n) => {
                 const st = researchStatus(state, n);
-                const cost = researchCost(n, year);
+                const cost = researchCost(n, year, state);
                 const pioneer = n.year > year;
                 return (
                   <div class={`node ${st}`} key={n.id}>

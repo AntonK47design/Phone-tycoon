@@ -18,6 +18,8 @@ export interface ResearchUnlock {
   marketing?: boolean;
   presentation?: number;
   os?: string;
+  /** Repeatable "frontier" research (+2 % tech per level). */
+  frontier?: boolean;
 }
 
 export interface ResearchNode {
@@ -31,7 +33,9 @@ export interface ResearchNode {
   unlock: ResearchUnlock;
 }
 
-const rpFor = (year: number, mul = 1) => Math.round(30 * Math.pow(1.25, year - START_YEAR) * mul);
+/** Research points: +25 %/year until 2024, then +12 %/year (the expectation curve slows too). */
+const rpFor = (year: number, mul = 1) =>
+  Math.round(30 * Math.pow(1.25, Math.min(year, 2024) - START_YEAR) * Math.pow(1.12, Math.max(0, year - 2024)) * mul);
 const moneyFor = (rp: number, year: number) => Math.round((rp * 90 * inflation(year)) / 100) * 100;
 
 function node(id: string, branch: Branch, year: number, unlock: ResearchUnlock, opts: { mul?: number; requires?: string[] } = {}): ResearchNode {
@@ -62,6 +66,12 @@ function build(): ResearchNode[] {
   out.push(node('edge', 'body', 2014, { shape: 'edge' }, { mul: 1.2, requires: ['blade'] }));
   out.push(node('fullscreen', 'body', 2017, { shape: 'fullscreen' }, { mul: 1.3, requires: ['edge'] }));
   out.push(node('titanium', 'body', 2019, { material: 'titanium' }, { mul: 1.3, requires: ['glass'] }));
+  // Future body tech (eras E6–E9).
+  out.push(node('fold', 'body', 2019, { shape: 'fold' }, { mul: 1.4, requires: ['fullscreen'] }));
+  out.push(node('ceramic', 'body', 2023, { material: 'ceramic' }, { mul: 1.2, requires: ['titanium'] }));
+  out.push(node('roll', 'body', 2030, { shape: 'roll', sizes: [7.2] }, { mul: 1.4, requires: ['fold', 'screen68'] }));
+  out.push(node('transparent', 'body', 2041, { material: 'transparent' }, { mul: 1.3, requires: ['ceramic'] }));
+  out.push(node('nano', 'body', 2047, { material: 'nano' }, { mul: 1.3, requires: ['transparent'] }));
   // Connectivity & extras.
   out.push(node('net3g', 'connectivity', 2008, { feature: 'net3g' }, { mul: 1 }));
   out.push(node('gps', 'connectivity', 2008, { feature: 'gps' }, { mul: 0.8 }));
@@ -72,6 +82,13 @@ function build(): ResearchNode[] {
   out.push(node('wireless', 'connectivity', 2016, { feature: 'wireless' }, { mul: 1.1 }));
   out.push(node('faceUnlock', 'connectivity', 2017, { feature: 'faceUnlock' }, { mul: 1.2, requires: ['fingerprint'] }));
   out.push(node('net5g', 'connectivity', 2019, { feature: 'net5g' }, { mul: 1.3, requires: ['net4g'] }));
+  out.push(node('satellite', 'connectivity', 2023, { feature: 'satellite' }, { mul: 1.2, requires: ['net5g'] }));
+  out.push(node('aiCore', 'connectivity', 2024, { feature: 'aiCore' }, { mul: 1.3 }));
+  out.push(node('underCam', 'connectivity', 2027, { feature: 'underCam' }, { mul: 1.2, requires: ['faceUnlock'] }));
+  out.push(node('solidState', 'connectivity', 2032, { feature: 'solidState' }, { mul: 1.3, requires: ['wireless'] }));
+  out.push(node('holo', 'connectivity', 2038, { feature: 'holo' }, { mul: 1.4, requires: ['aiCore'] }));
+  // Endless research: each level +2 % tech index on every part (repeatable from 2045).
+  out.push(node('frontier', 'business', 2045, { frontier: true }, { mul: 0.8 }));
   // Business: reach, marketing, launch events, OS licence.
   out.push(node('marketing', 'business', 2007, { marketing: true }, { mul: 0.6 }));
   out.push(node('retail', 'business', 2007, { reach: 0.0035 }, { mul: 0.9 }));

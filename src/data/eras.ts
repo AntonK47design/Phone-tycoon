@@ -4,9 +4,15 @@ export const START_YEAR = 2007;
 export const DAYS_PER_YEAR = 364;
 export const DAYS_PER_WEEK = 7;
 
-/** Flagship technology expectation (tech index). +30 % per year. */
+/**
+ * Flagship technology expectation (tech index). +30 % per year until 2024, then the
+ * pace slows (+18 %/year to 2040, +6 %/year after): late-game tech stays reachable.
+ */
 export function expectedTech(year: number): number {
-  return 100 * Math.pow(1.3, year - START_YEAR);
+  const a = Math.min(year, 2024) - START_YEAR;
+  const b = Math.max(0, Math.min(year, 2040) - 2024);
+  const c = Math.max(0, year - 2040);
+  return 100 * Math.pow(1.3, a) * Math.pow(1.18, b) * Math.pow(1.06, c);
 }
 
 /** Expected flagship display diagonal in inches. */
