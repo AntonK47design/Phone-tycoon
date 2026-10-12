@@ -144,6 +144,9 @@ export function installJuice() {
           if (p && p.orders.length === 0) toast(t('toast.soldOut', { name: p.design.name }), 'warn');
           break;
         }
+        case 'repaid':
+          toast(t('toast.repaid', { amount: money(e.amount, lang.value) }), 'spark');
+          break;
         case 'loan':
           toast(t('toast.loan', { amount: money(e.amount, lang.value) }), 'warn');
           break;

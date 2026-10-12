@@ -163,6 +163,8 @@ export interface GameState {
     fans: number;
     /** Outstanding bank loan. */
     debt: number;
+    /** Paid back to the bank at the last week end (optional: added after save v4). */
+    lastRepay?: number;
   };
   /** 1 = garage, 2 = startup office. */
   phase: number;

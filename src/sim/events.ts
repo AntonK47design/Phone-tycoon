@@ -32,6 +32,7 @@ export type SimEvent =
   | { type: 'orderArrived'; productId: number; units: number }
   | { type: 'soldOut'; productId: number }
   | { type: 'loan'; amount: number }
+  | { type: 'repaid'; amount: number }
   | { type: 'hired'; id: number; role: string }
   | { type: 'fired'; id: number }
   | { type: 'trainingStarted'; id: number }

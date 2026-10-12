@@ -192,3 +192,31 @@ describe('daily calendar & mini orders (GDD §20.3–20.4)', () => {
     expect(s.daily.cycles).toBe(1);
   });
 });
+
+describe('bank loan repayment', () => {
+  it('pays back manually, never more than cash or debt', () => {
+    const s = officeGame();
+    s.company.debt = 80_000;
+    s.company.cash = 30_000;
+    applyAction(s, { type: 'repay', amount: 50_000 });
+    expect(s.company.debt).toBe(50_000);
+    expect(s.company.cash).toBe(0);
+    expect(applyAction(s, { type: 'repay', amount: 1 })[0]).toMatchObject({ type: 'rejected', reason: 'noCash' });
+  });
+
+  it('spare cash above the reserve goes to the bank at week end', () => {
+    const s = officeGame();
+    s.products.forEach((p) => (p.active = false));
+    s.company.debt = 100_000;
+    s.company.cash = 200_000;
+    while (s.day % 7 !== 6) advanceDay(s);
+    advanceDay(s);
+    expect(s.company.debt).toBe(0);
+    expect(s.company.lastRepay).toBeGreaterThan(0);
+    // A small debt with little cash: the reserve is kept.
+    s.company.debt = 50_000;
+    s.company.cash = 10_000;
+    for (let i = 0; i < 7; i++) advanceDay(s);
+    expect(s.company.debt).toBeGreaterThan(49_000);
+  });
+});

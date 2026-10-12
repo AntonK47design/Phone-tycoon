@@ -1,14 +1,14 @@
 // Phase-2 side panels: Company, Team, Research, Market.
 
 import { sfx } from '../../audio/sfx';
-import { LAB_BUDGETS, LAB_COST_PER_RP, OEM_MIN_BATCH } from '../../data/components';
+import { LAB_BUDGETS, LAB_COST_PER_RP, LOAN_INTEREST_WEEK, OEM_MIN_BATCH } from '../../data/components';
 import { colorById } from '../../data/design';
 import { expectedDisplaySize, expectedTech, expectedThickness, eraForYear, inflation } from '../../data/eras';
 import { GOALS } from '../../data/goals';
 import { COMPETITORS, SEGMENTS, type Segment } from '../../data/market';
 import { FEATURES } from '../../data/parts';
 import { BRANCHES, RESEARCH } from '../../data/research';
-import { creditAvailable, currentDemand, marketShare, valuation } from '../../sim/game';
+import { cashReserve, creditAvailable, currentDemand, marketShare, valuation } from '../../sim/game';
 import { marketSize } from '../../sim/economy/market';
 import { goalProgress, visibleGoals } from '../../sim/goals';
 import { channelCut, reach, researchCost, researchProgress, researchStatus, rpPerDay } from '../../sim/research';
@@ -85,6 +85,46 @@ function Spark({ values, color }: { values: number[]; color: string }) {
   );
 }
 
+function LoanCard() {
+  const state = useGameState();
+  const { store } = game();
+  const l = lang.value;
+  const debt = state.company.debt;
+  const interest = debt * LOAN_INTEREST_WEEK;
+  const net = (state.company.lastRepay ?? 0) - interest;
+  const weeks = net > 0 ? Math.ceil(debt / net) : null;
+  const cash = Math.max(0, state.company.cash);
+  const pay = (amount: number) => {
+    const ev = store.dispatch({ type: 'repay', amount });
+    if (ev[0]?.type === 'repaid') sfx.coin(0.7);
+    else toast(t('toast.noCash'), 'warn');
+  };
+  const steps = [10_000, 50_000].filter((a) => a < debt && a < cash);
+  return (
+    <div class="loan-card">
+      <div class="loan-head">
+        <b>{t('loan.title')}</b>
+        <b class="neg">{money(debt, l)}</b>
+      </div>
+      <div class="loan-rows">
+        <span>{t('loan.interest')}</span><b>{money(interest, l)}/{t('loan.wk')}</b>
+        <span>{t('loan.lastRepay')}</span><b>{money(state.company.lastRepay ?? 0, l)}</b>
+        <span>{t('loan.payoff')}</span>
+        <b class={weeks === null ? 'neg' : ''}>{weeks === null ? t('loan.notShrinking') : t('loan.weeks', { n: weeks })}</b>
+      </div>
+      <div class="prod-actions">
+        {steps.map((a) => (
+          <button key={a} class="btn-secondary" onClick={() => pay(a)}>{t('loan.pay', { amount: money(a, l) })}</button>
+        ))}
+        <button class="btn-secondary" disabled={cash < 1} onClick={() => pay(debt)}>
+          {cash >= debt ? t('loan.payAll') : t('loan.pay', { amount: money(cash, l) })}
+        </button>
+      </div>
+      <span class="hint-line">{t('loan.auto', { reserve: money(cashReserve(state), l) })}</span>
+    </div>
+  );
+}
+
 function CompanyPanel() {
   // Own subscription: a same-object `state` prop would let signals' render optimisation skip updates.
   const state = useGameState();
@@ -113,6 +153,7 @@ function CompanyPanel() {
         <div class="kpi"><span class="label">{t('company.reach')}</span><b>{decimal(reach(state) * 100, l, 2)}%</b></div>
         <div class="kpi"><span class="label">{t('company.channel')}</span><b>{Math.round(channelCut(state) * 100)}%</b></div>
       </div>
+      {state.company.debt > 0 && <LoanCard />}
       <div class="chart-block">
         <div class="label">{t('company.profit')} · {money(last(state.history.profit), l)}</div>
         <Spark values={state.history.profit} color="var(--orange)" />

@@ -160,6 +160,7 @@ export type Action =
   | { type: 'dailySync'; date: string }
   | { type: 'claimDaily'; index: number }
   | { type: 'claimCalendar'; date: string }
+  | { type: 'repay'; amount: number }
   | TeamAction;
 
 export function isFirstLaunch(state: GameState): boolean {
@@ -251,6 +252,8 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
       return dailySync(state, action.date).concat(checkDaily(state));
     case 'claimDaily':
       return claimDaily(state, action.index).concat(checkGoals(state));
+    case 'repay':
+      return repay(state, action.amount).concat(checkGoals(state));
     case 'claimCalendar':
       return claimCalendar(state, action.date).concat(checkGoals(state));
     default:
@@ -304,6 +307,27 @@ function makeCards(rng: Rng, est: ReturnType<typeof reviewEstimate>): ReviewCard
     const sorted = [...pool].sort((a, b) => (good ? b[1] - a[1] : a[1] - b[1]));
     return { outletId: o.id, score, quote: `${good ? 'good' : 'bad'}.${sorted[0][0]}` };
   });
+}
+
+/** Weekly running costs (rent, payroll, lab budget) – used for the cash reserve. */
+export function weeklyCosts(state: GameState): number {
+  const inf = inflation(Math.floor(yearOf(state.day)));
+  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget : GARAGE_UPKEEP_WEEK * inf;
+}
+
+/** Cash the company keeps before spare money goes to the bank. */
+export function cashReserve(state: GameState): number {
+  return Math.max(LOAN_BUFFER * inflation(Math.floor(yearOf(state.day))) * 1.5, 4 * weeklyCosts(state));
+}
+
+/** Pays back up to `amount` of the bank loan from cash. */
+function repay(state: GameState, amount: number): SimEvent[] {
+  const paid = Math.min(Math.max(0, amount), state.company.debt, Math.max(0, state.company.cash));
+  if (paid <= 0) return [{ type: 'rejected', reason: state.company.debt <= 0 ? 'notReady' : 'noCash' }];
+  state.company.debt -= paid;
+  state.company.cash -= paid;
+  if (state.company.debt < 1) state.company.debt = 0;
+  return [{ type: 'repaid', amount: paid }];
 }
 
 /** Money the bank will lend for production right now. */
@@ -683,11 +707,18 @@ export function advanceDay(state: GameState): SimEvent[] {
     const lab = state.phase >= 2 ? state.research.budget : 0;
     state.company.cash -= rent + storage + interest + operations + lab;
     state.week.profit -= rent + storage + interest + operations + lab;
-    // Good weeks pay the bank back automatically.
-    if (state.company.debt > 0 && state.week.profit > 0) {
-      const repay = Math.min(state.company.debt, state.week.profit * LOAN_REPAY_SHARE, Math.max(0, state.company.cash));
-      state.company.debt -= repay;
-      state.company.cash -= repay;
+    // The bank is paid back automatically: a share of a good week's profit, plus all
+    // cash above a safety reserve (≈ 4 weeks of running costs).
+    state.company.lastRepay = 0;
+    if (state.company.debt > 0) {
+      const fromProfit = Math.max(0, state.week.profit) * LOAN_REPAY_SHARE;
+      const spare = state.company.cash - cashReserve(state);
+      const repay = Math.min(state.company.debt, Math.max(fromProfit, spare), Math.max(0, state.company.cash));
+      if (repay > 0) {
+        state.company.debt -= repay;
+        state.company.cash -= repay;
+        state.company.lastRepay = repay;
+      }
     }
 
     for (const p of state.products) {

@@ -240,7 +240,8 @@
     "noCashBatch": "Weder Geld noch Bankkredit für eine Charge.",
     "orderPlaced": "{n} Stück bestellt. Sie kommen in 2 Wochen.",
     "orderReduced": "Die Bank finanziert nur {n} von {wanted} Stück. {n} bestellt – verkauf erst und bestell dann nach.",
-    "noCashProto": "Zu wenig Geld für die Prototyp-Teile."
+    "noCashProto": "Zu wenig Geld für die Prototyp-Teile.",
+    "repaid": "{amount} getilgt. Die Bank sagt danke."
   },
   "barks": {
     "idle": [
@@ -607,5 +608,17 @@
       "train": "Schick jemanden auf einen Kurs",
       "reorder": "Bestelle eine Produktionscharge"
     }
+  },
+  "loan": {
+    "title": "Bankkredit",
+    "interest": "Zinsen",
+    "wk": "Wo",
+    "lastRepay": "Letzte Woche getilgt",
+    "payoff": "Abbezahlt in",
+    "notShrinking": "sinkt nicht",
+    "weeks": "≈ {n} Wochen",
+    "pay": "{amount} tilgen",
+    "payAll": "Alles tilgen",
+    "auto": "Jede Woche nimmt die Bank 25 % des Gewinns, plus alles Geld über {reserve} (deine Reserve)."
   }
 }

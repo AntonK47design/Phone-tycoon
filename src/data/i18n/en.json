@@ -240,7 +240,8 @@
     "noCashBatch": "Not enough cash or bank credit for a batch.",
     "orderPlaced": "Ordered {n} units. They arrive in 2 weeks.",
     "orderReduced": "The bank only covers {n} of {wanted} units. Ordered {n}; sell some and order more.",
-    "noCashProto": "Not enough cash for the prototype parts."
+    "noCashProto": "Not enough cash for the prototype parts.",
+    "repaid": "Paid back {amount}. The bank says thanks."
   },
   "barks": {
     "idle": [
@@ -607,5 +608,17 @@
       "train": "Send someone to a course",
       "reorder": "Order a production batch"
     }
+  },
+  "loan": {
+    "title": "Bank loan",
+    "interest": "Interest",
+    "wk": "wk",
+    "lastRepay": "Paid back last week",
+    "payoff": "Paid off in",
+    "notShrinking": "not shrinking",
+    "weeks": "≈ {n} weeks",
+    "pay": "Pay {amount}",
+    "payAll": "Pay it all",
+    "auto": "Each week the bank takes 25% of the profit, plus any cash above {reserve} (your safety reserve)."
   }
 }
