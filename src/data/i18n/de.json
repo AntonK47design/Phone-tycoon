@@ -1,0 +1,170 @@
+{
+  "app": {
+    "title": "Phone Empire 3D",
+    "loading": "Deine Garage wird gebaut…"
+  },
+  "hud": {
+    "date": "Woche {week} · {year}",
+    "cash": "Kapital",
+    "brand": "Marke",
+    "fans": "Fans",
+    "pause": "Pause",
+    "settings": "Einstellungen",
+    "rename": "Firma umbenennen"
+  },
+  "tip": {
+    "cash": "Das Kapital deiner Firma. Kommt aus Handyverkäufen abzüglich Stückkosten, Miete und Entwicklung.",
+    "brand": "Markenwert (0–100). Steigt mit guten Reviews und macht jedes Handy attraktiver.",
+    "fans": "Fans bestellen zum Launch vor und werden mit jedem gut bewerteten Handy mehr.",
+    "date": "Spielzeit. Bei 1x vergeht alle 5 Sekunden ein Tag.",
+    "design": "Design-Score 0–10: Material, Dicke, Display-Anteil, Größe, Farbe und Proportionen – gemessen an den Erwartungen der Epoche.",
+    "tech": "Technik-Score 0–10: Chip, Display, Akku, Kamera, Speicher und RAM im Vergleich zu dem, was der Markt dieses Jahr erwartet.",
+    "review": "Prognose der Review-Note (±0,5). Bessere Reviews verkaufen deutlich mehr Handys.",
+    "unitCost": "Was dich ein Handy in der Herstellung kostet: Bauteile, Material, Montage und Verpackung.",
+    "price": "Verkaufspreis, vorerst automatisch auf einen fairen Wert gesetzt.",
+    "margin": "Gewinn pro verkauftem Handy.",
+    "devTime": "Entwicklungszeit in Spieltagen (Gründer arbeitet allein).",
+    "devCost": "Einmalige Entwicklungskosten, fällig beim Start.",
+    "weekly": "Erwartete Verkäufe in den ersten Wochen. Die Garage schafft 50 Handys pro Woche.",
+    "speed": "Spielgeschwindigkeit"
+  },
+  "tutorial": {
+    "color": "Wähle eine Farbe – dein Handy wird live lackiert.",
+    "shape": "Jetzt die Form.",
+    "display": "Wähle die Displaygröße. Groß sieht toll aus, kostet aber Akku.",
+    "launch": "Fertig! Bring dein erstes Handy auf den Markt.",
+    "skip": "Überspringen"
+  },
+  "editor": {
+    "cat": {
+      "color": "Farbe",
+      "shape": "Form",
+      "display": "Display"
+    },
+    "shape": {
+      "round": "Rund",
+      "boxy": "Kantig",
+      "slim": "Schlank"
+    },
+    "trend": "Trend",
+    "new": "Neu",
+    "design": "Design",
+    "tech": "Technik",
+    "review": "Review-Prognose",
+    "unitCost": "Stückkosten",
+    "price": "Preis",
+    "margin": "Marge",
+    "devTime": "Entwicklung",
+    "devTimeValue": "{days} Tage",
+    "devCost": "Entw.-Kosten",
+    "weekly": "Absatzprognose",
+    "weeklyValue": "≈ {n}/Woche",
+    "startDev": "Entwicklung starten",
+    "launch": "Launch!",
+    "close": "Schließen",
+    "inches": "{n}″",
+    "thinner": "dünner",
+    "pricier": "teurer"
+  },
+  "color": {
+    "graphite": "Graphit",
+    "snow": "Schnee",
+    "silver": "Silber",
+    "crimson": "Karmesin",
+    "ocean": "Ozean",
+    "lime": "Limette",
+    "midnight": "Mitternachtsblau",
+    "coral": "Koralle",
+    "mint": "Mint",
+    "gold": "Champagner"
+  },
+  "launch": {
+    "overnight": "Die Nacht durchgearbeitet…",
+    "launching": "{name} geht an den Start",
+    "preorders": "Vorbestellungen",
+    "units": "{n} Handys",
+    "revenue": "Umsatz",
+    "profit": "Gewinn",
+    "reviews": "Die Reviews sind da!",
+    "score": "Review-Note",
+    "brand": "Marke +{n}",
+    "continue": "Weiter",
+    "next": "Als Nächstes",
+    "unlockColor": "Neue Farbe freigeschaltet: {color}",
+    "now": "Jetzt neu"
+  },
+  "review": {
+    "good": {
+      "color": "Die Farbe trifft genau den Nerv der Saison.",
+      "shape": "Wunderbar ausgewogene Proportionen.",
+      "thin": "Beeindruckend dünn – passt in jede Tasche.",
+      "screen": "Das Display füllt die Front. Traumhaft.",
+      "display": "Ein Display in genau der richtigen Größe.",
+      "battery": "Der Akku hält locker den ganzen Tag.",
+      "performance": "Flott und flüssig im Alltag.",
+      "price": "Hervorragendes Preis-Leistungs-Verhältnis."
+    },
+    "bad": {
+      "color": "Die Farbe wirkt etwas aus der Mode.",
+      "shape": "Die Proportionen wirken unglücklich.",
+      "thin": "Klobig im Vergleich zur Konkurrenz.",
+      "screen": "Viel Rand, wenig Display.",
+      "display": "Die Displaygröße passt nicht ganz.",
+      "battery": "Der Akku kämpft sich kaum durch den Tag.",
+      "performance": "Träge, wenn viele Apps laufen.",
+      "price": "Zu teuer für das Gebotene."
+    }
+  },
+  "goals": {
+    "title": "Ziele",
+    "done": "Ziel erreicht!",
+    "firstLaunch": "Bring dein erstes Handy auf den Markt",
+    "earn10k": "Besitze 10K $ Kapital",
+    "secondLaunch": "Launche ein zweites Handy",
+    "sell500": "Verkaufe insgesamt 500 Handys",
+    "office": "Spare 25K $ für dein erstes Büro",
+    "review8": "Erreiche eine Review-Note von 8,0",
+    "fans100": "Gewinne 100 Fans",
+    "rewardCash": "+{amount}",
+    "rewardColor": "Neue Farbe"
+  },
+  "teaser": {
+    "office": "Nur noch {amount} bis zu deinem ersten Büro!",
+    "secondLaunch": "Designe dein nächstes Handy – jedes stärkt deine Marke.",
+    "officeReady": "Dein Startup-Büro ist bereit. Team und Forschung kommen im nächsten Update!",
+    "generic": "Nächstes Ziel: {goal}"
+  },
+  "action": {
+    "newPhone": "Neues Handy designen",
+    "developing": "In Entwicklung… {p} %",
+    "ready": "{name} launchen!"
+  },
+  "products": {
+    "title": "Deine Handys",
+    "perWeek": "{n}/Wo.",
+    "sold": "{n} verkauft",
+    "retired": "Ausgelaufen",
+    "capped": "Garage ausgelastet"
+  },
+  "toast": {
+    "noCash": "Nicht genug Kapital für die Entwicklung.",
+    "devDone": "Prototyp fertig – bereit zum Launch!",
+    "officeReady": "Startup-Büro freigeschaltet!",
+    "retired": "{name} ist ausgelaufen."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "quality": "Grafik",
+    "auto": "Auto",
+    "low": "Niedrig",
+    "medium": "Mittel",
+    "high": "Hoch",
+    "sound": "Ton",
+    "on": "An",
+    "off": "Aus",
+    "reset": "Neu beginnen",
+    "resetConfirm": "Firma löschen und neu beginnen?",
+    "close": "Schließen"
+  }
+}

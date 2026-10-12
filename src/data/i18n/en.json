@@ -1,0 +1,170 @@
+{
+  "app": {
+    "title": "Phone Empire 3D",
+    "loading": "Building your garage…"
+  },
+  "hud": {
+    "date": "Week {week} · {year}",
+    "cash": "Cash",
+    "brand": "Brand",
+    "fans": "Fans",
+    "pause": "Pause",
+    "settings": "Settings",
+    "rename": "Rename company"
+  },
+  "tip": {
+    "cash": "Your company's cash. Earned from phone sales minus unit costs, upkeep and development.",
+    "brand": "Brand value (0–100). Grows with good reviews and makes every phone more attractive.",
+    "fans": "Fans buy at launch (pre-orders) and grow with every well-reviewed phone.",
+    "date": "Game time. One day passes every 5 seconds at 1x.",
+    "design": "Design score 0–10: material, thickness, screen-to-body, size, color and proportions – measured against this era's expectations.",
+    "tech": "Tech score 0–10: chip, display, battery, camera, storage and RAM compared with what the market expects this year.",
+    "review": "Forecast review score (±0.5). Higher reviews sell far more phones.",
+    "unitCost": "What one phone costs you to build: parts, materials, assembly and packaging.",
+    "price": "Retail price, set automatically to a fair value for now.",
+    "margin": "Profit per phone sold.",
+    "devTime": "Development time in game days (founder working alone).",
+    "devCost": "One-off development cost, paid when development starts.",
+    "weekly": "Expected sales in the first weeks. The garage can build 50 phones per week.",
+    "speed": "Game speed"
+  },
+  "tutorial": {
+    "color": "Pick a color – your phone gets painted live.",
+    "shape": "Now choose a shape.",
+    "display": "Pick a display size. Bigger looks great but drains the battery.",
+    "launch": "Ready! Launch your first phone.",
+    "skip": "Skip"
+  },
+  "editor": {
+    "cat": {
+      "color": "Color",
+      "shape": "Shape",
+      "display": "Display"
+    },
+    "shape": {
+      "round": "Rounded",
+      "boxy": "Boxy",
+      "slim": "Slim"
+    },
+    "trend": "Trend",
+    "new": "New",
+    "design": "Design",
+    "tech": "Tech",
+    "review": "Review forecast",
+    "unitCost": "Unit cost",
+    "price": "Price",
+    "margin": "Margin",
+    "devTime": "Development",
+    "devTimeValue": "{days} days",
+    "devCost": "Dev cost",
+    "weekly": "Sales forecast",
+    "weeklyValue": "≈ {n}/week",
+    "startDev": "Start development",
+    "launch": "Launch!",
+    "close": "Close",
+    "inches": "{n}″",
+    "thinner": "thinner",
+    "pricier": "pricier"
+  },
+  "color": {
+    "graphite": "Graphite",
+    "snow": "Snow",
+    "silver": "Silver",
+    "crimson": "Crimson",
+    "ocean": "Ocean",
+    "lime": "Lime",
+    "midnight": "Midnight Blue",
+    "coral": "Coral",
+    "mint": "Mint",
+    "gold": "Champagne"
+  },
+  "launch": {
+    "overnight": "Working through the night…",
+    "launching": "Launching {name}",
+    "preorders": "Pre-orders",
+    "units": "{n} phones",
+    "revenue": "Revenue",
+    "profit": "Profit",
+    "reviews": "The reviews are in!",
+    "score": "Review score",
+    "brand": "Brand +{n}",
+    "continue": "Continue",
+    "next": "Up next",
+    "unlockColor": "New color unlocked: {color}",
+    "now": "Now launching"
+  },
+  "review": {
+    "good": {
+      "color": "That color is spot-on for this season.",
+      "shape": "Beautifully balanced proportions.",
+      "thin": "Impressively thin – it slides into any pocket.",
+      "screen": "The screen dominates the front. Gorgeous.",
+      "display": "A display that's just the right size.",
+      "battery": "Battery easily lasts the whole day.",
+      "performance": "Snappy and smooth in everyday use.",
+      "price": "Great value for the money."
+    },
+    "bad": {
+      "color": "The color feels a bit out of fashion.",
+      "shape": "The proportions look awkward.",
+      "thin": "Chunky compared with the competition.",
+      "screen": "Too much bezel, too little screen.",
+      "display": "The display size feels off.",
+      "battery": "The battery struggles to last a day.",
+      "performance": "Sluggish when apps pile up.",
+      "price": "Overpriced for what you get."
+    }
+  },
+  "goals": {
+    "title": "Goals",
+    "done": "Goal complete!",
+    "firstLaunch": "Launch your first phone",
+    "earn10k": "Have $10K in cash",
+    "secondLaunch": "Launch a second phone",
+    "sell500": "Sell 500 phones in total",
+    "office": "Save $25K for your first office",
+    "review8": "Get a review score of 8.0",
+    "fans100": "Win 100 fans",
+    "rewardCash": "+{amount}",
+    "rewardColor": "New color"
+  },
+  "teaser": {
+    "office": "Only {amount} to go until your first office!",
+    "secondLaunch": "Design your next phone – each one makes your brand stronger.",
+    "officeReady": "Your startup office is ready. Hiring and research arrive in the next update!",
+    "generic": "Next goal: {goal}"
+  },
+  "action": {
+    "newPhone": "Design new phone",
+    "developing": "Developing… {p}%",
+    "ready": "Launch {name}!"
+  },
+  "products": {
+    "title": "Your phones",
+    "perWeek": "{n}/wk",
+    "sold": "{n} sold",
+    "retired": "Discontinued",
+    "capped": "Garage at capacity"
+  },
+  "toast": {
+    "noCash": "Not enough cash for development.",
+    "devDone": "Prototype finished – ready to launch!",
+    "officeReady": "Startup office unlocked!",
+    "retired": "{name} has been discontinued."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "quality": "Graphics",
+    "auto": "Auto",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "sound": "Sound",
+    "on": "On",
+    "off": "Off",
+    "reset": "Start over",
+    "resetConfirm": "Delete your company and start over?",
+    "close": "Close"
+  }
+}

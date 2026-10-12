@@ -11,7 +11,7 @@
 | Sprache | TypeScript (strict) | – |
 | Build | Vite | Code-Splitting, schnelle Dev-Builds |
 | 3D | three.js (aktuelle Version, ES-Module, tree-shaken) | ~150 KB |
-| Postprocessing | three/examples `EffectComposer`, `SMAAPass`, `UnrealBloomPass`, `OutputPass` + **n8ao** | ~35 KB; Vignette & Tilt-Shift als eigene Shader-Passes (~2 KB) |
+| Postprocessing | three/examples `EffectComposer`, `GTAOPass` (SSAO), `SMAAPass`, `UnrealBloomPass`, `OutputPass` | im three-Bundle enthalten; Vignette/Grade & Tilt-Shift als eigene Shader-Passes (~2 KB). *n8ao verworfen: zieht die komplette `postprocessing`-Bibliothek als Peer-Dependency nach.* |
 | UI | **Preact + @preact/signals**, HTML/CSS-Overlay | ~6 KB |
 | Tests | Vitest (nur dev) | – |
 | Asset-Pipeline | `@gltf-transform/cli` (Draco/Meshopt, KTX2) – nur dev | – |
@@ -87,8 +87,8 @@ Keine weiteren Runtime-Abhängigkeiten ohne Größenbegründung im PR.
 ```
 
 ### Architektur-Regeln
-1. `src/sim` importiert nie aus `render`, `ui`, `platform`. Durch ESLint-Regel
-   (`no-restricted-imports`) erzwungen.
+1. `src/sim` importiert nie aus `render`, `ui`, `platform`. Erzwungen durch
+   `scripts/check-boundaries.mjs` (kein ESLint nötig; prüft auch `Math.random`/`Date.now`/DOM in `sim`).
 2. Der State ist **reines JSON** (keine Klassen, Maps, Dates) → triviales Speichern.
 3. Sim ist **deterministisch**: gleiche Seed + gleiche Aktionen ⇒ gleicher State.
    Kein `Math.random`, kein `Date.now` in `sim/` (Echtzeit wird als Parameter übergeben).
@@ -142,17 +142,19 @@ interface SaveFile {
   |---|---|---|---|
   | Pixel-Ratio-Cap | 1,0 | 1,5 | 2,0 |
   | Schatten | 1 Map 1024, harte Kanten | 2048 PCFSoft | 2048 PCFSoft + Kontaktschatten |
-  | AO | – | N8AO halbe Auflösung | N8AO voll |
+  | AO | – | GTAO 8 Samples | GTAO 16 Samples |
   | Bloom | – | ✓ | ✓ |
   | SMAA | – (FXAA-frei, MSAA aus) | ✓ | ✓ |
   | Tilt-Shift/Vignette | Vignette | ✓ | ✓ |
   | Transmission | Fake | Fake | echt |
 
 - **Auto-Qualität:** Start auf Medium (Mobile: Low), nach 3 s FPS-Messung (Median der
-  Frame-Zeiten) auf-/abstufen; Hysterese, Spieler kann fixieren.
-- **Render-on-demand:** Dirty-Flag; bei Pause und keinem laufenden Tween/Animation wird
-  nicht gerendert. Mitarbeiter-/Fließband-Animationen gelten als „aktiv" nur, wenn ihr
-  Raum sichtbar ist.
+  Frame-Zeiten) auf-/abstufen; max. zwei Anpassungen, dann fix; Spieler kann fixieren.
+- **Tonemapping:** ACES Filmic + eigener Grade-Pass (Sättigung, sanfte S-Kurve). AgX wurde
+  getestet, wirkte für den Diorama-Look zu flau.
+- **Render-on-demand:** Rendering stoppt komplett bei verstecktem Tab, Ads und Menüs.
+  Steht die Spielzeit still und läuft keine Animation/Eingabe seit 3 s, drosselt die
+  Schleife auf ~15 FPS (Diorama bleibt lebendig, spart Akku).
 - **Lazy Loading:** Jeder Raum ist ein dynamischer `import()`-Chunk; Garage + Handy +
   Editor + Launch sind im Initial-Bundle. Optionale CC0-GLBs nur ab Büro.
 

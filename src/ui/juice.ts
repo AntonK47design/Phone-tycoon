@@ -1,0 +1,132 @@
+// Reacts to simulation events with sound, toasts, coins and 3D effects.
+
+import { sfx } from '../audio/sfx';
+import { colorById } from '../data/design';
+import { GOALS } from '../data/goals';
+import type { SimEvent } from '../sim/events';
+import { money } from './format';
+import { game, launchData, toast } from './game';
+import { lang, t } from './i18n';
+
+let lastCoin = 0;
+const deferred: (() => void)[] = [];
+
+/** Toasts are held back while the launch sequence is on screen. */
+function later(fn: () => void) {
+  if (launchData.value) deferred.push(fn);
+  else fn();
+}
+
+export function flushDeferred() {
+  const list = deferred.splice(0);
+  list.forEach((fn, i) => setTimeout(fn, 300 + i * 600));
+}
+
+export function cashTarget(): DOMRect | null {
+  return document.querySelector('.cash')?.getBoundingClientRect() ?? null;
+}
+
+export function flyCoins(from: { x: number; y: number }, count: number) {
+  const layer = document.getElementById('fx-layer');
+  const target = cashTarget();
+  if (!layer || !target) return;
+  const tx = target.left + 28;
+  const ty = target.top + target.height / 2;
+  for (let i = 0; i < count; i++) {
+    const coin = document.createElement('div');
+    coin.className = 'coin';
+    layer.appendChild(coin);
+    const sx = from.x + (Math.random() - 0.5) * 40;
+    const sy = from.y + (Math.random() - 0.5) * 30;
+    const mx = (sx + tx) / 2 + (Math.random() - 0.5) * 120;
+    const my = Math.min(sy, ty) - 60 - Math.random() * 60;
+    const anim = coin.animate(
+      [
+        { transform: `translate(${sx}px, ${sy}px) scale(0.4)`, opacity: 0 },
+        { transform: `translate(${mx}px, ${my}px) scale(1.1)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${tx}px, ${ty}px) scale(0.6)`, opacity: 0.9 },
+      ],
+      { duration: 700 + Math.random() * 250, delay: i * 70, easing: 'cubic-bezier(.4,.1,.6,1)', fill: 'both' },
+    );
+    anim.onfinish = () => {
+      coin.remove();
+      const chip = document.querySelector('.cash');
+      chip?.classList.remove('flash');
+      void (chip as HTMLElement | null)?.offsetWidth;
+      chip?.classList.add('flash');
+    };
+  }
+}
+
+function floatMoney(amount: number) {
+  const layer = document.getElementById('fx-layer');
+  const target = cashTarget();
+  if (!layer || !target) return;
+  const el = document.createElement('div');
+  el.className = 'float-money';
+  el.textContent = `+${money(amount, lang.value)}`;
+  el.style.left = `${target.left + target.width / 2}px`;
+  el.style.top = `${target.bottom + 2}px`;
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+export function installJuice() {
+  const { store, engine, platform } = game();
+  store.onEvents((events: SimEvent[]) => {
+    for (const e of events) {
+      switch (e.type) {
+        case 'sales': {
+          const now = performance.now();
+          if (launchData.value || now - lastCoin < 650) break;
+          lastCoin = now;
+          const p = engine.project('phone');
+          if (p.visible) flyCoins(p, Math.min(4, 1 + Math.floor(e.units / 4)));
+          floatMoney(e.profit);
+          sfx.coin(0.9 + Math.random() * 0.2);
+          break;
+        }
+        case 'goalCompleted': {
+          later(() => {
+            const g = GOALS.find((x) => x.id === e.goalId);
+            if (!g) return;
+            toast(`${t('goals.done')} ${t(`goals.${g.id}`)}`, '🏆', true);
+            sfx.unlock2();
+          });
+          break;
+        }
+        case 'colorUnlocked':
+          later(() => toast(t('launch.unlockColor', { color: t(`color.${e.colorId}`) }), '🎨'));
+          void colorById(e.colorId);
+          break;
+        case 'devStarted':
+          sfx.whoosh();
+          break;
+        case 'devDone':
+          if (store.getState().stats.launches > 0) {
+            toast(t('toast.devDone'), '✨', true);
+            sfx.unlock2();
+            engine.confettiAt('bench');
+          }
+          break;
+        case 'officeReady':
+          later(() => {
+            toast(t('toast.officeReady'), '🏢', true);
+            sfx.fanfare();
+            platform.happytime();
+          });
+          break;
+        case 'productRetired': {
+          const p = store.getState().products.find((x) => x.id === e.productId);
+          if (p) toast(t('toast.retired', { name: p.design.name }), '📦');
+          break;
+        }
+        case 'rejected':
+          if (e.reason === 'noCash') toast(t('toast.noCash'), '⚠️');
+          break;
+        default:
+          break;
+      }
+    }
+  });
+}
