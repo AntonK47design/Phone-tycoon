@@ -1,6 +1,7 @@
 // UI-side context: store, engine, platform plus transient UI signals.
 
 import { signal } from '@preact/signals';
+import { useEffect, useReducer } from 'preact/hooks';
 import type { Engine } from '../render/engine';
 import type { PhoneVisual } from '../render/phone/PhoneModel';
 import type { Platform } from '../platform/platform';
@@ -104,10 +105,19 @@ export function toast(text: string, icon?: ToastIcon, gold?: boolean) {
 /** Bumped on every store change (see main.ts). Components re-render through it. */
 export const storeRev = signal(0);
 
-/** Re-render on every store change. Returns the current state. */
+/**
+ * Re-render on every store change. Returns the current state.
+ * Subscribes explicitly (a counter, since the state object is mutated in place and a
+ * plain setState(state) would bail out) instead of relying on signal auto-tracking.
+ */
 export function useGameState() {
-  void storeRev.value;
-  return game().store.getState();
+  const { store } = game();
+  const [, bump] = useReducer((n: number, _: void) => n + 1, 0);
+  useEffect(() => {
+    const off = store.subscribe(() => bump());
+    return () => void off();
+  }, [store]);
+  return store.getState();
 }
 
 export function toVisual(d: PhoneDesign): PhoneVisual {

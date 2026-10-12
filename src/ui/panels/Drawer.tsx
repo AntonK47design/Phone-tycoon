@@ -13,7 +13,6 @@ import { marketSize } from '../../sim/economy/market';
 import { goalProgress, visibleGoals } from '../../sim/goals';
 import { channelCut, reach, researchCost, researchProgress, researchStatus, rpPerDay } from '../../sim/research';
 import { priceAnchor } from '../../sim/scoring/score';
-import type { GameState } from '../../sim/state';
 import { calendar, yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
 import { drawer, game, hubView, toast, useGameState, type DrawerTab } from '../game';
@@ -62,10 +61,10 @@ export function Drawer() {
       <button class="icon-btn drawer-close" aria-label="close" onClick={() => ((drawer.value = null), sfx.click())}>
         <IconClose />
       </button>
-      {tab === 'company' && <CompanyPanel state={state} />}
-      {tab === 'team' && <TeamPanel state={state} />}
-      {tab === 'research' && <ResearchPanel state={state} />}
-      {tab === 'market' && <MarketPanel state={state} />}
+      {tab === 'company' && <CompanyPanel />}
+      {tab === 'team' && <TeamPanel />}
+      {tab === 'research' && <ResearchPanel />}
+      {tab === 'market' && <MarketPanel />}
     </div>
   );
 }
@@ -86,7 +85,9 @@ function Spark({ values, color }: { values: number[]; color: string }) {
   );
 }
 
-function CompanyPanel({ state }: { state: GameState }) {
+function CompanyPanel() {
+  // Own subscription: a same-object `state` prop would let signals' render optimisation skip updates.
+  const state = useGameState();
   const { store } = game();
   const l = lang.value;
   const last = (arr: number[]) => arr[arr.length - 1] ?? 0;
@@ -94,8 +95,12 @@ function CompanyPanel({ state }: { state: GameState }) {
   const gate = GOALS.find((g) => g.gate === 'phase3')!;
   const order = (id: number, units: number) => {
     const ev = store.dispatch({ type: 'orderBatch', productId: id, units });
-    if (ev[0]?.type === 'orderPlaced') sfx.coin(0.8);
-    else toast(t('toast.noCash'), 'warn');
+    const e = ev[0];
+    if (e?.type === 'orderPlaced') {
+      sfx.coin(0.8);
+      if (e.requested && e.units < e.requested) toast(t('toast.orderReduced', { n: shortNum(e.units, l), wanted: shortNum(e.requested, l) }), 'box');
+      else toast(t('toast.orderPlaced', { n: shortNum(e.units, l) }), 'box');
+    } else toast(t('toast.noCashBatch'), 'warn');
   };
   return (
     <>
@@ -162,7 +167,9 @@ function CompanyPanel({ state }: { state: GameState }) {
   );
 }
 
-function ResearchPanel({ state }: { state: GameState }) {
+function ResearchPanel() {
+  // Own subscription: a same-object `state` prop would let signals' render optimisation skip updates.
+  const state = useGameState();
   const { store } = game();
   const l = lang.value;
   const year = yearOf(state.day);
@@ -243,7 +250,9 @@ function ResearchPanel({ state }: { state: GameState }) {
   );
 }
 
-function MarketPanel({ state }: { state: GameState }) {
+function MarketPanel() {
+  // Own subscription: a same-object `state` prop would let signals' render optimisation skip updates.
+  const state = useGameState();
   const l = lang.value;
   const year = yearOf(state.day);
   const cal = calendar(state.day);

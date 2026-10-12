@@ -20,6 +20,7 @@ import { isTrendColor, priceAnchor, ratingFromRatio } from '../../sim/scoring/sc
 import type { GameState } from '../../sim/state';
 import { yearOf } from '../../sim/time';
 import { decimal, money } from '../format';
+import { useGameState } from '../game';
 import { lang, t } from '../i18n';
 import { shapeName } from '../labels';
 
@@ -36,7 +37,9 @@ function scoreClass(s: number) {
   return s >= 8 ? 'good' : s >= 6 ? 'ok' : 'bad';
 }
 
-export function AdvancedEditor({ state, suggestedPrice, missing, onChange }: Props) {
+export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
+  // Subscribe directly; the draft is mutated in place, so props alone don't change.
+  const state = useGameState();
   const [open, setOpen] = useState<Section>('position');
   const d = state.draft;
   const l = lang.value;

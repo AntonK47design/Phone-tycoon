@@ -191,9 +191,6 @@ export function installJuice() {
         case 'dailyClaimed':
           if (e.reward.cash) floatMoney(e.reward.cash);
           break;
-        case 'rejected':
-          if (e.reason === 'noCash') toast(t('toast.noCash'), 'warn');
-          break;
         default:
           break;
       }

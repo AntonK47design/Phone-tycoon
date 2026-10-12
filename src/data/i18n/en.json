@@ -218,7 +218,7 @@
     "capped": "Garage maxed out"
   },
   "toast": {
-    "noCash": "Not enough cash for the prototype parts.",
+    "noCash": "Not enough cash for that.",
     "devDone": "Prototype works. Mostly. Ready to launch!",
     "officeReady": "You can afford a real office now!",
     "retired": "{name} has quietly left the shelves.",
@@ -236,7 +236,11 @@
     "studioBuilt": "Design studio level {level} is open",
     "bonus": "Bonus paid. The office smells like pizza.",
     "dailyDone": "Odd job done! Collect it in Daily.",
-    "aurora": "Unlocked: Aurora finish (paint menu)"
+    "aurora": "Unlocked: Aurora finish (paint menu)",
+    "noCashBatch": "Not enough cash or bank credit for a batch.",
+    "orderPlaced": "Ordered {n} units. They arrive in 2 weeks.",
+    "orderReduced": "The bank only covers {n} of {wanted} units. Ordered {n}; sell some and order more.",
+    "noCashProto": "Not enough cash for the prototype parts."
   },
   "barks": {
     "idle": [

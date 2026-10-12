@@ -3,7 +3,7 @@
 import { sfx } from '../../audio/sfx';
 import { APPLICANT_REFRESH_DAYS, LAB_LEVELS, OFFICE_LEVELS, ROLE_COLORS, STUDIO_LEVELS } from '../../data/team';
 import type { SimEvent } from '../../sim/events';
-import type { Employee, GameState } from '../../sim/state';
+import type { Employee } from '../../sim/state';
 import {
   bonusCost,
   bonusReady,
@@ -22,14 +22,15 @@ import {
 } from '../../sim/team';
 import { yearOf } from '../../sim/time';
 import { decimal, money } from '../format';
-import { game, toast } from '../game';
+import { game, toast, useGameState } from '../game';
 import { lang, t } from '../i18n';
 
 function moraleWord(m: number) {
   return m >= 75 ? 'great' : m >= 55 ? 'ok' : m >= 35 ? 'meh' : 'bad';
 }
 
-function Person({ e, state, applicant }: { e: Employee; state: GameState; applicant?: boolean }) {
+function Person({ e, applicant }: { e: Employee; applicant?: boolean }) {
+  const state = useGameState();
   const { store } = game();
   const l = lang.value;
   const year = yearOf(state.day);
@@ -96,7 +97,8 @@ function Building({ title, desc, cost, action, disabled }: { title: string; desc
   );
 }
 
-export function TeamPanel({ state }: { state: GameState }) {
+export function TeamPanel() {
+  const state = useGameState();
   const { store } = game();
   const l = lang.value;
   const team = state.team;
@@ -150,7 +152,7 @@ export function TeamPanel({ state }: { state: GameState }) {
 
       <h4 class="drawer-sub">{t('team.staff')}</h4>
       {staff.length === 0 && <p class="muted">{t('team.empty')}</p>}
-      {staff.map((e) => <Person key={e.id} e={e} state={state} />)}
+      {staff.map((e) => <Person key={e.id} e={e} />)}
       {staff.length > 0 && (
         <button class="btn-secondary bonus-btn" disabled={!bonusReady(state)} onClick={bonus}>
           {bonusReady(state) ? t('team.bonus', { amount: money(bonusCost(state), l) }) : t('team.bonusWait')}
@@ -161,7 +163,7 @@ export function TeamPanel({ state }: { state: GameState }) {
         {t('team.applicants')} <small class="muted">{t('team.newIn', { days: poolIn })}</small>
       </h4>
       {team.applicants.length === 0 && <p class="muted">{t('team.noApplicants')}</p>}
-      {team.applicants.map((e) => <Person key={e.id} e={e} state={state} applicant />)}
+      {team.applicants.map((e) => <Person key={e.id} e={e} applicant />)}
       <p class="hint-line">{t('team.roleHint')}</p>
 
       <h4 class="drawer-sub">{t('team.buildings')}</h4>

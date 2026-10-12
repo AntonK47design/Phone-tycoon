@@ -28,7 +28,7 @@ export type SimEvent =
   | { type: 'phase3Ready' }
   | { type: 'researchStarted'; id: string }
   | { type: 'researchDone'; id: string }
-  | { type: 'orderPlaced'; productId: number; units: number; cost: number }
+  | { type: 'orderPlaced'; productId: number; units: number; cost: number; requested?: number }
   | { type: 'orderArrived'; productId: number; units: number }
   | { type: 'soldOut'; productId: number }
   | { type: 'loan'; amount: number }

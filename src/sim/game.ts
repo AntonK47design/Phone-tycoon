@@ -480,12 +480,21 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
 function orderBatch(state: GameState, productId: number, units: number, leadDays: number): SimEvent[] {
   const p = state.products.find((x) => x.id === productId);
   if (!p || !p.active || p.madeToOrder) return [{ type: 'rejected', reason: 'notReady' }];
-  units = Math.max(OEM_MIN_BATCH, Math.round(units));
-  const cost = batchCost(p.design, units, yearOf(state.day));
-  if (!payWithCredit(state, cost, cost, batchCost(p.design, OEM_MIN_BATCH, yearOf(state.day)))) return [{ type: 'rejected', reason: 'noCash' }];
+  const year = yearOf(state.day);
+  const requested = Math.max(OEM_MIN_BATCH, Math.round(units));
+  const minCost = batchCost(p.design, OEM_MIN_BATCH, year);
+  // Cash plus what the bank will lend; a minimum batch is always financed.
+  const maxCost = state.company.cash + Math.max(minCost, creditAvailable(state));
+  units = requested;
+  // Too big for the budget: order the largest batch we can pay for instead of nothing.
+  while (units > OEM_MIN_BATCH && batchCost(p.design, units, year) > maxCost) {
+    units = Math.max(OEM_MIN_BATCH, Math.floor((units * 0.9) / 50) * 50);
+  }
+  const cost = batchCost(p.design, units, year);
+  if (!payWithCredit(state, cost, cost, minCost)) return [{ type: 'rejected', reason: 'noCash' }];
   p.orders.push({ units, arriveDay: state.day + leadDays });
   state.stats.reorders += 1;
-  return [{ type: 'orderPlaced', productId, units, cost }];
+  return [{ type: 'orderPlaced', productId, units, cost, requested }];
 }
 
 function discontinue(state: GameState, productId: number): SimEvent[] {

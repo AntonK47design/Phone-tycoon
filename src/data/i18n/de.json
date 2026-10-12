@@ -218,7 +218,7 @@
     "capped": "Garage am Limit"
   },
   "toast": {
-    "noCash": "Zu wenig Geld für die Prototyp-Teile.",
+    "noCash": "Dafür reicht das Geld nicht.",
     "devDone": "Der Prototyp läuft. Meistens. Bereit zum Launch!",
     "officeReady": "Ein echtes Büro ist jetzt drin!",
     "retired": "{name} hat leise die Regale verlassen.",
@@ -236,7 +236,11 @@
     "studioBuilt": "Designstudio Stufe {level} ist offen",
     "bonus": "Bonus gezahlt. Das Büro riecht nach Pizza.",
     "dailyDone": "Job erledigt! Unter „Täglich“ abholen.",
-    "aurora": "Freigeschaltet: Aurora-Finish (Lackmenü)"
+    "aurora": "Freigeschaltet: Aurora-Finish (Lackmenü)",
+    "noCashBatch": "Weder Geld noch Bankkredit für eine Charge.",
+    "orderPlaced": "{n} Stück bestellt. Sie kommen in 2 Wochen.",
+    "orderReduced": "Die Bank finanziert nur {n} von {wanted} Stück. {n} bestellt – verkauf erst und bestell dann nach.",
+    "noCashProto": "Zu wenig Geld für die Prototyp-Teile."
   },
   "barks": {
     "idle": [

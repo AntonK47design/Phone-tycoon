@@ -7,7 +7,7 @@ import type { TutorialStep } from '../../sim/state';
 import { yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
 import { mark } from '../funnel';
-import { game, hubCamera, mode, toVisual, useGameState } from '../game';
+import { game, hubCamera, mode, toast, toVisual, useGameState } from '../game';
 import { lang, t } from '../i18n';
 import { startLaunch } from '../launch/flow';
 import { AdvancedEditor } from './AdvancedEditor';
@@ -214,7 +214,7 @@ export function Editor() {
     if (ev.some((e) => e.type === 'devStarted')) {
       mode.value = 'free';
       engine.goToView(hubCamera(), 1.2);
-    }
+    } else if (ev.some((e) => e.type === 'rejected' && e.reason === 'noCash')) toast(t('toast.noCashProto'), 'warn');
   };
 
   const skip = () => {
