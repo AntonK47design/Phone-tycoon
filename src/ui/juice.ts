@@ -7,7 +7,7 @@ import type { SimEvent } from '../sim/events';
 import { money } from './format';
 import { game, hubView, launchData, sayBark, toast } from './game';
 import { lang, t, tList } from './i18n';
-import { researchNameById } from './labels';
+import { researchNameById, rivalName } from './labels';
 
 let lastCoin = 0;
 const deferred: (() => void)[] = [];
@@ -170,6 +170,43 @@ export function installJuice() {
             sfx.fanfare();
             platform.happytime();
           });
+          break;
+        case 'rivalLaunch':
+          if (Math.random() < 0.5) sfx.click();
+          break;
+        case 'rivalPriceCut':
+          toast(t('toast.priceCut', { rival: rivalName(e.rival), segment: t(`segment.${e.segment}`) }), 'warn');
+          break;
+        case 'eventStarted':
+          if (e.id !== 'chipShortage' && e.id !== 'recall') later(() => toast(t(`event.${e.id}.toast`, { rival: e.target ? rivalName(e.target) : '', region: e.target ? t(`region.${e.target}`) : '' }), e.id === 'recession' || e.id === 'tariff' ? 'warn' : 'spark', true));
+          else sfx.unlock2();
+          break;
+        case 'eventEnded':
+          toast(t(`event.${e.id}.end`), 'spark');
+          break;
+        case 'regionEntered':
+          toast(t('toast.regionEntered', { region: t(`region.${e.region}`) }), 'building', true);
+          platform.happytime();
+          break;
+        case 'storeOpened': {
+          toast(t('toast.storeOpened', { region: t(`region.${e.region}`) }), 'building', true);
+          // The very first store: go and have a look.
+          const total = Object.values(store.getState().regions.stores).reduce((a, b) => a + b, 0);
+          if (total === 1) {
+            hubView.value = 'store';
+            engine.goToView('store', 1.4);
+          }
+          break;
+        }
+        case 'contractOffered':
+          toast(t('toast.contractOffered'), 'box');
+          break;
+        case 'contractDone':
+          floatMoney(e.payout);
+          toast(t('toast.contractDone', { amount: money(e.payout, lang.value) }), 'trophy', true);
+          break;
+        case 'contractFailed':
+          toast(t('toast.contractFailed'), 'warn');
           break;
         case 'repaid':
           toast(t('toast.repaid', { amount: money(e.amount, lang.value) }), 'spark');

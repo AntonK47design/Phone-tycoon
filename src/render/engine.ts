@@ -34,11 +34,12 @@ import { AutoQuality, initialQuality, isMobileDevice, PROFILES, type Quality, ty
 import { buildGarage, TURNTABLE_POS, type GarageRoom } from './rooms/garage';
 import { Factory, FACTORY_ORIGIN, type FactoryVisual } from './rooms/factory';
 import { Office, OFFICE_ORIGIN, type OfficeVisual } from './rooms/office';
+import { Store, STORE_ORIGIN, type StoreVisual } from './rooms/store';
 import { OfficeCorner } from './rooms/officeCorner';
 import type { Role } from '../data/team';
 import { backgroundTexture } from './textures';
 
-export type ViewName = 'intro' | 'overview' | 'editor' | 'launch' | 'office' | 'factory';
+export type ViewName = 'intro' | 'overview' | 'editor' | 'launch' | 'office' | 'factory' | 'store';
 
 const TT = TURNTABLE_POS;
 const VIEWS: Record<ViewName, View> = {
@@ -48,6 +49,7 @@ const VIEWS: Record<ViewName, View> = {
   launch: { target: new Vector3(TT.x, 0.6, TT.z), azimuth: 0.3, elevation: 0.24, distance: 2.3, fov: 32, tiltShift: 0.5 },
   office: { target: OFFICE_ORIGIN.clone().add(new Vector3(0, 0.7, 0)), azimuth: 0.55, elevation: 0.55, distance: 12, fov: 30, tiltShift: 1 },
   factory: { target: FACTORY_ORIGIN.clone().add(new Vector3(0, 0.6, 0)), azimuth: 0.5, elevation: 0.58, distance: 15, fov: 30, tiltShift: 1 },
+  store: { target: STORE_ORIGIN.clone().add(new Vector3(0, 0.8, 0)), azimuth: 0.55, elevation: 0.5, distance: 13, fov: 30, tiltShift: 1 },
 };
 
 export interface EngineStats {
@@ -79,6 +81,7 @@ export class Engine {
   private hqLevel = 0;
   private fac = new Factory();
   private facSize = 0;
+  private shop = new Store();
   private view: ViewName = 'intro';
   private phone: PhoneModel;
   private confetti = new Confetti();
@@ -169,6 +172,7 @@ export class Engine {
     this.scene.add(this.office.group);
     this.scene.add(this.hq.root);
     this.scene.add(this.fac.root);
+    this.scene.add(this.shop.root);
 
     this.phone = new PhoneModel({ colorHex: null, shapeId: 'round', displaySize: 3.5, kitYear: 2007, finishId: 'gloss', lenses: 1 });
     this.garage.heroAnchor.add(this.phone.group);
@@ -283,6 +287,7 @@ export class Engine {
     this.office.update(t);
     if (this.view === 'office') animating = this.hq.update(t, dt) || animating;
     if (this.view === 'factory') animating = this.fac.update(t, dt) || animating;
+    if (this.view === 'store') animating = this.shop.update(t, dt) || animating;
     const tilt = this.rig.view.tiltShift * (PROFILES[this.quality].tiltShift ? 1 : 0);
     this.passes.tiltH.uniforms.strength.value = tilt;
     this.passes.tiltV.uniforms.strength.value = tilt;
@@ -359,17 +364,19 @@ export class Engine {
     this.view = name;
     if (name === 'office') VIEWS.office.distance = [12, 14.5, 17, 20.5][Math.max(1, Math.min(4, this.hqLevel)) - 1];
     if (name === 'factory') VIEWS.factory.distance = [15, 18, 23][Math.max(1, Math.min(3, this.facSize)) - 1];
-    const room = name === 'office' ? 'office' : name === 'factory' ? 'factory' : 'garage';
+    const room = name === 'office' || name === 'factory' || name === 'store' ? name : 'garage';
     this.aimShadows(room);
     // Only draw the room the camera looks at (once it has arrived): saves ~40 draw calls.
     if (room === 'office') this.hq.setShown(true);
     else if (room === 'factory') this.fac.setShown(true);
+    else if (room === 'store') this.shop.setShown(true);
     else this.garage.root.visible = true;
     this.rig.goTo(VIEWS[name], duration, () => {
       if (this.view === name) {
         this.garage.root.visible = room === 'garage';
         this.hq.setShown(room === 'office');
         this.fac.setShown(room === 'factory');
+        this.shop.setShown(room === 'store');
       }
       onDone?.();
     });
@@ -387,8 +394,8 @@ export class Engine {
   }
 
   /** Moves the shadow frustum to the room the camera looks at. */
-  private aimShadows(room: 'garage' | 'office' | 'factory') {
-    const off = room === 'office' ? OFFICE_ORIGIN : room === 'factory' ? FACTORY_ORIGIN : new Vector3();
+  private aimShadows(room: 'garage' | 'office' | 'factory' | 'store') {
+    const off = room === 'office' ? OFFICE_ORIGIN : room === 'factory' ? FACTORY_ORIGIN : room === 'store' ? STORE_ORIGIN : new Vector3();
     this.key.position.set(5.5, 9, 6.5).add(off);
     this.key.target.position.copy(off);
     const sc = this.key.shadow.camera;
@@ -410,6 +417,11 @@ export class Engine {
     this.facSize = v.size;
     if (grew && this.view === 'factory') this.goToView('factory', 1);
     this.fac.setVisual(v);
+  }
+
+  /** Store diorama: phones on display and shoppers. */
+  setStore(v: StoreVisual) {
+    this.shop.setVisual(v);
   }
 
   /** Office diorama: level, buildings and staff. */

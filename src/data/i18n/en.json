@@ -202,7 +202,13 @@
     "lines3": "Run 3 production lines",
     "revenue100m": "Make $100M in total sales",
     "valuation100m": "Reach a $100M valuation",
-    "revenue400m": "Make $400M in total sales"
+    "revenue400m": "Make $400M in total sales",
+    "region2": "Enter a second region",
+    "store1": "Open your first store",
+    "contracts3": "Deliver 3 contract jobs",
+    "regions5": "Sell on every continent",
+    "stores10": "Run 10 stores",
+    "valuation1b": "Become a $1B company"
   },
   "teaser": {
     "office": "{amount} more and you can stop working in a garage.",
@@ -256,7 +262,13 @@
     "lineAdded": "New production line installed.",
     "lineUpgraded": "Line upgraded to level {level}: faster and cheaper.",
     "warehouseUpgraded": "Warehouse expanded.",
-    "phase4": "Expansion unlocked! Regions, stores and rivals arrive in the next update."
+    "phase4": "Expansion unlocked! Regions, stores and rivals arrive in the next update.",
+    "priceCut": "{rival} started a price war in {segment}!",
+    "regionEntered": "Welcome to {region}! Your phones are in the shops.",
+    "storeOpened": "Your own store in {region} opened. Queue around the block!",
+    "contractOffered": "New contract offer in the World tab.",
+    "contractDone": "Contract delivered: {amount}",
+    "contractFailed": "A contract expired. The client went elsewhere."
   },
   "barks": {
     "idle": [
@@ -301,7 +313,8 @@
     "research": "Research",
     "market": "Market",
     "team": "Team",
-    "factory": "Factory"
+    "factory": "Factory",
+    "world": "World"
   },
   "office": {
     "rent": "Move into an office · {price}",
@@ -315,7 +328,8 @@
     "view": {
       "garage": "Garage",
       "office": "Office",
-      "factory": "Factory"
+      "factory": "Factory",
+      "store": "Store"
     }
   },
   "segment": {
@@ -323,7 +337,9 @@
     "budget": "Budget",
     "mid": "Mid-range",
     "flagship": "Flagship",
-    "anchor": "Typical price {price}"
+    "anchor": "Typical price {price}",
+    "senior": "Senior",
+    "gaming": "Gaming"
   },
   "price": {
     "title": "Price",
@@ -464,7 +480,11 @@
     "screen": "Screen size",
     "features": "Must-haves",
     "none": "nothing special yet",
-    "segments": "Segments"
+    "segments": "Segments",
+    "rivals": "Rivals",
+    "priceCut": "price war",
+    "scandal": "scandal",
+    "news": "Headlines"
   },
   "company": {
     "title": "Company",
@@ -691,5 +711,118 @@
     "overflow": "The warehouse is overflowing. Extra stock costs 1% of its value every week.",
     "warehouseUp": "Expand warehouse to {cap} · {amount}",
     "howItWorks": "New phones get a line automatically (an idle one, or the one building your weakest seller)."
+  },
+  "news": {
+    "tag": "NEWS",
+    "rivalLaunch": "{rival} launches {name} ({segment}), reviews say {score}",
+    "priceCut": "{rival} slashes {segment} prices by {pct}% to fight back",
+    "event": {
+      "chipShortage": "Chip shortage! Factories everywhere wait for parts",
+      "cameraHype": "Everyone wants the best camera right now",
+      "recession": "Recession: shoppers count every dollar",
+      "rivalScandal": "Scandal at {rival}: exploding batteries, angry fans",
+      "tradeFair": "You're invited to the big tech fair",
+      "starApplicant": "Star engineer {name} is looking for a new job",
+      "tariff": "New tariffs hit phones sold in {region}",
+      "breakthrough": "Breakthrough in your lab: research jumps ahead",
+      "influencer": "A big influencer can't stop talking about {name}",
+      "recallDone": "{name} recalled. Customers appreciate the honesty",
+      "recallIgnored": "Faulty {name} units make headlines"
+    }
+  },
+  "event": {
+    "kicker": "Breaking",
+    "chipShortage": {
+      "title": "Chip shortage",
+      "text": "A fire at a chip plant: parts are scarce for months. Stockpile now for {amount}, or ride it out with pricier parts and slower lines.",
+      "stockpile": "Stockpile chips · {amount}",
+      "stockpileHint": "No extra costs, lines run at full speed",
+      "wait": "Ride it out",
+      "waitHint": "+8% unit costs, −30% line capacity for ~4 months",
+      "end": "The chip shortage is over."
+    },
+    "recall": {
+      "title": "Faulty phones",
+      "text": "Too much scrap slipped through: {name} units are failing. A recall costs {amount}, but keeps your name clean.",
+      "recall": "Recall · {amount}",
+      "recallHint": "Brand stays, returns stop",
+      "ignore": "Say nothing",
+      "ignoreHint": "Brand −15",
+      "end": ""
+    },
+    "cameraHype": {
+      "toast": "Camera hype! Phones with a pro camera sell 20% better for half a year.",
+      "end": "The camera hype has cooled down."
+    },
+    "recession": {
+      "toast": "Recession: the market shrinks 15% and buyers watch prices closely.",
+      "end": "The recession is over. Wallets open again."
+    },
+    "rivalScandal": {
+      "toast": "Scandal at {rival}! Their brand takes a hit, some fans come to you.",
+      "end": "The scandal has faded."
+    },
+    "tradeFair": {
+      "toast": "Trade fair invitation: your next stage show costs half and brings +20 hype."
+    },
+    "starApplicant": {
+      "toast": "A star applicant (skill 70+) is in your Team tab for two weeks."
+    },
+    "tariff": {
+      "toast": "Tariffs in {region}: fewer sales there for half a year.",
+      "end": "The tariffs are gone."
+    },
+    "breakthrough": {
+      "toast": "Lab breakthrough! Your current research is halfway done."
+    }
+  },
+  "region": {
+    "home": "North America",
+    "europe": "Europe",
+    "asia": "Asia-Pacific",
+    "latam": "Latin America",
+    "africa": "Africa & Middle East",
+    "homeTaste": "Loves flagships and speed.",
+    "europeTaste": "Design and battery life, a little price-aware.",
+    "asiaTaste": "Huge market. Cameras, speed, gaming. Pebblecom is strong here.",
+    "latamTaste": "Budget phones with long battery life. Very price-aware.",
+    "africaTaste": "Budget, battery, water resistance. Very price-aware."
+  },
+  "client": {
+    "carrierNorth": "CarrierNorth",
+    "skylink": "Skylink Mobile",
+    "metroTel": "MetroTel",
+    "cityHall": "City Hall IT",
+    "fleetCo": "FleetCo Logistics",
+    "eduNet": "EduNet Schools",
+    "medica": "Medica Clinics",
+    "courierOne": "CourierOne"
+  },
+  "world": {
+    "title": "World",
+    "regions": "{n}/5 regions",
+    "locked": "Reach the expansion goal ($400M total sales) to go global.",
+    "share": "{pct}% of the world",
+    "reach": "Reach",
+    "stores": "Stores",
+    "openStore": "Open a store · {amount}",
+    "enter": "Enter market · {amount}",
+    "tariff": "Tariffs right now: fewer sales here.",
+    "notNow": "Not possible right now.",
+    "contracts": "Contract jobs",
+    "contractsLocked": "Companies send bulk orders once you're international.",
+    "noContracts": "No offers right now. New ones arrive every few weeks.",
+    "dueIn": "due in {n} wk",
+    "late": "{n} wk late (−10%/wk)",
+    "minReview": "Min review",
+    "maxCost": "Max unit cost",
+    "deliver": "Deliver {name}",
+    "decline": "Decline",
+    "problem": {
+      "segment": "You have no phone in this segment yet.",
+      "review": "{name} doesn't score high enough.",
+      "cost": "{name} is too expensive to build.",
+      "stock": "{name}: not enough units in stock yet."
+    }
   }
 }

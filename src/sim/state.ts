@@ -5,7 +5,7 @@ import type { Segment } from '../data/market';
 import type { Tempo } from '../data/factory';
 import type { Role, TraitId } from '../data/team';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 export interface PhoneDesign {
   name: string;
@@ -82,6 +82,8 @@ export interface Product {
   launchHype: number;
   /** Recent scrap share of own-factory production (returns cost review points). */
   defectRate?: number;
+  /** Cached regional taste fit (region id → 0.7–1.3). */
+  fit?: Record<string, number>;
 }
 
 export interface Development {
@@ -106,6 +108,101 @@ export interface Employee {
   trainingUntil: number | null;
   /** Visual seed for the 3D figure (hair, skin). */
   look: number;
+}
+
+export interface RivalModel {
+  name: string;
+  segment: Segment;
+  review: number;
+  price: number;
+  launchDay: number;
+}
+
+export interface RivalState {
+  id: string;
+  brand: number;
+  /** Drift of the tech aggressiveness τ from good or bad years. */
+  tauAdj: number;
+  models: RivalModel[];
+  launches: number;
+  nextLaunch: number;
+  priceCutUntil: number;
+  scandalUntil: number;
+  unitsYear: number;
+  unitsLastYear: number;
+}
+
+/** News ticker entry; the UI turns it into a sentence. */
+export interface NewsItem {
+  day: number;
+  kind: string;
+  rival?: string;
+  text?: string;
+  value?: number;
+  segment?: string;
+  region?: string;
+}
+
+export type EventId =
+  | 'chipShortage'
+  | 'cameraHype'
+  | 'recession'
+  | 'rivalScandal'
+  | 'recall'
+  | 'tradeFair'
+  | 'influencer'
+  | 'starApplicant'
+  | 'tariff'
+  | 'breakthrough';
+
+export interface ActiveEvent {
+  id: EventId;
+  start: number;
+  until: number;
+  /** Rival or region the event is about. */
+  target?: string;
+}
+
+/** An event card waiting for the player's decision. */
+export interface PendingChoice {
+  id: EventId;
+  options: string[];
+  /** Day the default option is taken automatically. */
+  deadline: number;
+  target?: string;
+  /** Money involved (recall cost, expensive chips …). */
+  amount?: number;
+}
+
+export interface EventState {
+  active: ActiveEvent[];
+  /** Event id → day it may fire again. */
+  cooldown: Record<string, number>;
+  pending: PendingChoice | null;
+  /** Next presentation at half price with +20 hype (trade fair invitation). */
+  tradeFair: boolean;
+}
+
+export interface Contract {
+  id: number;
+  /** Client name key (fictional carriers, companies, agencies). */
+  client: string;
+  segment: Segment;
+  minReview: number;
+  /** Highest unit cost the client accepts. */
+  maxCost: number;
+  units: number;
+  /** Day the delivery is due (late: −10 %/week, cancelled after 4 weeks). */
+  deadline: number;
+  payout: number;
+  accepted: boolean;
+}
+
+export interface RegionState {
+  /** Region ids the company sells in ('home' always). */
+  entered: string[];
+  /** Region id → number of own stores. */
+  stores: Record<string, number>;
 }
 
 export interface FactoryLine {
@@ -230,6 +327,11 @@ export interface GameState {
   };
   team: TeamState;
   factory: FactoryState;
+  rivals: RivalState[];
+  news: NewsItem[];
+  events: EventState;
+  regions: RegionState;
+  contracts: { offers: Contract[]; nextId: number; nextOfferDay: number; done: number };
   /** Phase-4 gate reached (expansion – next update). */
   phase4Ready: boolean;
   daily: DailyState;

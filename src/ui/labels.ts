@@ -36,3 +36,23 @@ export function shapeName(id: string): string {
   void shapeById(id);
   return t(`editor.shape.${id}`);
 }
+
+/** One news ticker line. */
+export function newsText(n: import('../sim/state').NewsItem): string {
+  const rival = n.rival ? rivalName(n.rival) : '';
+  return t(`news.${n.kind}`, {
+    rival,
+    name: n.text ?? '',
+    score: n.value !== undefined ? decimal(n.value, lang.value) : '',
+    pct: n.value ?? '',
+    segment: n.segment ? t(`segment.${n.segment}`) : '',
+    region: n.rival && n.kind === 'event.tariff' ? t(`region.${n.rival}`) : '',
+  });
+}
+
+export function rivalName(id: string): string {
+  return COMPETITOR_NAMES[id] ?? id;
+}
+
+import { COMPETITORS } from '../data/market';
+const COMPETITOR_NAMES: Record<string, string> = Object.fromEntries(COMPETITORS.map((c) => [c.id, c.name]));

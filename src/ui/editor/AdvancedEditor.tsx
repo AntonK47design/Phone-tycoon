@@ -8,6 +8,7 @@ import { SEGMENTS, type Segment } from '../../data/market';
 import { FEATURES, partById, type PartDef } from '../../data/parts';
 import type { DraftPatch } from '../../sim/game';
 import {
+  availableSegments,
   availableFeatures,
   availableFinishes,
   availableMaterials,
@@ -88,7 +89,7 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
   const part = (c: TechCategory) => partById(d.parts[c]);
   const feats = availableFeatures(state);
   const sizes = availableSizes(state);
-  const segs: Segment[] = ['budget', 'mid', 'flagship'];
+  const segs: Segment[] = availableSegments(state);
   const custom = d.customPrice !== null;
   const fair = suggestedPrice;
 

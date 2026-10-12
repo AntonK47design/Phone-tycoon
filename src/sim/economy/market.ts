@@ -10,7 +10,7 @@ import {
 import { lineAssembly } from '../../data/factory';
 import { finishById, materialById, PACKAGING, shapeById } from '../../data/design';
 import { inflation } from '../../data/eras';
-import { COMPETITORS, SEGMENT_SHARES, SEGMENTS, restMarketAttractiveness, type Segment } from '../../data/market';
+import { COMPETITORS, curveAt, SEGMENT_SHARES, SEGMENTS, restMarketAttractiveness, type Segment } from '../../data/market';
 import { featureById, partById, partCostAt } from '../../data/parts';
 import { clamp, fairPrice, overallRating } from '../scoring/score';
 import type { PhoneDesign } from '../state';
@@ -115,15 +115,29 @@ export interface AttractivenessInput {
 
 /** Attractiveness A_i (GDD §7.3). */
 export function attractiveness(input: AttractivenessInput, year: number): number {
+  return attractivenessParts(input, year).a;
+}
+
+/**
+ * Attractiveness plus the price ratio and elasticity, so callers can re-weight the price
+ * factor for a more price-sensitive region without recomputing the ratings.
+ */
+export function attractivenessParts(input: AttractivenessInput, year: number): { a: number; ratio: number; eps: number } {
   const seg = SEGMENTS[input.design.segment];
   const p = overallRating(input.design, year).p;
   const pRef = fairPrice(input.design, p, year);
-  const priceF = clamp(Math.pow(pRef / Math.max(1, input.design.price), seg.elasticity), 0.03, 3);
+  const ratio = pRef / Math.max(1, input.design.price);
+  const priceF = priceFactor(ratio, seg.elasticity);
   const hype = input.hype ?? 0;
   const spike = ((1.5 * hype) / 100) * Math.exp(-input.weeksSinceLaunch / 2);
   const life = (1 + spike) * Math.exp(-input.weeksSinceLaunch / LIFE_TAU_WEEKS);
   const mkt = 1 + (0.6 * hype) / 100;
-  return Math.pow(clamp(input.review, 0, 10) / 10, KAPPA) * priceF * brandFactor(input.brand) * life * mkt;
+  const a = Math.pow(clamp(input.review, 0, 10) / 10, KAPPA) * priceF * brandFactor(input.brand) * life * mkt;
+  return { a, ratio, eps: seg.elasticity };
+}
+
+export function priceFactor(ratio: number, eps: number): number {
+  return clamp(Math.pow(ratio, eps), 0.03, 3);
 }
 
 export interface SegmentResult {
@@ -133,24 +147,39 @@ export interface SegmentResult {
   comps: Record<string, number>;
 }
 
+/** A rival in a segment: id and effective attractiveness (A × reach). */
+export interface RivalEntry {
+  id: string;
+  e: number;
+}
+
+/** Static rival line-up (used before the dynamic competitors exist, e.g. in tests). */
+export function staticRivals(segment: Segment, year: number): RivalEntry[] {
+  return COMPETITORS.filter((c) => c.segments.includes(segment)).map((c) => {
+    const r = competitorReview(curveAt(c.tau, year), c.designBias);
+    return { id: c.id, e: Math.pow(r / 10, KAPPA) * brandFactor(c.brand) * curveAt(c.reach, year) };
+  });
+}
+
 /**
  * Splits a segment's weekly demand between player products, competitors and the rest of
  * the market. Every product competes with its effective attractiveness A × reach.
+ * `size` scales the market (regions, recession).
  */
-export function segmentDemand(players: { a: number; reach: number }[], segment: Segment, year: number): SegmentResult {
-  const total = marketSize(year) * segmentShare(segment, year);
+export function segmentDemand(
+  players: { a: number; reach: number }[],
+  segment: Segment,
+  year: number,
+  rivals: RivalEntry[] = staticRivals(segment, year),
+  size = 1,
+): SegmentResult {
+  const total = marketSize(year) * segmentShare(segment, year) * size;
   const comps: Record<string, number> = {};
-  let denom = restMarketAttractiveness(year);
-  const compE: [string, number][] = [];
-  for (const c of COMPETITORS) {
-    if (!c.segments.includes(segment)) continue;
-    const r = competitorReview(c.tau, c.designBias);
-    const e = Math.pow(r / 10, KAPPA) * brandFactor(c.brand) * c.reach;
-    compE.push([c.id, e]);
-    denom += e;
-  }
+  const rest = restMarketAttractiveness(year);
+  let denom = rest;
+  for (const r of rivals) denom += r.e;
   for (const p of players) denom += p.a * p.reach;
-  for (const [id, e] of compE) comps[id] = (total * e) / denom;
-  comps._rest = (total * restMarketAttractiveness(year)) / denom;
+  for (const r of rivals) comps[r.id] = (comps[r.id] ?? 0) + (total * r.e) / denom;
+  comps._rest = (total * rest) / denom;
   return { player: players.map((p) => (total * p.a * p.reach) / denom), comps };
 }

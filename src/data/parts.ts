@@ -128,6 +128,13 @@ export interface FeatureDef {
   starter?: boolean;
 }
 
+/** Year a segment expects a feature: seniors expect what budget phones have, gamers what flagships have. */
+export function featureExpected(f: { expected: { budget: number; mid: number; flagship: number } }, segment: string): number {
+  if (segment === 'senior') return f.expected.budget;
+  if (segment === 'gaming') return f.expected.flagship;
+  return f.expected[segment as 'budget' | 'mid' | 'flagship'];
+}
+
 export const FEATURES: FeatureDef[] = [
   { id: 'net3g', cost: 9, devPoints: 2, expected: { budget: 2011, mid: 2009, flagship: 2008 }, drain: 1.06 },
   { id: 'gps', cost: 5, devPoints: 1, expected: { budget: 2012, mid: 2010, flagship: 2008 }, drain: 1.03 },

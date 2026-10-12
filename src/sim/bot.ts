@@ -19,6 +19,7 @@ import {
   valuation,
 } from './game';
 import {
+  availableSegments,
   availableFeatures,
   availableFinishes,
   availableMaterials,
@@ -34,6 +35,8 @@ import {
 import { isTrendColor } from './scoring/score';
 import { buildFactoryCost, factorySizeCost, lineRate, lineUpgradeCost, newLineCost, stockTotal, warehouseCost } from './factory';
 import { warehouseCapacity } from '../data/factory';
+import { REGIONS } from '../data/regions';
+import { contractProblem, entryCost, storeCost } from './world';
 import {
   bonusCost,
   bonusReady,
@@ -73,6 +76,8 @@ export interface BotSample {
   office: number;
   lines: number;
   produced: number;
+  regions: number;
+  stores: number;
 }
 
 export interface BotResult {
@@ -93,7 +98,7 @@ function speedAt(sec: number, profile: BotProfile): number {
   return t < 4 ? 1 : t < 7 ? 2 : 4;
 }
 
-const TIER_FOR: Record<Segment, Tier> = { budget: 'lite', mid: 'std', flagship: 'pro' };
+const TIER_FOR: Record<Segment, Tier> = { budget: 'lite', mid: 'std', flagship: 'pro', senior: 'lite', gaming: 'pro' };
 
 /** Builds the bot's best guess for a segment and returns it with its forecast. */
 function designFor(state: GameState, segment: Segment, pick: number, profile: BotProfile): { design: PhoneDesign; score: number } {
@@ -136,7 +141,7 @@ function designFor(state: GameState, segment: Segment, pick: number, profile: Bo
 
 function chooseDesign(state: GameState, pick: number, profile: BotProfile): PhoneDesign {
   if (state.phase < 2) return designFor(state, 'mid', pick, profile).design;
-  const segs: Segment[] = profile === 'weak' ? ['mid'] : ['budget', 'mid', 'flagship'];
+  const segs: Segment[] = profile === 'weak' ? ['mid'] : availableSegments(state);
   let best = designFor(state, segs[0], pick, profile);
   for (const s of segs.slice(1)) {
     const c = designFor(state, s, pick, profile);
@@ -225,6 +230,13 @@ function botDecide(state: GameState, profile: BotProfile, nextPick: () => number
   }
   if (state.phase >= 2) manageTeam(state, profile);
   if (state.phase3Ready) manageFactory(state, profile);
+  if (state.phase4Ready) manageWorld(state, profile);
+  const pending = state.events.pending;
+  if (pending) {
+    const care = profile === 'weak' ? 8 : 3;
+    const pay = pending.options[0];
+    applyAction(state, { type: 'eventChoice', option: state.company.cash > (pending.amount ?? 0) * care ? pay : pending.options[pending.options.length - 1] });
+  }
   const reserve = 4 * 3000 * inf;
   if (state.phase >= 2 && !state.research.current && state.company.cash > reserve) {
     const id = pickResearch(state, profile);
@@ -367,13 +379,34 @@ function manageFactory(state: GameState, profile: BotProfile): void {
   if (profile === 'optimizer' && f.tempo !== 'quality' && state.team.staff.some((e) => e.role === 'producer')) applyAction(state, { type: 'setTempo', tempo: 'quality' });
 }
 
+function manageWorld(state: GameState, profile: BotProfile): void {
+  if (state.day % 7 !== 5) return;
+  const care = profile === 'optimizer' ? 1.5 : profile === 'weak' ? 4 : 2.5;
+  const year = yearOf(state.day);
+  // Cheapest region first.
+  const next = REGIONS.filter((r) => !state.regions.entered.includes(r.id)).sort((a, b) => a.entry - b.entry)[0];
+  if (next && state.company.cash > entryCost(state, next) * care) applyAction(state, { type: 'enterRegion', region: next.id });
+  // Stores where they pay off most: the biggest entered region with the fewest stores.
+  if (profile !== 'weak') {
+    const target = state.regions.entered
+      .map((id) => REGIONS.find((r) => r.id === id)!)
+      .sort((a, b) => b.share / (1 + (state.regions.stores[b.id] ?? 0)) - a.share / (1 + (state.regions.stores[a.id] ?? 0)))[0];
+    if (target && state.company.cash > storeCost(state, target.id) * care * 2) applyAction(state, { type: 'openStore', region: target.id });
+  }
+  // Contracts: deliver whenever a product qualifies.
+  for (const c of [...state.contracts.offers]) {
+    const p = state.products.find((x) => x.active && !contractProblem(state, c, x, currentReview(x, year)));
+    if (p) applyAction(state, { type: 'fulfilContract', id: c.id, productId: p.id });
+  }
+}
+
 function sample(state: GameState, minute: number): BotSample {
   const cal = calendar(state.day);
   const reviews = state.products.slice(-5).map((p) => p.review.score);
   return {
     minute: Math.round(minute * 10) / 10,
     date: `W${cal.week} ${cal.year}`,
-    phase: state.phase3Ready ? 3 : state.phase,
+    phase: state.phase >= 4 ? 4 : state.phase3Ready ? 3 : state.phase,
     cash: Math.round(state.company.cash),
     valuation: Math.round(valuation(state)),
     launches: state.stats.launches,
@@ -388,5 +421,7 @@ function sample(state: GameState, minute: number): BotSample {
     office: state.team.office,
     lines: state.factory.lines.reduce((a, l) => a + l.level, 0),
     produced: state.factory.produced,
+    regions: state.regions.entered.length,
+    stores: Object.values(state.regions.stores).reduce((a, b) => a + b, 0),
   };
 }

@@ -19,6 +19,7 @@ export function isClockRunning(): boolean {
     speed.value > 0 &&
     !settingsOpen.value &&
     !dailyOpen.value &&
+    !store.getState().events.pending &&
     launchData.value === null &&
     !launchSetupOpen.value &&
     welcomeReport.value === null &&

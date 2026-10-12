@@ -4,7 +4,7 @@ import type { TechCategory } from '../data/components';
 import { CHANNEL_CUT, LAB_COST_PER_RP, OFFICE_REACH } from '../data/components';
 import { inflation } from '../data/eras';
 import { DISPLAY_SIZES, FINISHES, MATERIALS, SHAPES } from '../data/design';
-import { GARAGE_REACH } from '../data/market';
+import { ALL_SEGMENTS, BASE_SEGMENTS, GARAGE_REACH, type Segment } from '../data/market';
 import { FEATURES, FIRST_GEN, PARTS, type PartDef } from '../data/parts';
 import { RESEARCH, researchById, type ResearchNode } from '../data/research';
 import type { SimEvent } from './events';
@@ -43,6 +43,11 @@ export function availableMaterials(state: GameState): string[] {
 
 export function availableFinishes(state: GameState): string[] {
   return FINISHES.filter((f) => f.id === 'gloss' || unlocks(state, 'finish').includes(f.id) || state.cosmetics.includes(f.id)).map((f) => f.id);
+}
+
+/** Market segments the company can target (senior & gaming open with the expansion). */
+export function availableSegments(state: GameState): Segment[] {
+  return state.phase >= 4 ? ALL_SEGMENTS : BASE_SEGMENTS;
 }
 
 export function availableFeatures(state: GameState): string[] {

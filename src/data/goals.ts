@@ -1,4 +1,4 @@
-// Goal chain for Phases 1–3 (GDD §18.1). Conditions are evaluated in sim/goals.ts.
+// Goal chain for Phases 1–4 (GDD §18.1). Conditions are evaluated in sim/goals.ts.
 
 export type GoalKind =
   | 'launches'
@@ -17,7 +17,10 @@ export type GoalKind =
   | 'trainings'
   | 'produced'
   | 'lineLevel'
-  | 'lines';
+  | 'lines'
+  | 'regions'
+  | 'stores'
+  | 'contracts';
 
 export interface GoalReward {
   cash?: number;
@@ -65,6 +68,13 @@ export const GOALS: GoalDef[] = [
   { id: 'revenue100m', kind: 'revenueTotal', target: 100_000_000, reward: { cash: 1_000_000 } },
   { id: 'valuation100m', kind: 'valuation', target: 100_000_000, reward: { cash: 2_000_000 } },
   { id: 'revenue400m', kind: 'revenueTotal', target: 400_000_000, reward: {}, gate: 'phase4', requires: ['lines3'] },
+  // Phase 4 – expansion.
+  { id: 'region2', kind: 'regions', target: 2, reward: { cash: 1_000_000 } },
+  { id: 'store1', kind: 'stores', target: 1, reward: { cash: 500_000 } },
+  { id: 'contracts3', kind: 'contracts', target: 3, reward: { cash: 2_000_000 } },
+  { id: 'regions5', kind: 'regions', target: 5, reward: { cash: 5_000_000 } },
+  { id: 'stores10', kind: 'stores', target: 10, reward: { cash: 10_000_000 } },
+  { id: 'valuation1b', kind: 'valuation', target: 1_000_000_000, reward: {} },
 ];
 
 /** How many goals are visible at once. */

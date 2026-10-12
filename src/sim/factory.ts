@@ -17,6 +17,7 @@ import {
   type Tempo,
 } from '../data/factory';
 import { DAYS_PER_WEEK } from '../data/eras';
+import { capacityMultiplier, productionCostMultiplier } from './director';
 import { unitCost } from './economy/market';
 import type { SimEvent } from './events';
 import { clamp } from './scoring/score';
@@ -63,7 +64,7 @@ export function stockTotal(state: GameState): number {
 
 /** Units per day a line builds right now (tempo and production leads included). */
 export function lineRate(state: GameState, line: FactoryLine): number {
-  return lineCapacityDay(line.level) * TEMPOS[state.factory.tempo].speed * productionBoost(state).speed;
+  return lineCapacityDay(line.level) * TEMPOS[state.factory.tempo].speed * productionBoost(state).speed * capacityMultiplier(state);
 }
 
 /** Scrap share of a line right now. */
@@ -206,7 +207,7 @@ export function produceDay(state: GameState, dailyDemand: Map<number, number>): 
     const target = ((dailyDemand.get(p.id) ?? 0) * DAYS_PER_WEEK * f.targetWeeks + p.backlog) / sharing;
     const need = Math.max(0, target - (p.stock + incoming) / sharing);
     if (need < 1) continue;
-    const cost = unitCost(p.design, year, 'factory', line.level);
+    const cost = unitCost(p.design, year, 'factory', line.level) * productionCostMultiplier(state);
     const want = Math.min(lineRate(state, line) + line.carry, need);
     let units = Math.floor(want);
     line.carry = want - units;

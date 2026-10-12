@@ -9,7 +9,7 @@ import {
   trendColors,
 } from '../../data/eras';
 import { LICENSED_OS, TECH_CATEGORIES, TECH_WEIGHTS, type TechCategory } from '../../data/components';
-import { FEATURES, featureById, partById } from '../../data/parts';
+import { FEATURES, featureById, featureExpected, partById } from '../../data/parts';
 import { finishById, materialById, PACKAGING } from '../../data/design';
 import { SEGMENTS } from '../../data/market';
 import { phoneDims } from '../phoneSpec';
@@ -137,7 +137,7 @@ export function featureAdjustment(design: PhoneDesign, year: number): FeatureChe
   let malus = 0;
   let bonus = 0;
   for (const f of FEATURES) {
-    const expected = f.expected[design.segment];
+    const expected = featureExpected(f, design.segment);
     const has = design.features.includes(f.id);
     if (!has && year >= expected) {
       missing.push(f.id);

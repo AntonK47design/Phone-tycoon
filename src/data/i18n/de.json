@@ -202,7 +202,13 @@
     "lines3": "Betreibe 3 Fertigungslinien",
     "revenue100m": "Mache 100 Mio. $ Gesamtumsatz",
     "valuation100m": "Erreiche 100 Mio. $ Firmenwert",
-    "revenue400m": "Mache 400 Mio. $ Gesamtumsatz"
+    "revenue400m": "Mache 400 Mio. $ Gesamtumsatz",
+    "region2": "Erschließe eine zweite Region",
+    "store1": "Eröffne deinen ersten Store",
+    "contracts3": "Liefere 3 Auftragsarbeiten",
+    "regions5": "Verkaufe auf jedem Kontinent",
+    "stores10": "Betreibe 10 Stores",
+    "valuation1b": "Werde eine Milliarden-Firma"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
@@ -256,7 +262,13 @@
     "lineAdded": "Neue Fertigungslinie installiert.",
     "lineUpgraded": "Linie auf Stufe {level}: schneller und günstiger.",
     "warehouseUpgraded": "Lagerhalle erweitert.",
-    "phase4": "Expansion freigeschaltet! Regionen, Stores und Rivalen kommen im nächsten Update."
+    "phase4": "Expansion freigeschaltet! Regionen, Stores und Rivalen kommen im nächsten Update.",
+    "priceCut": "{rival} startet einen Preiskampf bei {segment}!",
+    "regionEntered": "Willkommen in {region}! Deine Handys sind in den Läden.",
+    "storeOpened": "Dein eigener Store in {region} hat eröffnet. Schlange bis um die Ecke!",
+    "contractOffered": "Neues Auftragsangebot im Welt-Tab.",
+    "contractDone": "Auftrag geliefert: {amount}",
+    "contractFailed": "Ein Auftrag ist abgelaufen. Der Kunde ging woanders hin."
   },
   "barks": {
     "idle": [
@@ -301,7 +313,8 @@
     "research": "Forschung",
     "market": "Markt",
     "team": "Team",
-    "factory": "Fabrik"
+    "factory": "Fabrik",
+    "world": "Welt"
   },
   "office": {
     "rent": "Ins Büro ziehen · {price}",
@@ -315,7 +328,8 @@
     "view": {
       "garage": "Garage",
       "office": "Büro",
-      "factory": "Fabrik"
+      "factory": "Fabrik",
+      "store": "Store"
     }
   },
   "segment": {
@@ -323,7 +337,9 @@
     "budget": "Budget",
     "mid": "Mittelklasse",
     "flagship": "Flaggschiff",
-    "anchor": "Üblicher Preis {price}"
+    "anchor": "Üblicher Preis {price}",
+    "senior": "Senioren",
+    "gaming": "Gaming"
   },
   "price": {
     "title": "Preis",
@@ -464,7 +480,11 @@
     "screen": "Displaygröße",
     "features": "Pflicht-Extras",
     "none": "noch nichts Besonderes",
-    "segments": "Segmente"
+    "segments": "Segmente",
+    "rivals": "Konkurrenz",
+    "priceCut": "Preiskampf",
+    "scandal": "Skandal",
+    "news": "Schlagzeilen"
   },
   "company": {
     "title": "Firma",
@@ -691,5 +711,118 @@
     "overflow": "Die Halle quillt über. Überbestand kostet jede Woche 1 % seines Werts.",
     "warehouseUp": "Halle erweitern auf {cap} · {amount}",
     "howItWorks": "Neue Handys bekommen automatisch eine Linie (eine freie oder die mit dem schwächsten Verkaufsschlager)."
+  },
+  "news": {
+    "tag": "NEWS",
+    "rivalLaunch": "{rival} bringt {name} ({segment}), Wertung {score}",
+    "priceCut": "{rival} senkt die {segment}-Preise um {pct} %",
+    "event": {
+      "chipShortage": "Chipmangel! Fabriken weltweit warten auf Teile",
+      "cameraHype": "Alle wollen gerade die beste Kamera",
+      "recession": "Rezession: Kunden drehen jeden Dollar um",
+      "rivalScandal": "Skandal bei {rival}: Akkus brennen, Fans sind sauer",
+      "tradeFair": "Du bist zur großen Technikmesse eingeladen",
+      "starApplicant": "Star-Ingenieur {name} sucht einen neuen Job",
+      "tariff": "Neue Zölle auf Handys in {region}",
+      "breakthrough": "Durchbruch im Labor: die Forschung springt voran",
+      "influencer": "Ein großer Influencer schwärmt von {name}",
+      "recallDone": "{name} zurückgerufen. Kunden schätzen die Ehrlichkeit",
+      "recallIgnored": "Defekte {name} machen Schlagzeilen"
+    }
+  },
+  "event": {
+    "kicker": "Eilmeldung",
+    "chipShortage": {
+      "title": "Chipmangel",
+      "text": "Brand in einem Chipwerk: Teile sind monatelang knapp. Jetzt für {amount} einlagern oder durchhalten – mit teureren Teilen und langsameren Linien.",
+      "stockpile": "Chips einlagern · {amount}",
+      "stockpileHint": "Keine Mehrkosten, Linien laufen voll",
+      "wait": "Durchhalten",
+      "waitHint": "+8 % Stückkosten, −30 % Linienkapazität für ~4 Monate",
+      "end": "Der Chipmangel ist vorbei."
+    },
+    "recall": {
+      "title": "Defekte Handys",
+      "text": "Zu viel Ausschuss ist durchgerutscht: {name} fällt aus. Ein Rückruf kostet {amount}, hält aber deinen Namen sauber.",
+      "recall": "Rückruf · {amount}",
+      "recallHint": "Marke bleibt, Rückläufer enden",
+      "ignore": "Schweigen",
+      "ignoreHint": "Marke −15",
+      "end": ""
+    },
+    "cameraHype": {
+      "toast": "Kamera-Hype! Handys mit Pro-Kamera verkaufen sich ein halbes Jahr 20 % besser.",
+      "end": "Der Kamera-Hype ist abgeflaut."
+    },
+    "recession": {
+      "toast": "Rezession: Der Markt schrumpft um 15 %, Käufer achten genau auf Preise.",
+      "end": "Die Rezession ist vorbei. Die Geldbörsen gehen wieder auf."
+    },
+    "rivalScandal": {
+      "toast": "Skandal bei {rival}! Deren Marke leidet, einige Fans wechseln zu dir.",
+      "end": "Der Skandal ist vergessen."
+    },
+    "tradeFair": {
+      "toast": "Messe-Einladung: Deine nächste Bühnenshow kostet die Hälfte und bringt +20 Hype."
+    },
+    "starApplicant": {
+      "toast": "Eine Star-Bewerbung (Skill 70+) liegt zwei Wochen im Team-Tab."
+    },
+    "tariff": {
+      "toast": "Zölle in {region}: ein halbes Jahr weniger Verkäufe dort.",
+      "end": "Die Zölle sind weg."
+    },
+    "breakthrough": {
+      "toast": "Durchbruch im Labor! Die aktuelle Forschung ist zur Hälfte fertig."
+    }
+  },
+  "region": {
+    "home": "Nordamerika",
+    "europe": "Europa",
+    "asia": "Asien-Pazifik",
+    "latam": "Lateinamerika",
+    "africa": "Afrika & Nahost",
+    "homeTaste": "Liebt Flaggschiffe und Tempo.",
+    "europeTaste": "Design und Akku, etwas preisbewusst.",
+    "asiaTaste": "Riesiger Markt. Kamera, Tempo, Gaming. Pebblecom ist hier stark.",
+    "latamTaste": "Budget-Handys mit langem Akku. Sehr preisbewusst.",
+    "africaTaste": "Budget, Akku, Wasserschutz. Sehr preisbewusst."
+  },
+  "client": {
+    "carrierNorth": "CarrierNorth",
+    "skylink": "Skylink Mobile",
+    "metroTel": "MetroTel",
+    "cityHall": "Rathaus-IT",
+    "fleetCo": "FleetCo Logistik",
+    "eduNet": "EduNet Schulen",
+    "medica": "Medica Kliniken",
+    "courierOne": "CourierOne"
+  },
+  "world": {
+    "title": "Welt",
+    "regions": "{n}/5 Regionen",
+    "locked": "Erreiche das Expansionsziel (400 Mio. $ Gesamtumsatz), um global zu gehen.",
+    "share": "{pct} % der Welt",
+    "reach": "Reichweite",
+    "stores": "Stores",
+    "openStore": "Store eröffnen · {amount}",
+    "enter": "Markteintritt · {amount}",
+    "tariff": "Gerade Zölle: weniger Verkäufe hier.",
+    "notNow": "Gerade nicht möglich.",
+    "contracts": "Auftragsarbeiten",
+    "contractsLocked": "Firmen schicken Großaufträge, sobald du international bist.",
+    "noContracts": "Gerade keine Angebote. Alle paar Wochen kommen neue.",
+    "dueIn": "fällig in {n} Wo",
+    "late": "{n} Wo zu spät (−10 %/Wo)",
+    "minReview": "Mind. Wertung",
+    "maxCost": "Max. Stückkosten",
+    "deliver": "{name} liefern",
+    "decline": "Ablehnen",
+    "problem": {
+      "segment": "Du hast noch kein Handy in diesem Segment.",
+      "review": "{name} ist nicht gut genug bewertet.",
+      "cost": "{name} ist in der Herstellung zu teuer.",
+      "stock": "{name}: noch nicht genug auf Lager."
+    }
   }
 }

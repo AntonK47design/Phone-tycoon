@@ -11,6 +11,7 @@ import { LaunchSetup } from './launch/LaunchSetup';
 import { Drawer, DrawerTabs } from './panels/Drawer';
 import { WelcomeBack } from './hud/WelcomeBack';
 import { DailyModal, useDailySync } from './hud/Daily';
+import { EventCard, NewsTicker } from './hud/World';
 import { TeamLabels, ViewToggle } from './hud/Office';
 import { isWorking } from '../sim/team';
 import { lineScrapRate, stockTotal } from '../sim/factory';
@@ -37,6 +38,11 @@ function usePhoneSync() {
       companyName: state.company.name,
       staff: state.team.staff.map((e) => ({ id: e.id, role: e.role, look: e.look, morale: e.morale, away: !isWorking(e, state.day) })),
       busy: !!state.dev && !state.dev.done,
+    });
+    engine.setStore({
+      stores: Object.values(state.regions.stores).reduce((a, b) => a + b, 0),
+      companyName: state.company.name,
+      phones: [...state.products].reverse().filter((p) => p.active).map((p) => colorById(p.design.colorId)?.hex ?? '#cccccc'),
     });
     const f = state.factory;
     engine.setFactory({
@@ -71,6 +77,7 @@ export function App() {
       {m === 'free' && <BenchLabel />}
       {m === 'free' && <TeamLabels />}
       {m === 'free' && <ViewToggle />}
+      {m === 'free' && <NewsTicker />}
       {m === 'free' && <DrawerTabs />}
       {m === 'free' && <Drawer />}
       <FounderBark />
@@ -80,6 +87,7 @@ export function App() {
       {launchSetupOpen.value && <LaunchSetup />}
       <WelcomeBack />
       <DailyModal />
+      <EventCard />
       {settingsOpen.value && <Settings />}
       <div id="fx-layer" class="passthrough" />
       {DevPanel && (

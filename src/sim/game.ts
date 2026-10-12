@@ -18,12 +18,14 @@ import {
   TECH_CATEGORIES,
 } from '../data/components';
 import { DAYS_PER_WEEK, inflation } from '../data/eras';
-import { COMPETITORS, OUTLETS, type Segment } from '../data/market';
+import { ALL_SEGMENTS, COMPETITORS, OUTLETS, type Segment } from '../data/market';
+import { HOME_SHARE, regionById } from '../data/regions';
 import { COMPANY_PREFIXES, COMPANY_SUFFIXES, PHONE_WORDS } from '../data/names';
-import { defaultParts, LAST_GEN } from '../data/parts';
+import { defaultParts, LAST_GEN, partById } from '../data/parts';
 import {
-  attractiveness,
+  attractivenessParts,
   devCost,
+  priceFactor,
   marketSize,
   segmentDemand,
   unitCost,
@@ -32,6 +34,9 @@ import {
 import type { SimEvent } from './events';
 import { checkDaily, claimCalendar, claimDaily, dailySync, newDaily } from './daily';
 import { applyFactoryAction, autoAssign, factoryWeek, newFactory, produceDay, returnsPenalty, type FactoryAction } from './factory';
+import { addNews, newRivals, rivalEntries, tickRivalsDay, tickRivalsWeek } from './competitors';
+import { cameraHype, choose, elasticityMultiplier, marketMultiplier, newEvents, productionCostMultiplier, tariffRegion, tickDirector } from './director';
+import { applyWorldAction, newContracts, newRegions, productFit, regionReach, storeRent, tickContracts, type WorldAction } from './world';
 import { checkGoals } from './goals';
 import {
   availableFeatures,
@@ -39,6 +44,7 @@ import {
   availableMaterials,
   availableOs,
   availableParts,
+  availableSegments,
   availableShapes,
   availableSizes,
   canMarket,
@@ -108,7 +114,7 @@ export function newGame(seed: number): GameState {
     features: ['wifi'],
   };
   draft.price = suggestedPrice(draft, 2007);
-  return {
+  const state: GameState = {
     version: SAVE_VERSION,
     seed,
     rng: rng.state,
@@ -134,7 +140,14 @@ export function newGame(seed: number): GameState {
     cosmetics: [],
     history: { cash: [], revenue: [], profit: [], playerUnits: [], compUnits: {} },
     week: { revenue: 0, profit: 0, units: 0 },
+    rivals: [],
+    news: [],
+    events: newEvents(),
+    regions: newRegions(),
+    contracts: newContracts(),
   };
+  state.rivals = newRivals(state);
+  return state;
 }
 
 export type DraftPatch = Partial<
@@ -164,8 +177,12 @@ export type Action =
   | { type: 'claimDaily'; index: number }
   | { type: 'claimCalendar'; date: string }
   | { type: 'repay'; amount: number }
+  | { type: 'eventChoice'; option: string }
   | TeamAction
-  | FactoryAction;
+  | FactoryAction
+  | WorldAction;
+
+const WORLD_ACTIONS = new Set(['enterRegion', 'openStore', 'fulfilContract', 'declineContract']);
 
 const FACTORY_ACTIONS = new Set(['buildFactory', 'growFactory', 'addLine', 'upgradeLine', 'assignLine', 'pauseLine', 'setTempo', 'upgradeWarehouse', 'setTargetWeeks']);
 
@@ -195,6 +212,7 @@ export function normalizeDraft(state: GameState, d: PhoneDesign): void {
     if (!availableMaterials(state).includes(d.materialId)) d.materialId = 'plastic';
     if (!availableFinishes(state).includes(d.finishId)) d.finishId = 'gloss';
     if (!availableOs(state).includes(d.osId)) d.osId = 'leafline';
+    if (!availableSegments(state).includes(d.segment)) d.segment = 'mid';
   }
   if (!availableShapes(state).includes(d.shapeId)) d.shapeId = 'round';
   if (!availableSizes(state).includes(d.displaySize)) d.displaySize = 3.5;
@@ -262,7 +280,13 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
       return repay(state, action.amount).concat(checkGoals(state));
     case 'claimCalendar':
       return claimCalendar(state, action.date).concat(checkGoals(state));
+    case 'eventChoice':
+      return choose(state, action.option).concat(checkGoals(state));
     default:
+      if (WORLD_ACTIONS.has(action.type)) {
+        const year = yearOf(state.day);
+        return applyWorldAction(state, action as WorldAction, (p) => currentReview(p, year)).concat(checkGoals(state), checkDaily(state));
+      }
       if (FACTORY_ACTIONS.has(action.type)) {
         const ev = applyFactoryAction(state, action as FactoryAction);
         if (ev.some((e) => e.type === 'factoryBuilt')) normalizeDraft(state, state.draft);
@@ -323,7 +347,7 @@ function makeCards(rng: Rng, est: ReturnType<typeof reviewEstimate>): ReviewCard
 /** Weekly running costs (rent, payroll, lab budget) – used for the cash reserve. */
 export function weeklyCosts(state: GameState): number {
   const inf = inflation(Math.floor(yearOf(state.day)));
-  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget + state.factory.invested * 0.01 : GARAGE_UPKEEP_WEEK * inf;
+  return state.phase >= 2 ? buildingRent(state) + payroll(state) + state.research.budget + state.factory.invested * 0.01 + storeRent(state) : GARAGE_UPKEEP_WEEK * inf;
 }
 
 /** Cash the company keeps before spare money goes to the bank. */
@@ -382,8 +406,8 @@ export function launchHype(state: GameState, marketing: number, presentation: nu
   return clamp((fromMarketing + fromStage) * marketingBoost(state), 0, 100);
 }
 
-export function batchCost(design: PhoneDesign, units: number, year: number): number {
-  return unitCost(design, year, 'oem') * volumeDiscount(units) * units;
+export function batchCost(design: PhoneDesign, units: number, year: number, costMul = 1): number {
+  return unitCost(design, year, 'oem') * volumeDiscount(units) * units * costMul;
 }
 
 export interface LaunchQuote {
@@ -403,10 +427,12 @@ export function launchQuote(state: GameState, design: PhoneDesign, opts: LaunchO
   // With an own factory the first batch is optional: the lines build the stock.
   const factoryOnly = state.factory.size > 0 && opts.batch === 0;
   const batch = state.phase >= 2 && !factoryOnly ? Math.max(OEM_MIN_BATCH, Math.round(opts.batch ?? OEM_MIN_BATCH)) : 0;
-  const pCost = presentationCost(presentation, year);
-  const bCost = batch ? batchCost(design, batch, year) : 0;
+  // Trade-fair invitation: the next stage show costs half and draws a bigger crowd.
+  const fair = state.events.tradeFair && presentation > 0;
+  const pCost = presentationCost(presentation, year) * (fair ? 0.5 : 1);
+  const bCost = batch ? batchCost(design, batch, year, productionCostMultiplier(state)) : 0;
   return {
-    hype: launchHype(state, marketing, presentation, design),
+    hype: Math.min(100, launchHype(state, marketing, presentation, design) + (fair ? 20 : 0)),
     marketing,
     presentation,
     presentationCost: pCost,
@@ -433,6 +459,12 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
   if (!payWithCredit(state, quote.total, quote.batchCost, minBatch)) return [{ type: 'rejected', reason: 'noCash' }];
 
   const rng = createRng(state.rng);
+  if (quote.presentation > 0 && state.events.tradeFair) state.events.tradeFair = false;
+  // Influencer review (GDD §13): 5 % of launches get a free hype push.
+  if (state.stats.launches >= 2 && rng.next() < 0.05) {
+    quote.hype = Math.min(100, quote.hype + 15);
+    addNews(state, { kind: 'event.influencer', text: design.name });
+  }
   const est = reviewEstimate(design, year, reviewOpts(state, quote.hype));
   const review: ReviewResult = {
     score: est.score,
@@ -529,7 +561,7 @@ function orderBatch(state: GameState, productId: number, units: number, leadDays
   while (units > OEM_MIN_BATCH && batchCost(p.design, units, year) > maxCost) {
     units = Math.max(OEM_MIN_BATCH, Math.floor((units * 0.9) / 50) * 50);
   }
-  const cost = batchCost(p.design, units, year);
+  const cost = batchCost(p.design, units, year, productionCostMultiplier(state));
   if (!payWithCredit(state, cost, cost, minCost)) return [{ type: 'rejected', reason: 'noCash' }];
   p.orders.push({ units, arriveDay: state.day + leadDays });
   state.stats.reorders += 1;
@@ -582,8 +614,8 @@ export function currentReview(product: Product, year: number): number {
   return clamp(product.review.score - (product.review.p - pNow) - returnsPenalty(product), 0, 10);
 }
 
-function productA(state: GameState, product: Product, year: number): number {
-  return attractiveness(
+function productA(state: GameState, product: Product, year: number): { a: number; ratio: number; eps: number } {
+  const parts = attractivenessParts(
     {
       design: product.design,
       review: currentReview(product, year),
@@ -593,15 +625,45 @@ function productA(state: GameState, product: Product, year: number): number {
     },
     year,
   );
+  // Camera hype event: phones with a pro camera are the talk of the town.
+  if (cameraHype(state) && partById(product.design.parts.camera)?.tier === 'pro') parts.a *= 1.2;
+  return parts;
+}
+
+/**
+ * Weekly demand of a segment's player products across all regions the company sells in,
+ * plus each rival's units. Regions differ in size, taste, price sensitivity and reach.
+ */
+function regionalDemand(state: GameState, list: Product[], segment: Segment): { player: number[]; comps: Record<string, number> } {
+  const year = yearOf(state.day);
+  const base = reach(state);
+  const parts = list.map((p) => productA(state, p, year));
+  const player = list.map(() => 0);
+  const comps: Record<string, number> = {};
+  const tariff = tariffRegion(state);
+  const epsMul = elasticityMultiplier(state);
+  for (const id of state.regions.entered) {
+    const region = regionById(id);
+    const rm = regionReach(state, id, tariff === id);
+    if (rm <= 0) continue;
+    const m = region.priceSens * epsMul;
+    const players = list.map((p, i) => {
+      const pa = parts[i];
+      const a = m === 1 ? pa.a : (pa.a / priceFactor(pa.ratio, pa.eps)) * priceFactor(pa.ratio, pa.eps * m);
+      return { a: a * (id === 'home' && state.phase < 4 ? 1 : productFit(p, id)), reach: base * rm };
+    });
+    const boost = region.rivalBoost ?? {};
+    const res = segmentDemand(players, segment, year, rivalEntries(state, segment, (rid) => boost[rid] ?? 1), (region.share / HOME_SHARE) * marketMultiplier(state));
+    res.player.forEach((u, i) => (player[i] += u));
+    for (const [k, v] of Object.entries(res.comps)) comps[k] = (comps[k] ?? 0) + v;
+  }
+  return { player, comps };
 }
 
 /** Weekly demand for `product` given all player products competing in its segment. */
 function productDemand(state: GameState, product: Product, all: Product[]): number {
-  const year = yearOf(state.day);
-  const r = reach(state);
   const list = all.includes(product) ? all : [product, ...all];
-  const res = segmentDemand(list.map((p) => ({ a: productA(state, p, year), reach: r })), product.design.segment, year);
-  return res.player[list.indexOf(product)];
+  return regionalDemand(state, list, product.design.segment).player[list.indexOf(product)];
 }
 
 /** Valuation (GDD §7.8). */
@@ -653,6 +715,7 @@ export function advanceDay(state: GameState): SimEvent[] {
   }
   events.push(...tickResearch(state));
   events.push(...tickTeamDay(state));
+  events.push(...tickRivalsDay(state));
 
   // Production orders arriving.
   for (const p of state.products) {
@@ -667,12 +730,11 @@ export function advanceDay(state: GameState): SimEvent[] {
 
   // Sales.
   const active = state.products.filter((p) => p.active);
-  const r = reach(state);
   const daily = new Map<number, number>();
   const segments = new Set(active.map((p) => p.design.segment));
   for (const seg of segments) {
     const list = active.filter((p) => p.design.segment === seg);
-    const res = segmentDemand(list.map((p) => ({ a: productA(state, p, year), reach: r })), seg, year);
+    const res = regionalDemand(state, list, seg);
     list.forEach((p, i) => daily.set(p.id, res.player[i] / DAYS_PER_WEEK));
   }
   // Own factory lines refill stock before the day's sales.
@@ -723,7 +785,7 @@ export function advanceDay(state: GameState): SimEvent[] {
     const interest = state.company.debt * LOAN_INTEREST_WEEK;
     const operations = state.phase >= 2 ? state.week.revenue * OPERATIONS_RATE : 0;
     const lab = state.phase >= 2 ? state.research.budget : 0;
-    const factory = factoryWeek(state);
+    const factory = factoryWeek(state) + storeRent(state);
     const costs = rent + storage + interest + operations + lab + factory;
     state.company.cash -= costs;
     state.week.profit -= costs;
@@ -765,11 +827,17 @@ export function advanceDay(state: GameState): SimEvent[] {
 
     // Market history: player vs. competitors (weekly snapshot).
     const comps: Record<string, number> = {};
-    for (const seg of ['budget', 'mid', 'flagship'] as Segment[]) {
+    const bySegment = new Map<Segment, { player: number; comps: Record<string, number> }>();
+    for (const seg of ALL_SEGMENTS) {
+      if (seg !== 'budget' && seg !== 'mid' && seg !== 'flagship' && state.phase < 4) continue;
       const list = state.products.filter((p) => p.active && p.design.segment === seg);
-      const res = segmentDemand(list.map((p) => ({ a: productA(state, p, year), reach: r })), seg, year);
+      const res = regionalDemand(state, list, seg);
       for (const [id, u] of Object.entries(res.comps)) comps[id] = (comps[id] ?? 0) + u;
+      bySegment.set(seg, { player: res.player.reduce((a, b) => a + b, 0), comps: res.comps });
     }
+    events.push(...tickRivalsWeek(state, bySegment));
+    events.push(...tickDirector(state));
+    events.push(...tickContracts(state));
     for (const c of [...COMPETITORS.map((c) => c.id), '_rest']) {
       state.history.compUnits[c] ??= [];
       pushHistory(state.history.compUnits[c], comps[c] ?? 0);

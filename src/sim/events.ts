@@ -51,6 +51,16 @@ export type SimEvent =
   | { type: 'warehouseUpgraded'; level: number }
   | { type: 'produced'; units: number; scrapped: number }
   | { type: 'phase4Ready' }
+  | { type: 'rivalLaunch'; rival: string; name: string; review: number }
+  | { type: 'rivalPriceCut'; rival: string; segment: string }
+  | { type: 'eventStarted'; id: string; target?: string }
+  | { type: 'eventEnded'; id: string }
+  | { type: 'eventChoice'; id: string }
+  | { type: 'regionEntered'; region: string }
+  | { type: 'storeOpened'; region: string }
+  | { type: 'contractOffered'; id: number }
+  | { type: 'contractDone'; id: number; payout: number }
+  | { type: 'contractFailed'; id: number }
   | { type: 'dailyDone'; index: number }
   | { type: 'dailyClaimed'; index: number; reward: { cash?: number; hype?: number } }
   | { type: 'calendarClaimed'; step: number; cash: number; cosmetic?: string }

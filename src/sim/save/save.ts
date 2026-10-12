@@ -1,6 +1,7 @@
 // Save serialization with versioning and migrations (PLAN §3).
 
 import { defaultParts, LAST_GEN } from '../../data/parts';
+import { newRivals } from '../competitors';
 import { SAVE_VERSION, type GameState } from '../state';
 
 export interface SaveFile {
@@ -67,6 +68,15 @@ export const MIGRATIONS: Record<number, Migration> = {
     // M4: own factory.
     s.factory ??= { size: 0, lines: [], nextLineId: 1, tempo: 'normal', warehouse: 0, targetWeeks: 4, invested: 0, produced: 0, scrapped: 0 };
     s.phase4Ready ??= false;
+    return s;
+  },
+  5: (s: Obj) => {
+    // M5: living rivals, news, events, regions, contracts.
+    s.rivals ??= newRivals(s as GameState);
+    s.news ??= [];
+    s.events ??= { active: [], cooldown: {}, pending: null, tradeFair: false };
+    s.regions ??= { entered: ['home'], stores: {} };
+    s.contracts ??= { offers: [], nextId: 1, nextOfferDay: 0, done: 0 };
     return s;
   },
 };

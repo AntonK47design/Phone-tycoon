@@ -41,6 +41,12 @@ export function goalProgress(state: GameState, goal: GoalDef): number {
       return state.factory.lines.reduce((a, l) => Math.max(a, l.level), 0);
     case 'lines':
       return state.factory.lines.length;
+    case 'regions':
+      return state.regions.entered.length;
+    case 'stores':
+      return Object.values(state.regions.stores).reduce((a, b) => a + b, 0);
+    case 'contracts':
+      return state.contracts.done;
   }
 }
 

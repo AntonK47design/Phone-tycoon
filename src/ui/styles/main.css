@@ -530,6 +530,42 @@ svg { flex: none; }
 .btn-secondary.wide { width: 100%; margin: 4px 0 8px; font-size: 12px; }
 .prod-stats b.neg { color: var(--red); }
 
+/* ── M5: news, events, world ─────────────────────────────────────────── */
+.ticker { position: absolute; left: 50%; transform: translateX(-50%); bottom: 82px; width: min(620px, calc(100vw - 560px)); min-width: 280px; height: 30px; display: flex; align-items: center; background: var(--ink); color: var(--paper); border-radius: 6px; overflow: hidden; font-family: var(--mono); font-size: 12px; box-shadow: var(--shadow-sm); z-index: 4; }
+.ticker-tag { flex: none; height: 100%; display: grid; place-items: center; padding: 0 10px; background: var(--red); font-weight: 700; letter-spacing: .1em; }
+.ticker-track { flex: 1; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.ticker-run { display: inline-block; padding-left: 100%; animation: ticker 38s linear infinite; }
+.ticker-item { margin-right: 48px; }
+.ticker-item::before { content: '◆ '; color: var(--tape); }
+@keyframes ticker { to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { .ticker-run { padding-left: 8px; } }
+@media (max-width: 900px) { .ticker { width: calc(100vw - 32px); bottom: 136px; } }
+.event-card { width: min(440px, calc(100vw - 24px)); gap: 10px; transform: rotate(-.8deg); }
+.event-kicker { align-self: flex-start; background: var(--red); color: #fff; font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .1em; }
+.event-options { display: flex; flex-direction: column; gap: 8px; }
+.event-options button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; min-height: 56px; text-align: left; }
+.event-options small { font-family: var(--body); font-weight: 600; font-size: 12px; opacity: .8; }
+.rivals { display: flex; flex-direction: column; gap: 6px; }
+.rival { border: 2px solid var(--ink); border-radius: 6px; padding: 6px 8px; background: #fffdf6; }
+.rival-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+.rival-head .muted { font-family: var(--mono); font-size: 11px; }
+.rival-models { display: flex; flex-direction: column; font-family: var(--mono); font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+.badge { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: var(--tape); border: 1.5px solid var(--ink); text-transform: uppercase; }
+.badge.bad { background: var(--red); color: #fff; }
+.news-list { margin: 0; padding-left: 16px; font-size: 13px; display: flex; flex-direction: column; gap: 3px; }
+.news-list .muted { font-family: var(--mono); font-size: 10px; }
+.world-map { position: relative; height: 150px; margin-bottom: 10px; border: 2px solid var(--ink); border-radius: 8px; background: radial-gradient(ellipse at 22% 40%, #b9d8c2 0 14%, transparent 15%), radial-gradient(ellipse at 50% 30%, #b9d8c2 0 9%, transparent 10%), radial-gradient(ellipse at 76% 42%, #b9d8c2 0 17%, transparent 18%), radial-gradient(ellipse at 30% 72%, #b9d8c2 0 8%, transparent 9%), radial-gradient(ellipse at 53% 62%, #b9d8c2 0 10%, transparent 11%), #9fc7e8; overflow: hidden; }
+.region-pin { position: absolute; transform: translate(-50%, -50%); font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; background: var(--paper); border: 1.5px dashed var(--ink); white-space: nowrap; }
+.region-pin.in { background: var(--orange); color: #fff; border-style: solid; }
+.region-card { border: 2px dashed var(--ink); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.region-card.in { border-style: solid; background: #fffdf6; box-shadow: var(--shadow-sm); }
+.region-card .prod-stats { align-items: center; }
+.region-card .btn-secondary { min-height: 32px; font-size: 11px; padding: 0 10px; }
+.contract .contract-pay { font-family: var(--display); font-size: 20px; color: #12915f; }
+.contract .btn-primary { min-height: 40px; font-size: 14px; }
+.small-btn { min-height: 28px !important; font-size: 10px !important; align-self: flex-end; }
+.lvl.neg { color: var(--red); }
+
 /* Respect the OS "reduce motion" setting: no entrance animations or bobbing. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

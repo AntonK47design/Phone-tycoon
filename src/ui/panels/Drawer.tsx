@@ -6,12 +6,12 @@ import { colorById } from '../../data/design';
 import { expectedDisplaySize, expectedTech, expectedThickness, eraForYear, inflation } from '../../data/eras';
 import { GOALS } from '../../data/goals';
 import { COMPETITORS, SEGMENTS, type Segment } from '../../data/market';
-import { FEATURES } from '../../data/parts';
+import { featureExpected, FEATURES } from '../../data/parts';
 import { BRANCHES, RESEARCH } from '../../data/research';
 import { cashReserve, creditAvailable, currentDemand, marketShare, valuation } from '../../sim/game';
 import { marketSize } from '../../sim/economy/market';
 import { goalProgress, visibleGoals } from '../../sim/goals';
-import { channelCut, reach, researchCost, researchProgress, researchStatus, rpPerDay } from '../../sim/research';
+import { availableSegments, channelCut, reach, researchCost, researchProgress, researchStatus, rpPerDay } from '../../sim/research';
 import { priceAnchor } from '../../sim/scoring/score';
 import { calendar, yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
@@ -19,6 +19,9 @@ import { drawer, game, hubView, toast, useGameState, type DrawerTab } from '../g
 import { seats } from '../../sim/team';
 import { TeamPanel } from './TeamPanel';
 import { FactoryPanel } from './FactoryPanel';
+import { WorldPanel } from '../hud/World';
+import { rivalModelReview } from '../../sim/competitors';
+import { newsText } from '../labels';
 import { lang, t } from '../i18n';
 import { IconClose } from '../icons';
 import { researchEffect, researchName, researchNameById } from '../labels';
@@ -26,7 +29,10 @@ import { researchEffect, researchName, researchNameById } from '../labels';
 export function DrawerTabs() {
   const state = useGameState();
   if (state.phase < 2) return null;
-  const tabs: DrawerTab[] = state.phase3Ready || state.factory.size > 0 ? ['company', 'team', 'factory', 'research', 'market'] : ['company', 'team', 'research', 'market'];
+  const tabs: DrawerTab[] = ['company', 'team'];
+  if (state.phase3Ready || state.factory.size > 0) tabs.push('factory');
+  tabs.push('research', 'market');
+  if (state.phase4Ready) tabs.push('world');
   const busy = researchProgress(state);
   return (
     <div class="tabs">
@@ -51,6 +57,7 @@ export function DrawerTabs() {
           {t(`tabs.${tab}`)}
           {tab === 'research' && !busy && <i class="dot-alert" />}
           {tab === 'factory' && state.factory.size === 0 && <i class="dot-alert" />}
+          {tab === 'world' && (state.phase < 4 || state.contracts.offers.length > 0) && <i class="dot-alert" />}
           {tab === 'team' && state.team.staff.length < seats(state) && state.team.applicants.length > 0 && state.team.staff.length < 2 && <i class="dot-alert" />}
         </button>
       ))}
@@ -72,6 +79,7 @@ export function Drawer() {
       {tab === 'factory' && <FactoryPanel />}
       {tab === 'research' && <ResearchPanel />}
       {tab === 'market' && <MarketPanel />}
+      {tab === 'world' && <WorldPanel />}
     </div>
   );
 }
@@ -313,7 +321,7 @@ function MarketPanel() {
     { id: '_rest', name: t('market.rest'), units: sum(state.history.compUnits._rest), color: '#9a9184' },
   ].sort((a, b) => b.units - a.units);
   const total = rows.reduce((a, r) => a + r.units, 0) || 1;
-  const segs: Segment[] = ['budget', 'mid', 'flagship'];
+  const segs: Segment[] = availableSegments(state);
   return (
     <>
       <h3 class="drawer-title">{t('market.title')} <small>{t(`era.${eraForYear(year).id}`)}</small></h3>
@@ -321,6 +329,36 @@ function MarketPanel() {
         <div class="kpi"><span class="label">{t('market.size')}</span><b>{shortNum(marketSize(year), l)}</b></div>
         <div class="kpi"><span class="label">{t('market.share')}</span><b>{decimal(marketShare(state) * 100, l, 2)}%</b></div>
       </div>
+      <h4 class="drawer-sub">{t('market.rivals')}</h4>
+      <div class="rivals">
+        {state.rivals.map((r) => {
+          const def = COMPETITORS.find((c) => c.id === r.id)!;
+          return (
+            <div class="rival" key={r.id}>
+              <div class="rival-head">
+                <span class="dot" style={{ background: def.color }} />
+                <b>{def.name}</b>
+                <span class="muted">{t('hud.brand')} {Math.round(r.brand)}</span>
+                {state.day < r.priceCutUntil && <span class="badge">{t('market.priceCut')}</span>}
+                {state.day < r.scandalUntil && <span class="badge bad">{t('market.scandal')}</span>}
+              </div>
+              <div class="rival-models">
+                {r.models.map((m) => (
+                  <span key={m.name}>
+                    {m.name} · {t(`segment.${m.segment}`)} · <b>{decimal(rivalModelReview(m, state.day), l, 1)}</b> · {money(m.price, l)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <h4 class="drawer-sub">{t('market.news')}</h4>
+      <ul class="news-list">
+        {[...state.news].reverse().slice(0, 8).map((n, i) => (
+          <li key={i}><span class="muted">{t('hud.date', { week: calendar(n.day).week, year: calendar(n.day).year })}</span> {newsText(n)}</li>
+        ))}
+      </ul>
       <h4 class="drawer-sub">{t('market.ranking')}</h4>
       <div class="ranking">
         {rows.map((r, i) => (
@@ -360,7 +398,7 @@ function MarketPanel() {
           <tr>
             <td>{t('market.features')}</td>
             {segs.map((s) => {
-              const must = FEATURES.filter((f) => f.expected[s] <= year).map((f) => t(`feature.${f.id}`));
+              const must = FEATURES.filter((f) => featureExpected(f, s) <= year).map((f) => t(`feature.${f.id}`));
               return <td key={s}>{must.join(', ') || t('market.none')}</td>;
             })}
           </tr>
