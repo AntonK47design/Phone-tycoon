@@ -823,7 +823,7 @@ Zukunftstech: Falt-Gehäuse (2019), Keramik (2024), Satelliten-SOS (2023), KI-Ke
   Unter-Display-Kamera (2027), Rollbar + 7,2″ (2030), Festkörperakku (2032, Verbrauch ×0,82),
   Holo-Display (2038), Transparent (2041), Nano-Legierung (2047).
 Grenzforschung (ab 2045, wiederholbar): +2 % TI auf alle Teile je Stufe, Kosten ×1,06 je Stufe.
-Phase-5-Gate: Firmenwert 5 Mrd. $ (statt 1 Mrd. $ – die Expansion macht Firmen viel größer).
+Phase-5-Gate: Firmenwert 15 Mrd. $ (statt 1 Mrd. $ – die Expansion und die realen Preissteigerungen machen Firmen viel größer).
 Campus 50/150/400 Mio. $: +10/20/30 % Leistung für Team und Forschung, Unterhalt 0,4 %/Woche.
 Eigener Chip: Projekt n kostet 20 Mio. $ · 1,5^n und 400 · 1,3^n Technikpunkte (Ingenieure, 50 %);
   TI = Erwartung · min(1,4; 0,9 + 0,05 · Stufe + 0,1 ab Campus 2), Kosten 0,6 × Markt-Pro-Chip.
@@ -837,7 +837,7 @@ Nebenprodukte (Uhr ab 2015, Earbuds 2016, Tablet 2010): Wertung = 5 + Stufe (0/1
   Alle drei (jünger als 3 Jahre) → Handys ×1,05.
 Übernahme: Rivale mit Marke < 30 und Wert < 25 % des eigenen; Preis 1,3 × (Marke · 2 Mio. $ +
   Jahresstück · 60 $); verschwindet vom Markt, Fans +10 % seiner Jahresstück, Marke +3.
-Phase-6-Gate: 20 % Marktanteil oder ab 2045 Firmenwert 50 Mrd. $.
+Phase-6-Gate: 20 % Marktanteil oder ab 2045 Firmenwert 100 Mrd. $.
 Prestige: LP = floor(√(Spitzenwert / 10 Mio. $)); Stufe n eines Bonus kostet 2·(n+1) LP.
   Boni: Startkapital +25 %, Forschung +5 %, Startmarke +5, Bewerber +10 Skill, alle Farben.
   Szenarien: Nur Budget (Erfolg 1 Mio. Handys), Kein Marketing (Wertung 9), Endlose Rezession
@@ -858,7 +858,7 @@ Fabrikunterhalt 0,25 %/Woche statt 1 % (sonst Todesspirale nach vielen Linien-Up
 | **4 Expansion** | 2–5 h | kumulierter Umsatz 25 M$ **und** 10 Launches | Regionen, Stores, Auftragsarbeiten, Events voll, Senioren-/Gaming-Segment |
 | **3-Gate (M2)** | – | Firmenwert 10 M$ **und** Marke ≥ 35 (ersetzt 1 M$/25 nach Bot-Balancing) | – |
 | **5 Tech-Gigant** | 5–15 h | Valuation 1 Mrd $ **oder** Marktanteil 10 % | Campus, eigener Chip, eigenes OS, Nebenprodukte, Übernahmen |
-| **6 Endgame** | 15 h+ | Marktanteil 20 % **oder** Jahr ≥ 2035 **und** Valuation 50 Mrd $ | Zukunftstech, Ruhmeshalle, Prestige, Szenarien |
+| **6 Endgame** | 15 h+ | Marktanteil 20 % **oder** Jahr ≥ 2045 **und** Valuation 100 Mrd $ | Zukunftstech, Ruhmeshalle, Prestige, Szenarien |
 
 Freischaltungen erscheinen mit kurzer Fanfare und einem kontextuellen Hinweis; nie mehr
 als **eine neue UI-Fläche pro Freischaltung**.

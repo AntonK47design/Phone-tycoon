@@ -10,7 +10,7 @@ export const TIERS: Tier[] = ['lite', 'std', 'pro'];
 
 /** Share of the flagship expectation per tier (budget / mid / flagship grade). */
 export const TIER_SHARE: Record<Tier, number> = { lite: 0.35, std: 0.6, pro: 1.0 };
-const TIER_COST: Record<Tier, number> = { lite: 0.45, std: 0.7, pro: 1.0 };
+const TIER_COST: Record<Tier, number> = { lite: 0.25, std: 0.5, pro: 1.0 };
 const TIER_DEV: Record<Tier, number> = { lite: 0.7, std: 1, pro: 1.4 };
 
 /** Flagship-tier cost in 2007 $ (display: 3.5" panel, scaled by area). */

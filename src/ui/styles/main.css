@@ -570,6 +570,10 @@ svg { flex: none; }
 .toggle-line { display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .toggle-line input { width: 18px; height: 18px; accent-color: var(--orange); }
 .side-launch { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg-mini { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin: 4px 0 6px; font-size: 11px; }
+.seg-mini button { border: 1px solid rgba(29, 26, 22, 0.18); background: transparent; border-radius: 8px; padding: 3px 8px; font-size: 11px; cursor: pointer; color: inherit; }
+.seg-mini button.on { background: var(--blue); border-color: transparent; color: #fff; }
+.seg-mini button small { opacity: .7; margin-left: 2px; }
 .side-launch .btn-secondary { min-height: 32px; padding: 0 10px; font-size: 11px; }
 .hall { display: flex; flex-direction: column; gap: 4px; }
 .hall-row { display: grid; grid-template-columns: 14px 96px 1fr auto; gap: 8px; align-items: center; font-size: 13px; padding: 4px 6px; border-bottom: 1px dashed rgba(29,26,22,.25); }

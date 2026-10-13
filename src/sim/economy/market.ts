@@ -41,10 +41,13 @@ export function brandFactor(brand: number): number {
 
 export type BuildMode = 'garage' | 'oem' | 'factory';
 
+const BODY_GRADE: Partial<Record<Segment, number>> = { budget: 0.5, senior: 0.6, mid: 0.75 };
+
 /** Unit cost of a design built in `year` (GDD §6.1). */
 export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'garage', lineLevel = 1): number {
   const inf = inflation(Math.floor(year));
-  const area = Math.pow(design.displaySize / 3.5, 2);
+  // Panels get cheaper per inch as they grow common: cost ∝ size^1.2 (not area).
+  const area = Math.pow(design.displaySize / 3.5, 1.2);
   let parts = 0;
   for (const [category, id] of Object.entries(design.parts)) {
     const part = partById(id);
@@ -53,10 +56,20 @@ export function unitCost(design: PhoneDesign, year: number, mode: BuildMode = 'g
   }
   // Own chip: 0.6 × the market chip of the same generation (GDD §15.1).
   if (design.parts.chip === 'own-chip' && design.ownChip) parts += design.ownChip.cost * Math.max(0.25, Math.exp(-0.25 * Math.max(0, year - design.kitYear)));
-  const extras = design.features.reduce((a, f) => a + (featureById(f)?.cost ?? 0), 0);
+  // Extras and materials get cheaper as they age, like parts (down to 30 % / 40 %).
+  const extras = design.features.reduce((a, f) => {
+    const def = featureById(f);
+    if (!def) return a;
+    const age = Math.max(0, year - (def.expected.flagship - 1));
+    return a + def.cost * Math.max(0.3, Math.exp(-0.18 * age));
+  }, 0);
+  const matDef = materialById(design.materialId);
+  const matCost = matDef.cost * Math.max(0.4, Math.exp(-0.1 * Math.max(0, year - matDef.year)));
   const os = design.osId === 'own' ? { feePerUnit: 0 } : LICENSED_OS[design.osId as keyof typeof LICENSED_OS] ?? LICENSED_OS.leafline;
+  // Cheaper segments use a cheaper build grade for body, finish and extras.
+  const grade = BODY_GRADE[design.segment] ?? 1;
   const body =
-    (materialById(design.materialId).cost + finishById(design.finishId).cost + shapeById(design.shapeId).cost + PACKAGING.basic.cost + extras) * inf;
+    grade * (matCost + finishById(design.finishId).cost + shapeById(design.shapeId).cost + PACKAGING.basic.cost + extras) * inf;
   if (mode === 'garage') return parts + body + GARAGE_ASSEMBLY_COST * inf + os.feePerUnit;
   // Own line: no contract manufacturer markup, assembly gets cheaper with the line level.
   if (mode === 'factory') return parts + body + lineAssembly(lineLevel) * inf + os.feePerUnit;

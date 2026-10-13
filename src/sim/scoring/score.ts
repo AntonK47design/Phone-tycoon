@@ -168,7 +168,9 @@ export function overallRating(design: PhoneDesign, year: number): Rating {
 
 /** Segment price anchor including inflation. */
 export function priceAnchor(design: Pick<PhoneDesign, 'segment'>, year: number): number {
-  return SEGMENTS[design.segment].anchor * Math.pow(1.02, year - 2007);
+  // Inflation plus real growth from 2010: phones became pricier as they did more (max ×2).
+  const real = Math.min(2, Math.pow(1.03, Math.max(0, year - 2010)));
+  return SEGMENTS[design.segment].anchor * Math.pow(1.02, year - 2007) * real;
 }
 
 /** Fair price for a phone with rating p (GDD §5.9). */

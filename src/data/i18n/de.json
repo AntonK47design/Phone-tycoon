@@ -74,7 +74,8 @@
     "rating": "Wertung im Segment",
     "channel": "Händler behalten {pct}",
     "locked": "Mehr forschen zum Freischalten",
-    "newPart": "NEU"
+    "newPart": "NEU",
+    "ownOsHint": "Dein OS: Qualität {quality} · Apps {apps}. Mehr Nutzer bringen mehr Apps; der Wert wird beim Entwicklungsstart festgelegt."
   },
   "color": {
     "graphite": "Graphit",
@@ -209,14 +210,14 @@
     "regions5": "Verkaufe auf jedem Kontinent",
     "stores10": "Betreibe 10 Stores",
     "valuation1b": "Werde eine Milliarden-Firma",
-    "valuation5b": "Erreiche 5 Mrd. $ Firmenwert",
-    "valuation20b": "Erreiche 20 Mrd. $ Firmenwert",
+    "valuation5b": "Erreiche 15 Mrd. $ Firmenwert",
+    "valuation20b": "Erreiche 50 Mrd. $ Firmenwert",
     "campus": "Bau den Campus",
     "ownChip": "Entwickle deinen eigenen Chip",
     "ownOs": "Bring dein eigenes OS raus",
     "side3": "Verkaufe Uhr, Earbuds und Tablet",
     "acquire1": "Übernimm einen Rivalen",
-    "endgame": "20 % Marktanteil oder ab 2045 eine 50-Mrd.-$-Firma"
+    "endgame": "20 % Marktanteil oder ab 2045 eine 100-Mrd.-$-Firma"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
@@ -969,7 +970,7 @@
   },
   "empire": {
     "title": "Imperium",
-    "locked": "Werde eine 5-Mrd.-$-Firma, um dein Tech-Imperium zu bauen.",
+    "locked": "Werde eine 15-Mrd.-$-Firma, um dein Tech-Imperium zu bauen.",
     "notNow": "Gerade nicht möglich.",
     "campusLevel": "Campus {n}/3",
     "campus": "Campus bauen",
@@ -1008,7 +1009,14 @@
     "takeovers": "Übernahmen",
     "yours": "deins",
     "buy": "Kaufen · {amount}",
-    "tooStrong": "zu stark"
+    "tooStrong": "zu stark",
+    "price": "Preis",
+    "priceLevel": {
+      "value": "Günstig",
+      "normal": "Normal",
+      "premium": "Premium"
+    },
+    "priceHint": "Günstiger verkauft mehr Stück; Premium verdient mehr pro Stück."
   },
   "legacy": {
     "title": "Vermächtnis",

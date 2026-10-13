@@ -113,6 +113,7 @@ export type GiantAction =
   | { type: 'startOs' }
   | { type: 'setLicensing'; what: 'chip' | 'os'; on: boolean }
   | { type: 'launchSide'; kind: SideKind; tier: Tier; price: SidePrice }
+  | { type: 'setSidePrice'; kind: SideKind; price: SidePrice }
   | { type: 'acquire'; id: string };
 
 export function applyGiantAction(state: GameState, action: GiantAction, ownValuation: number): SimEvent[] {
@@ -159,6 +160,12 @@ export function applyGiantAction(state: GameState, action: GiantAction, ownValua
       const prev = g.side[action.kind];
       g.side[action.kind] = { tier: action.tier, priceLevel: action.price, launchDay: state.day, gen: (prev?.gen ?? 0) + 1, units: 0, revenue: 0 };
       return [{ type: 'sideLaunched', kind: action.kind }];
+    }
+    case 'setSidePrice': {
+      const p = g.side[action.kind];
+      if (!p || !(action.price in SIDE_PRICE)) return no();
+      p.priceLevel = action.price;
+      return [];
     }
     case 'acquire': {
       if (!canAcquire(state, action.id, ownValuation)) return no();

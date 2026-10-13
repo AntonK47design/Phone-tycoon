@@ -3,7 +3,7 @@
 import { TECH_CATEGORIES, OFFICE_PRICE, PRESENTATIONS } from '../data/components';
 import { inflation } from '../data/eras';
 import type { Segment } from '../data/market';
-import type { Tier } from '../data/parts';
+import { featureExpected, FEATURES, type Tier } from '../data/parts';
 import { RESEARCH } from '../data/research';
 import {
   advanceDay,
@@ -117,9 +117,18 @@ function designFor(state: GameState, segment: Segment, pick: number, profile: Bo
       const parts = availableParts(state, c).filter((p) => p.tier === TIER_FOR[segment]);
       d.parts[c] = parts[parts.length - 1].id;
     }
-    d.features = availableFeatures(state);
     const mats = availableMaterials(state);
-    d.materialId = segment === 'budget' ? 'plastic' : mats[mats.length - 1];
+    if (profile === 'weak') {
+      // A mediocre player: the extras the market expects, a sensible material.
+      d.features = availableFeatures(state).filter((f) => {
+        const def = FEATURES.find((x) => x.id === f);
+        return !def || def.starter || featureExpected(def, segment) <= year;
+      });
+      d.materialId = segment === 'flagship' ? mats[mats.length - 1] : mats.includes('aluminium') ? 'aluminium' : 'plastic';
+    } else {
+      d.features = availableFeatures(state);
+      d.materialId = segment === 'budget' ? 'plastic' : mats[mats.length - 1];
+    }
     const fins = availableFinishes(state);
     d.finishId = fins[fins.length - 1];
     const os = availableOs(state).filter((o) => o !== 'own' || osScore(state) >= 7);

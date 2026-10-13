@@ -60,7 +60,7 @@ export function goalProgress(state: GameState, goal: GoalDef): number {
       return state.giant.acquired.length;
     case 'endgame': {
       const share = marketShare(state) / 0.2;
-      const big = yearOf(state.day) >= 2045 ? valuation(state) / 50_000_000_000 : 0;
+      const big = yearOf(state.day) >= 2045 ? valuation(state) / 100_000_000_000 : 0;
       return Math.min(1, Math.max(share, big));
     }
   }

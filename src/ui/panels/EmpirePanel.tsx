@@ -1,7 +1,8 @@
 // Phase 5 (GDD §15): campus, own chip and OS, side products, takeovers.
 
+import { useState } from 'preact/hooks';
 import { sfx } from '../../audio/sfx';
-import { CAMPUS_LEVELS, chipProjectCost, osProjectCost, SIDE_KINDS, SIDE_PRODUCTS } from '../../data/giant';
+import { CAMPUS_LEVELS, chipProjectCost, osProjectCost, SIDE_KINDS, SIDE_PRICE, SIDE_PRODUCTS, type SidePrice } from '../../data/giant';
 import { COMPETITORS } from '../../data/market';
 import type { Tier } from '../../data/parts';
 import { valuation } from '../../sim/game';
@@ -13,6 +14,7 @@ import { game, toast, useGameState } from '../game';
 import { lang, t } from '../i18n';
 
 const TIERS: Tier[] = ['lite', 'std', 'pro'];
+const PRICES = Object.keys(SIDE_PRICE) as SidePrice[];
 
 function run(ev: ReturnType<ReturnType<typeof game>['store']['dispatch']>) {
   if (ev[0]?.type === 'rejected') toast(t(ev[0].reason === 'noCash' ? 'toast.noCash' : 'empire.notNow'), 'warn');
@@ -28,6 +30,8 @@ export function EmpirePanel() {
   const inf = inflation(Math.floor(year));
   const campus = campusCost(state);
   const own = valuation(state);
+  // Price level for the next launch, per product kind.
+  const [launchPrice, setLaunchPrice] = useState<Record<string, SidePrice>>({});
   if (!state.phase5Ready) {
     return (
       <>
@@ -128,12 +132,29 @@ export function EmpirePanel() {
                 <span>{t('empire.revenue')}: <b>{money(p.revenue, l)}</b></span>
               </div>
             )}
+            {open && (
+              <div class="seg-mini">
+                <span class="muted">{t('empire.price')}</span>
+                {PRICES.map((pr) => {
+                  const cur = p ? (p.priceLevel as SidePrice) : (launchPrice[kind] ?? 'normal');
+                  return (
+                    <button
+                      key={pr}
+                      class={cur === pr ? 'on' : ''}
+                      onClick={() => (p ? store.dispatch({ type: 'setSidePrice', kind, price: pr }) : setLaunchPrice({ ...launchPrice, [kind]: pr }))}
+                    >
+                      {t(`empire.priceLevel.${pr}`)} <small>{money(def.anchor * SIDE_PRICE[pr] * inf, l)}</small>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             {!open ? (
               <span class="muted">{t('empire.from', { year: def.year })}</span>
             ) : (
               <div class="side-launch">
                 {TIERS.map((tier) => (
-                  <button key={tier} class="btn-secondary" disabled={state.phase < 5} onClick={() => run(store.dispatch({ type: 'launchSide', kind, tier, price: 'normal' }))}>
+                  <button key={tier} class="btn-secondary" disabled={state.phase < 5} onClick={() => run(store.dispatch({ type: 'launchSide', kind, tier, price: p ? (p.priceLevel as SidePrice) : (launchPrice[kind] ?? 'normal') }))}>
                     {t(`tier.${tier}`)} · {money(def.dev * inf * (1 + 0.5 * TIERS.indexOf(tier)), l)}
                   </button>
                 ))}
@@ -142,7 +163,7 @@ export function EmpirePanel() {
           </div>
         );
       })}
-      <p class="hint-line">{t('empire.ecosystem')}</p>
+      <p class="hint-line">{t('empire.priceHint')} {t('empire.ecosystem')}</p>
 
       <h4 class="drawer-sub">{t('empire.takeovers')}</h4>
       {state.rivals.map((r) => {

@@ -1,12 +1,13 @@
 // Phase-2 spec sheet: accordion sections for every design decision.
 
 import { useState } from 'preact/hooks';
-import { TECH_CATEGORIES, type TechCategory } from '../../data/components';
+import { LICENSED_OS, TECH_CATEGORIES, type TechCategory } from '../../data/components';
 import { COLORS } from '../../data/design';
 import { expectedTech } from '../../data/eras';
 import { SEGMENTS, type Segment } from '../../data/market';
 import { FEATURES, partById, type PartDef } from '../../data/parts';
 import type { DraftPatch } from '../../sim/game';
+import { osEcosystem, osQuality, osScore } from '../../sim/giant';
 import {
   availableSegments,
   availableFeatures,
@@ -55,6 +56,7 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
     </button>
   );
 
+  const osScoreOf = (o: string) => (o === 'own' ? osScore(state) : LICENSED_OS[o as keyof typeof LICENSED_OS]?.score ?? 5);
   const partRating = (p: PartDef) => ratingFromRatio(p.ti / (sigma * expectedTech(year)));
 
   const PartPicker = ({ category }: { category: TechCategory }) => {
@@ -225,16 +227,25 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
         </div>
       )}
 
-      <Head id="software" title={t('cat.software')} summary={t(`os.${d.osId}`)} />
+      <Head id="software" title={t('cat.software')} summary={`${t(`os.${d.osId}`)} · ${decimal(osScoreOf(d.osId), l, 1)}`} />
       {open === 'software' && (
         <div class="acc-body">
           <div class="chips">
-            {availableOs(state).map((o) => (
-              <button key={o} class={`chip ${d.osId === o ? 'on' : ''}`} onClick={() => onChange('os', { osId: o })}>
-                {t(`os.${o}`)}
-              </button>
-            ))}
+            {availableOs(state).map((o) => {
+              const score = osScoreOf(o);
+              return (
+                <button key={o} class={`chip ${d.osId === o ? 'on' : ''}`} onClick={() => onChange('os', { osId: o })}>
+                  {o === 'own' ? t('empire.osName', { name: state.company.name, n: state.giant.os.level }) : t(`os.${o}`)}{' '}
+                  <i class={`score-pill ${scoreClass(score)}`}>{decimal(score, l, 1)}</i>
+                </button>
+              );
+            })}
           </div>
+          {state.giant.os.level > 0 && (
+            <p class="hint-line">
+              {t('editor.ownOsHint', { quality: decimal(osQuality(state), l, 1), apps: decimal(osEcosystem(state), l, 1) })}
+            </p>
+          )}
         </div>
       )}
     </div>

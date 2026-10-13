@@ -74,7 +74,8 @@
     "rating": "Rating vs. segment",
     "channel": "Shops keep {pct}",
     "locked": "Research more to unlock",
-    "newPart": "NEW"
+    "newPart": "NEW",
+    "ownOsHint": "Your OS: quality {quality} · apps {apps}. More users bring more apps; the score is fixed when development starts."
   },
   "color": {
     "graphite": "Graphite",
@@ -209,14 +210,14 @@
     "regions5": "Sell on every continent",
     "stores10": "Run 10 stores",
     "valuation1b": "Become a $1B company",
-    "valuation5b": "Reach a $5B valuation",
-    "valuation20b": "Reach a $20B valuation",
+    "valuation5b": "Reach a $15B valuation",
+    "valuation20b": "Reach a $50B valuation",
     "campus": "Build the campus",
     "ownChip": "Design your own chip",
     "ownOs": "Ship your own OS",
     "side3": "Sell watch, earbuds and tablet",
     "acquire1": "Take over a rival",
-    "endgame": "20% market share, or a $50B company from 2045"
+    "endgame": "20% market share, or a $100B company from 2045"
   },
   "teaser": {
     "office": "{amount} more and you can stop working in a garage.",
@@ -969,7 +970,7 @@
   },
   "empire": {
     "title": "Empire",
-    "locked": "Become a $5B company to start building your tech empire.",
+    "locked": "Become a $15B company to start building your tech empire.",
     "notNow": "Not possible right now.",
     "campusLevel": "campus {n}/3",
     "campus": "Build the campus",
@@ -1008,7 +1009,14 @@
     "takeovers": "Takeovers",
     "yours": "yours",
     "buy": "Buy · {amount}",
-    "tooStrong": "too strong"
+    "tooStrong": "too strong",
+    "price": "Price",
+    "priceLevel": {
+      "value": "Value",
+      "normal": "Normal",
+      "premium": "Premium"
+    },
+    "priceHint": "Cheaper sells more units; premium earns more per unit."
   },
   "legacy": {
     "title": "Legacy",

@@ -215,7 +215,7 @@ export type Action =
   | WorldAction
   | GiantAction;
 
-const GIANT_ACTIONS = new Set(['buildCampus', 'startChip', 'startOs', 'setLicensing', 'launchSide', 'acquire']);
+const GIANT_ACTIONS = new Set(['buildCampus', 'startChip', 'startOs', 'setLicensing', 'launchSide', 'setSidePrice', 'acquire']);
 
 const WORLD_ACTIONS = new Set(['enterRegion', 'openStore', 'fulfilContract', 'declineContract']);
 

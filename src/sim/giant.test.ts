@@ -82,6 +82,11 @@ describe('tech giant (GDD §15)', () => {
     for (const kind of ['watch', 'earbuds', 'tablet'] as const) applyAction(s, { type: 'launchSide', kind, tier: 'pro', price: 'normal' });
     expect(sideUnitsWeek(s, 'watch')).toBeGreaterThan(0);
     expect(ecosystemComplete(s)).toBe(true);
+    // Repricing: value sells more units than premium.
+    applyAction(s, { type: 'setSidePrice', kind: 'watch', price: 'value' });
+    const cheap = sideUnitsWeek(s, 'watch');
+    applyAction(s, { type: 'setSidePrice', kind: 'watch', price: 'premium' });
+    expect(sideUnitsWeek(s, 'watch')).toBeLessThan(cheap);
   });
 
   it('weak rivals can be taken over and leave the market', () => {
