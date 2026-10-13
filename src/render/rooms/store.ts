@@ -5,6 +5,7 @@ import {
   CanvasTexture,
   CapsuleGeometry,
   Color,
+  CylinderGeometry,
   Group,
   InstancedMesh,
   Matrix4,
@@ -22,6 +23,7 @@ import {
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { woodTexture } from '../textures';
 import { StaticBatcher } from './batch';
+import { pendantLamp, plant, type Kit } from './props';
 import { neonTexture } from './officeCorner';
 
 export const STORE_ORIGIN = new Vector3(0, 0, -15);
@@ -143,6 +145,21 @@ export class Store {
       plant: std('#3f9a5b', 0.75),
       pot: std('#e8e2d6', 0.6),
       shelf: std('#c9a27a', 0.6),
+      tableTop: std('#ffffff', 0.45, 0, { map: keep(woodTexture('#d8b48a')) }),
+      slatwall: std('#3a3f4a', 0.8),
+      featureWall: std('#1d1f26', 0.7),
+      plantDark: std('#2e7a46', 0.75),
+      potWarm: std('#c96f4a', 0.8),
+      accA: std('#ff5a1f', 0.6),
+      accB: std('#4f7cff', 0.6),
+      accC: std('#ffd23f', 0.6),
+      accD: std('#2bb3a8', 0.6),
+      accE: std('#ff7aa8', 0.6),
+      cable: std('#1d1f26', 0.6),
+      globe: std('#fff6e0', 0.3, 0, { emissive: new Color('#ffe2a8'), emissiveIntensity: 1.6 }),
+      gate: std('#e8ecef', 0.3, 0.3),
+      mat: std('#2b2f3a', 0.95),
+      screen: std('#0e2236', 0.3, 0, { emissive: new Color('#7fb2ff'), emissiveIntensity: 0.8 }),
     };
     const batch = new StaticBatcher();
     const tmp = new Group();
@@ -170,24 +187,49 @@ export class Store {
     for (let i = 0; i < 3; i++) box(0.3, 0.04, 1.4, M.shelf, x0 + 0.17, 1.1 + i * 0.45, -0.6, 0.01);
     box(2.2, 1.0, 0.6, M.counter, W / 2 - 1.6, 0.5, z0 + 0.8, 0.04);
     box(2.3, 0.05, 0.7, M.table, W / 2 - 1.6, 1.02, z0 + 0.8, 0.02);
-    for (const [px, pz] of [[x0 + 0.5, D / 2 - 0.5], [W / 2 - 0.5, D / 2 - 0.5]]) {
-      const pot = new Mesh(new SphereGeometry(0.22, 12, 10), M.pot);
-      pot.position.set(px, 0.2, pz);
-      tmp.add(pot);
-      batch.add(pot);
-      tmp.remove(pot);
-      const leaves = new Mesh(new SphereGeometry(0.34, 12, 10), M.plant);
-      leaves.position.set(px, 0.65, pz);
-      tmp.add(leaves);
-      batch.add(leaves);
-      tmp.remove(leaves);
+    const kit: Kit = {
+      box: (bw, bh, bd, m, x, y, z, r = 0.02) => box(bw, bh, bd, m, x, y, z, r),
+      cyl: (rt, rb, h, m, x, y, z, seg = 16) => {
+        const mesh = new Mesh(new CylinderGeometry(rt, rb, h, seg), m);
+        mesh.position.set(x, y, z);
+        tmp.add(mesh);
+        batch.add(mesh);
+        tmp.remove(mesh);
+        mesh.geometry.dispose();
+      },
+      sphere: (r, m, x, y, z) => {
+        const mesh = new Mesh(new SphereGeometry(r, 12, 10), m);
+        mesh.position.set(x, y, z);
+        tmp.add(mesh);
+        batch.add(mesh);
+        tmp.remove(mesh);
+        mesh.geometry.dispose();
+      },
+    };
+    const plantMats = { pot: M.potWarm, leaf: M.plant, leafDark: M.plantDark };
+    plant(kit, plantMats, x0 + 0.5, D / 2 - 0.5, 1.1);
+    plant(kit, plantMats, W / 2 - 0.5, D / 2 - 0.5, 1.1);
+    // Accessory wall: slatwall panel behind the shelves, colourful boxes on them.
+    box(0.04, 1.6, 1.8, M.slatwall, x0 + 0.03, 1.55, -0.6, 0.01);
+    const accs = [M.accA, M.accB, M.accC, M.accD, M.accE];
+    for (let i = 0; i < 3; i++) {
+      for (let k = 0; k < 5; k++) box(0.16, 0.2 - (k % 2) * 0.04, 0.18, accs[(i + k) % accs.length], x0 + 0.2, 1.22 + i * 0.45 - (k % 2) * 0.02, -1.15 + k * 0.27, 0.02);
     }
+    // Dark feature panel so the neon logo reads, and a till on the counter.
+    box(2.6, 1.0, 0.04, M.featureWall, 2.4, 2.4, z0 + 0.02, 0.02);
+    box(0.36, 0.22, 0.3, M.counter, W / 2 - 2.1, 1.16, z0 + 0.8, 0.02);
+    box(0.3, 0.2, 0.02, M.screen, W / 2 - 2.1, 1.38, z0 + 0.74, 0.01);
+    box(0.24, 0.16, 0.02, M.screen, W / 2 - 1.2, 1.15, z0 + 0.62, 0.01);
+    // Entrance: doormat and two security gates.
+    box(1.6, 0.012, 0.7, M.mat, 0, 0.008, D / 2 - 0.4, 0.004);
+    for (const gx of [-0.95, 0.95]) box(0.08, 1.2, 0.4, M.gate, gx, 0.6, D / 2 - 0.45, 0.03);
     // Display islands.
     this.tables = [];
     for (let i = 0; i < TABLES; i++) {
       const x = -1.9 + (i % 2) * 3.2;
       const z = -0.9 + Math.floor(i / 2) * 2.2;
-      box(1.5, 0.06, 0.8, M.table, x, 0.88, z, 0.03);
+      box(1.5, 0.06, 0.8, M.tableTop, x, 0.88, z, 0.03);
+      for (const dx of [-0.45, 0.45]) pendantLamp(kit, { cable: M.cable, shade: M.globe, bulb: M.globe }, x + dx, z, 3.2, 2.35, 0.1);
       box(1.1, 0.85, 0.4, M.tableBase, x, 0.43, z, 0.04);
       this.tables.push(new Vector3(x, 0, z));
     }
@@ -197,7 +239,7 @@ export class Store {
     screen.position.set(-1.2, 1.9, z0 + 0.01);
     this.statics.add(screen);
     const sign = new Mesh(keep(new PlaneGeometry(2.2, 0.66)), this.signMat);
-    sign.position.set(2.4, 2.4, z0 + 0.02);
+    sign.position.set(2.4, 2.4, z0 + 0.06);
     this.statics.add(sign);
   }
 

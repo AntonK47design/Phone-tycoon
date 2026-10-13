@@ -28,6 +28,7 @@ import { ROLE_COLORS, type Role } from '../../data/team';
 import { Crowd, type SeatSpot, type StaffVisual } from '../characters/Crowd';
 import { roundRect, skyTexture, woodTexture } from '../textures';
 import { StaticBatcher } from './batch';
+import { pendantLamp, plant, type Kit } from './props';
 import { neonTexture } from './officeCorner';
 
 export const OFFICE_ORIGIN = new Vector3(12, 0, 0);
@@ -260,7 +261,23 @@ export class Office {
       labBench: std('#e8eef2', 0.35, 0.1),
       mood: std('#ffffff', 0.8, 0, { map: keep(boardTexture('mood')) }),
       plan: std('#ffffff', 0.6, 0, { map: keep(boardTexture('plan')) }),
+      areaRug: std(['#7d8fa6', '#5e7d7a', '#6f6a8f', '#3a3f4a'][level - 1], 0.95),
+      shade: std(['#ff5a1f', '#2bb3a8', '#4f7cff', '#ffd23f'][level - 1], 0.5, 0.2),
+      cable: std('#1b1d24', 0.6),
+      bulb: std('#fff1d0', 0.3, 0, { emissive: new Color('#ffdca0'), emissiveIntensity: 2.2 }),
+      artA: std('#ff7aa8', 0.8),
+      artB: std('#4f7cff', 0.8),
+      artC: std('#ffd23f', 0.8),
+      artD: std('#2bb3a8', 0.8),
+      cabinet: std('#8f97a3', 0.45, 0.5),
+      clockFace: std('#fbf8f2', 0.6),
     };
+    const kit: Kit = {
+      box: (bw, bh, bd, m, x, y, z, r = 0.02) => box(bw, bh, bd, m, x, y, z, r),
+      cyl: (rt, rb, h, m, x, y, z, seg = 16) => cyl(rt, rb, h, m, x, y, z, seg),
+      sphere: (r, m, x, y, z) => place(new SphereGeometry(r, 12, 10), m, x, y, z),
+    };
+    const plantMats = { pot: M.pot, leaf: M.plant, leafDark: M.plantDark };
     const { w, d, pods } = officeLayout(level);
     const x0 = -w / 2;
     const z0 = -d / 2;
@@ -437,6 +454,45 @@ export class Office {
         box(0.7, 0.5, 0.03, M.mood, ex, 1.15, ez + 0.03, 0.01);
       }
     }
+
+    // Rug under the desk area and a pendant lamp over every pod.
+    const pxs = pods.map((p) => p.x);
+    const pzs = pods.map((p) => p.z);
+    const rugX0 = Math.min(...pxs) - POD_W / 2 - 0.35;
+    const rugX1 = Math.max(...pxs) + POD_W / 2 + 0.35;
+    const rugZ0 = Math.max(z0 + 0.25, Math.min(...pzs) - 1.35);
+    const rugZ1 = Math.min(d / 2 - 0.85, Math.max(...pzs) + 1.35);
+    box(rugX1 - rugX0, 0.012, rugZ1 - rugZ0, M.areaRug, (rugX0 + rugX1) / 2, 0.006, (rugZ0 + rugZ1) / 2, 0.005);
+    for (const p of pods) pendantLamp(kit, { cable: M.cable, shade: M.shade, bulb: M.bulb }, p.x, p.z, wallH + 0.2, 2.25, 0.26);
+    // Skirting on the left wall.
+    box(0.03, 0.09, d, M.cap, x0 + 0.015, 0.045, 0, 0);
+    // Framed pictures and a clock on the left wall (above the stripe).
+    const arts: [Material, Material][] = [[M.artA, M.artC], [M.artB, M.artA], [M.artD, M.artC]];
+    const artZs = [z0 + 1.0, z0 + 2.0, z0 + 3.0].filter((z) => z < d / 2 - 0.8);
+    artZs.forEach((z, i) => {
+      if (i === 0) return; // first slot holds the clock
+      const [bg, fg] = arts[i % arts.length];
+      box(0.03, 0.62, 0.48, M.frame, x0 + 0.02, 1.95, z, 0.01);
+      box(0.02, 0.52, 0.38, bg, x0 + 0.04, 1.95, z, 0);
+      place(new CylinderGeometry(0.11, 0.11, 0.02, 20).rotateZ(Math.PI / 2), fg, x0 + 0.055, 1.98 - (i % 2) * 0.06, z + (i % 2 ? 0.06 : -0.05));
+    });
+    place(new CylinderGeometry(0.2, 0.2, 0.04, 28).rotateZ(Math.PI / 2), M.monitor, x0 + 0.03, 2.2, artZs[0]);
+    place(new CylinderGeometry(0.17, 0.17, 0.02, 28).rotateZ(Math.PI / 2), M.clockFace, x0 + 0.055, 2.2, artZs[0]);
+    box(0.01, 0.12, 0.018, M.monitor, x0 + 0.068, 2.24, artZs[0], 0);
+    box(0.01, 0.018, 0.1, M.monitor, x0 + 0.068, 2.2, artZs[0] + 0.04, 0);
+    // Small plants on the window sills.
+    winXs.forEach((wx, i) => {
+      if (i % 2) return;
+      cyl(0.06, 0.05, 0.1, M.pot, wx - 0.35, winY0 + 0.08, z0 + 0.06, 12);
+      place(new SphereGeometry(0.08, 10, 8), M.plant, wx - 0.35, winY0 + 0.2, z0 + 0.06);
+    });
+    // Filing cabinet with a printer in the back-right corner, a big plant front-right.
+    const cabX = w / 2 - 0.32;
+    box(0.46, 0.95, 0.5, M.cabinet, cabX, 0.475, z0 + 0.35, 0.02);
+    for (let i = 0; i < 3; i++) box(0.4, 0.02, 0.02, M.leg, cabX, 0.22 + i * 0.3, z0 + 0.61, 0.005);
+    box(0.4, 0.2, 0.36, M.white, cabX, 1.05, z0 + 0.35, 0.03);
+    box(0.3, 0.02, 0.2, M.monitor, cabX, 1.16, z0 + 0.35, 0.005);
+    if (level < 3) plant(kit, plantMats, w / 2 - 0.4, d / 2 - 0.4, 1.1);
 
     // Neon company sign above the pods.
     const sign = new Mesh(keep(new PlaneGeometry(2, 0.62)), this.signMat);

@@ -339,7 +339,8 @@
     "factory": "Fabrik",
     "world": "Welt",
     "empire": "Imperium",
-    "legacy": "Vermächtnis"
+    "legacy": "Vermächtnis",
+    "nav": "Panels"
   },
   "office": {
     "rent": "Ins Büro ziehen · {price}",

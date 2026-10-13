@@ -328,6 +328,14 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
   wischbare Reihe, Dialoge passen in niedrige Querformate. Barrierefreiheit: farbenblind-
   sichere Palette (Okabe–Ito) und große Schrift in den Einstellungen. Draw Calls (Medium):
   Garage 149, Büro 58, Fabrik 53, Store 22, Halle 49 – alle im Budget (≤ 150).
+- **Nachtrag Politur:** Räume detailreicher (gemeinsame Requisiten in `render/rooms/props.ts`,
+  über den StaticBatcher fast ohne Zusatz-Draw-Calls): Fabrik mit Wandverkleidung, Warnstreifen,
+  Stahlstützen, Rohren, Hängelampen, Maschinen mit Bedienfeld, Laderampe mit Paletten und
+  Gabelstapler; Büro mit Teppich, Pendelleuchten je Insel, Bildern, Uhr, Aktenschrank mit Drucker;
+  Store mit Holztischen, Zubehörwand, Kugelleuchten, Kasse, Sicherungsschranken; Ruhmeshalle mit
+  Wandpaneelen, rotem Teppich, Absperrkordeln, Plaketten und Lichtkegeln. Draw Calls (Medium):
+  Büro 66, Fabrik 71, Store 53, Halle 56, Garage 149. Tabs als Icon-Leiste am rechten Rand
+  (bricht nie um; Panels öffnen daneben), Hochformat: wischbare Icon-Reihe unten.
 - **Abweichung:** Kein eigener Profiling-Umbau der Garage – sie liegt mit 149 Draw Calls
   (Medium) knapp im Budget; die übrigen Räume sind deutlich darunter.
 

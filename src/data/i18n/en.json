@@ -339,7 +339,8 @@
     "factory": "Factory",
     "world": "World",
     "empire": "Empire",
-    "legacy": "Legacy"
+    "legacy": "Legacy",
+    "nav": "Panels"
   },
   "office": {
     "rent": "Move into an office · {price}",

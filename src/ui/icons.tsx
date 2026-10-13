@@ -21,6 +21,16 @@ export const IconWarn = ({ size = 20 }: P) => svg(size, <><path d="M12 3l10 18H2
 export const IconSpark = ({ size = 20 }: P) => svg(size, <path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" />);
 export const IconBuilding = ({ size = 20 }: P) =>
   svg(size, <><rect x="4" y="3" width="12" height="18" /><path d="M16 9h4v12h-4M8 7h4M8 11h4M8 15h4" /></>);
+export const IconTeam = ({ size = 20 }: P) =>
+  svg(size, <><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6" /><circle cx="17" cy="9" r="2.4" /><path d="M16 14c3 0 5 2.2 5 5" /></>);
+export const IconFactory = ({ size = 20 }: P) =>
+  svg(size, <><path d="M3 21V10l5 3V10l5 3V10l5 3V4h3v17z" /><path d="M7 17h2M12 17h2" /></>);
+export const IconFlask = ({ size = 20 }: P) => svg(size, <><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" /><path d="M7.5 15h9" /></>);
+export const IconChart = ({ size = 20 }: P) => svg(size, <><path d="M4 20V4M4 20h16" /><path d="M7 15l4-4 3 3 5-6" /></>);
+export const IconGlobe = ({ size = 20 }: P) =>
+  svg(size, <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z" /></>);
+export const IconCrown = ({ size = 20 }: P) => svg(size, <><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z" /><path d="M5 19h14" /></>);
+export const IconHelp = ({ size = 20 }: P) => svg(size, <><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.5" /></>);
 export const IconClose = ({ size = 18 }: P) => svg(size, <path d="M6 6l12 12M18 6L6 18" />);
 
 export type ToastIcon = 'trophy' | 'paint' | 'box' | 'warn' | 'spark' | 'building';

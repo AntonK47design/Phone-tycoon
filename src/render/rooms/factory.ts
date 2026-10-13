@@ -11,7 +11,10 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  CanvasTexture,
   PlaneGeometry,
+  RepeatWrapping,
+  SRGBColorSpace,
   Quaternion,
   SphereGeometry,
   Vector3,
@@ -21,6 +24,7 @@ import {
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { concreteTexture, skyTexture } from '../textures';
 import { StaticBatcher } from './batch';
+import { forklift, machine, pallet, pendantLamp, type Kit } from './props';
 
 export const FACTORY_ORIGIN = new Vector3(-14, 0, 0);
 
@@ -54,6 +58,29 @@ export function factoryLayout(size: number): { w: number; d: number } {
     { w: 12, d: 9 },
     { w: 15, d: 14 },
   ][Math.max(0, Math.min(2, size - 1))];
+}
+
+/** Yellow/black safety stripes. */
+function hazardTexture(): CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 16;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#ffd23f';
+  ctx.fillRect(0, 0, 64, 16);
+  ctx.fillStyle = '#1d1f26';
+  for (let x = -16; x < 64; x += 16) {
+    ctx.beginPath();
+    ctx.moveTo(x, 16);
+    ctx.lineTo(x + 8, 16);
+    ctx.lineTo(x + 16, 0);
+    ctx.lineTo(x + 8, 0);
+    ctx.fill();
+  }
+  const t = new CanvasTexture(c);
+  t.colorSpace = SRGBColorSpace;
+  t.wrapS = RepeatWrapping;
+  return t;
 }
 
 export class Factory {
@@ -176,6 +203,32 @@ export class Factory {
       bin: std('#e5383b', 0.6),
       rack: std('#2bb3a8', 0.5, 0.3),
       cap: std('#f2f2f2', 0.6),
+      wainscot: std('#5d6472', 0.8),
+      rib: std('#d6dae0', 0.8),
+      column: std('#ff7a1a', 0.5, 0.3),
+      pipe: std('#8c96a3', 0.35, 0.8),
+      pipe2: std('#2bb3a8', 0.45, 0.4),
+      cable: std('#1d1f26', 0.6),
+      shade: std('#3a3f4a', 0.4, 0.6),
+      bulb: std('#fff1d0', 0.3, 0, { emissive: new Color('#ffdca0'), emissiveIntensity: 2.4 }),
+      walkway: std('#ffd23f', 0.6),
+      machine: std('#4f7cff', 0.45, 0.25),
+      panel: std('#e8ecef', 0.4, 0.2),
+      screen: std('#0e2236', 0.3, 0, { emissive: new Color('#3cc8ff'), emissiveIntensity: 0.9 }),
+      lampGreen: std('#3cff8a', 0.3, 0, { emissive: new Color('#3cff8a'), emissiveIntensity: 1.6 }),
+      lampRed: std('#ff5a3c', 0.3, 0, { emissive: new Color('#ff5a3c'), emissiveIntensity: 1.2 }),
+      palletWood: std('#b98a55', 0.85),
+      cardboard: std('#c89a63', 0.9),
+      tape: std('#e8d6b0', 0.8),
+      forklift: std('#ffb21a', 0.45, 0.2),
+      seat: std('#2b2f3a', 0.8),
+      extinguisher: std('#e5383b', 0.4, 0.2),
+      hazard: std('#ffffff', 0.6, 0, { map: keep(hazardTexture()) }),
+    };
+    const kit: Kit = {
+      box: (w2, h, d2, m, x, y, z, r = 0.02) => box(w2, h, d2, m, x, y, z, r),
+      cyl: (rt, rb, h, m, x, y, z, seg = 16) => place(new CylinderGeometry(rt, rb, h, seg), m, x, y, z),
+      sphere: (r, m, x, y, z) => place(new SphereGeometry(r, 12, 10), m, x, y, z),
     };
     const { w, d } = factoryLayout(size);
     const x0 = -w / 2;
@@ -240,7 +293,13 @@ export class Factory {
         box(0.06, 0.62, 0.06, M.frame, lx0 + 0.1 + k * 1.4, 0.31, z + 0.2, 0.01);
       }
       // Feeder at the right end, inspection gate near the left end, scrap chute + bin.
-      box(0.7, 1.0, 0.7, M.feeder, lx1 + 0.15, 0.5, z, 0.04);
+      machine(kit, { body: M.machine, panel: M.panel, screen: M.screen, lampA: M.lampGreen, lampB: M.lampRed, dark: M.frame }, lx1 + 0.15, z, 0.7, 0.7, 1.0);
+      // Walkway markings around the line, a lamp every few metres above it.
+      box(len + 0.9, 0.006, 0.05, M.walkway, cx + 0.2, 0.004, z - 0.62, 0);
+      box(len + 0.9, 0.006, 0.05, M.walkway, cx + 0.2, 0.004, z + 0.62, 0);
+      for (let lxp = lx0 + 1.2; lxp < lx1 - 0.4; lxp += 2.4) {
+        pendantLamp(kit, { cable: M.cable, shade: M.shade, bulb: M.bulb }, lxp, z, wallH, 2.55, 0.32);
+      }
       const gateX = lx0 + 0.9;
       box(0.08, 0.7, 0.08, M.gate, gateX, 1.0, z - 0.3, 0.01);
       box(0.08, 0.7, 0.08, M.gate, gateX, 1.0, z + 0.3, 0.01);
@@ -248,6 +307,38 @@ export class Factory {
       box(0.5, 0.04, 0.3, M.chute, gateX - 0.3, 0.42, z + 0.42, 0.01, [0.5, 0, 0]);
       box(0.4, 0.3, 0.3, M.bin, gateX - 0.3, 0.15, z + 0.62, 0.03);
       this.belts.push({ x0: lx0, x1: lx1, z, gateX });
+    }
+    // Walls: dark lower band, hazard strip, ribbed panels, steel columns, pipes.
+    box(w, 1.0, 0.03, M.wainscot, 0, 0.5, z0 + 0.015, 0);
+    box(0.03, 1.0, d, M.wainscot, x0 + 0.015, 0.5, 0, 0);
+    const hz = new Mesh(keep(new PlaneGeometry(w, 0.14)), M.hazard);
+    hz.position.set(0, 0.07, z0 + 0.035);
+    (M.hazard.map as CanvasTexture).repeat.set(w * 2, 1);
+    this.statics.add(hz);
+    const hzL = new Mesh(keep(new PlaneGeometry(d, 0.14)), M.hazard);
+    hzL.position.set(x0 + 0.035, 0.07, 0);
+    hzL.rotation.y = Math.PI / 2;
+    this.statics.add(hzL);
+    for (let z = z0 + 0.4; z < d / 2; z += 0.6) box(0.04, wallH - 1.05, 0.06, M.rib, x0 + 0.03, 1.0 + (wallH - 1.0) / 2, z, 0.01);
+    for (let x = x0 + 1.5; x < w / 2; x += 2.5) box(0.22, 1.85, 0.16, M.column, x, 0.95, z0 + 0.08, 0.02);
+    for (let z = z0 + 1.5; z < d / 2 - 0.5; z += 2.5) box(0.16, wallH, 0.22, M.column, x0 + 0.08, wallH / 2, z, 0.02);
+    place(new CylinderGeometry(0.06, 0.06, w, 12), M.pipe, 0, 1.72, z0 + 0.14, [0, 0, Math.PI / 2]);
+    place(new CylinderGeometry(0.045, 0.045, w, 12), M.pipe2, 0, 1.56, z0 + 0.14, [0, 0, Math.PI / 2]);
+    for (let x = x0 + 2.75; x < w / 2; x += 5) place(new CylinderGeometry(0.045, 0.045, 1.56, 12), M.pipe2, x, 0.78, z0 + 0.14);
+    // Fire extinguisher by the warehouse.
+    kit.cyl(0.07, 0.07, 0.42, M.extinguisher, x0 + 0.14, 0.32, z0 + 0.5 + Math.min(4, d - 1.2), 14);
+    // Loading area in front of the lines: pallets and a parked forklift.
+    const lastZ = this.belts.length ? this.belts[this.belts.length - 1].z : z0;
+    const zoneZ = lastZ + 1.25;
+    if (d / 2 - zoneZ > 0.9) {
+      // Along the front edge, clear of the line's walkway.
+      const pz = Math.max(zoneZ + 0.3, d / 2 - 0.75);
+      const palletMats = { wood: M.palletWood, box: M.cardboard, tape: M.tape };
+      pallet(kit, palletMats, w / 2 - 0.6, pz, 2);
+      pallet(kit, palletMats, w / 2 - 1.5, pz, 1);
+      pallet(kit, palletMats, w / 2 - 2.4, pz, 3);
+      forklift(kit, { body: M.forklift, dark: M.frame, steel: M.pipe, seat: M.seat }, w / 2 - 4.0, pz);
+      box(4.2, 0.006, 0.05, M.walkway, w / 2 - 2.2, 0.004, pz - 0.6, 0);
     }
     batch.flush(this.statics);
   }

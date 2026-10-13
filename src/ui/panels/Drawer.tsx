@@ -26,7 +26,18 @@ import { WorldPanel } from '../hud/World';
 import { rivalModelReview } from '../../sim/competitors';
 import { newsText } from '../labels';
 import { lang, t } from '../i18n';
-import { IconClose } from '../icons';
+import { IconBuilding, IconChart, IconClose, IconCrown, IconFactory, IconFlask, IconGlobe, IconHelp, IconTeam, IconTrophy } from '../icons';
+
+const TAB_ICONS: Record<DrawerTab, (p: { size?: number }) => preact.JSX.Element> = {
+  company: IconBuilding,
+  team: IconTeam,
+  factory: IconFactory,
+  research: IconFlask,
+  market: IconChart,
+  world: IconGlobe,
+  empire: IconCrown,
+  legacy: IconTrophy,
+};
 import { researchEffect, researchName, researchNameById } from '../labels';
 import { RewardedButton } from '../hud/Rewarded';
 
@@ -56,28 +67,35 @@ export function DrawerTabs() {
   const busy = researchProgress(state);
   const focus = tourStep.value !== null ? TOUR_STEPS[tourStep.value]?.tab : null;
   return (
-    <div class="tabs">
+    <nav class="tabs" aria-label={t('tabs.nav')}>
+      {tabs.map((tab) => {
+        const Icon = TAB_ICONS[tab];
+        const alert =
+          (tab === 'research' && !busy) ||
+          (tab === 'factory' && state.factory.size === 0) ||
+          (tab === 'world' && (state.phase < 4 || state.contracts.offers.length > 0)) ||
+          (tab === 'empire' && state.giant.campus === 0) ||
+          (tab === 'team' && state.team.staff.length < seats(state) && state.team.applicants.length > 0 && state.team.staff.length < 2);
+        return (
+          <button
+            key={tab}
+            class={`tab ${drawer.value === tab ? 'on' : ''} ${focus === tab ? 'tour-focus' : ''}`}
+            aria-pressed={drawer.value === tab}
+            onClick={() => {
+              sfx.click();
+              openTab(drawer.value === tab ? null : tab);
+            }}
+          >
+            <Icon size={22} />
+            <span class="tab-label">{t(`tabs.${tab}`)}</span>
+            {alert && <i class="dot-alert" />}
+          </button>
+        );
+      })}
       <button class="tab tab-help" aria-label={t('tour.replay')} title={t('tour.replay')} onClick={() => (sfx.click(), (tourStep.value = 0))}>
-        ?
+        <IconHelp size={18} />
       </button>
-      {tabs.map((tab) => (
-        <button
-          key={tab}
-          class={`tab ${drawer.value === tab ? 'on' : ''} ${focus === tab ? 'tour-focus' : ''}`}
-          onClick={() => {
-            sfx.click();
-            openTab(drawer.value === tab ? null : tab);
-          }}
-        >
-          {t(`tabs.${tab}`)}
-          {tab === 'research' && !busy && <i class="dot-alert" />}
-          {tab === 'factory' && state.factory.size === 0 && <i class="dot-alert" />}
-          {tab === 'world' && (state.phase < 4 || state.contracts.offers.length > 0) && <i class="dot-alert" />}
-          {tab === 'empire' && state.giant.campus === 0 && <i class="dot-alert" />}
-          {tab === 'team' && state.team.staff.length < seats(state) && state.team.applicants.length > 0 && state.team.staff.length < 2 && <i class="dot-alert" />}
-        </button>
-      ))}
-    </div>
+    </nav>
   );
 }
 
