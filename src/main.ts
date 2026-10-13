@@ -42,7 +42,12 @@ async function boot() {
   // Offline progress (GDD §20.1) before anything renders.
   const offline = saved ? applyOffline(state, Math.max(0, (Date.now() - saved.savedAt) / 1000)) : null;
   const store = createStore(state);
-  const save = () => writeSave(platform, store.getState());
+  // Off once a reset or prestige has replaced the save: the reload fires visibilitychange/pagehide,
+  // and the autosave must not write the old company back.
+  let saving = true;
+  const save = () => {
+    if (saving) writeSave(platform, store.getState());
+  };
   setGame({
     store,
     engine,
@@ -50,14 +55,14 @@ async function boot() {
     gameplay,
     save,
     reset() {
+      saving = false;
       platform.data.remove(SAVE_KEY);
-      window.removeEventListener('pagehide', save);
       location.reload();
     },
     startOver(next) {
       // Prestige: the new company replaces the save, then a fresh boot runs the tutorial.
+      saving = false;
       writeSave(platform, next);
-      window.removeEventListener('pagehide', save);
       location.reload();
     },
   });
