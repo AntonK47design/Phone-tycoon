@@ -24,6 +24,7 @@ import '@fontsource/barlow-semi-condensed/latin-800.css';
 import '@fontsource/space-mono/latin-400.css';
 import '@fontsource/space-mono/latin-700.css';
 import './ui/styles/main.css';
+import { installAds } from './ui/ads';
 
 async function boot() {
   const platformPromise = createPlatform();
@@ -70,6 +71,7 @@ async function boot() {
   store.subscribe(() => (storeRev.value = store.revision()));
   installTooltips();
   installJuice();
+  installAds();
   render(h(App, {}), document.getElementById('ui')!);
 
   const st = store.getState();

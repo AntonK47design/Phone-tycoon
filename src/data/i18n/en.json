@@ -1096,5 +1096,21 @@
       "l2": "Who sells the most, and how big your share is.",
       "l3": "“What buyers expect” shows the tech level and must-haves for your next phone."
     }
+  },
+  "ads": {
+    "offer": {
+      "launchDouble": "Double launch income",
+      "devBoost": "Halve the remaining work",
+      "researchBoost": "+20% research now",
+      "offlineDouble": "Double it"
+    },
+    "done": {
+      "launchDouble": "Launch income doubled!",
+      "devBoost": "The team pulled an all-nighter: half the work is done.",
+      "researchBoost": "Lab boost: +20% research.",
+      "offlineDouble": "Offline earnings doubled!"
+    },
+    "wait": "Next bonus in {m}:{s}",
+    "unavailable": "No ad available right now. Try again later."
   }
 }

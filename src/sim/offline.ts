@@ -50,6 +50,7 @@ export function applyOffline(state: GameState, seconds: number): OfflineReport |
       }
     }
   }
+  state.lastOffline = { cash: Math.max(0, state.company.cash - cash0), claimed: false };
   return {
     seconds: capped,
     days,

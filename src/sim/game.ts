@@ -91,6 +91,7 @@ import {
 } from './team';
 import { LAB_LEVELS, OFFICE_LEVELS, STUDIO_LEVELS } from '../data/team';
 import { yearOf } from './time';
+import { applyAdReward, type AdRewardKind } from './rewards';
 
 export const START_CASH = 2_000;
 
@@ -197,6 +198,7 @@ export type Action =
   | { type: 'setDraft'; patch: DraftPatch }
   | { type: 'setTutorial'; step: GameState['tutorial'] }
   | { type: 'tourDone'; id: string }
+  | { type: 'adReward'; kind: AdRewardKind; productId?: number }
   | { type: 'startDev' }
   | { type: 'launch'; options?: LaunchOptions }
   | { type: 'renameCompany'; name: string }
@@ -298,6 +300,8 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
     case 'setTutorial':
       state.tutorial = action.step;
       return [];
+    case 'adReward':
+      return applyAdReward(state, action.kind, action.productId);
     case 'tourDone':
       state.tours = [...new Set([...(state.tours ?? []), action.id])];
       return [];
@@ -569,6 +573,7 @@ function launch(state: GameState, opts: LaunchOptions): SimEvent[] {
   }
   sell(state, product, preorderUnits, true);
 
+  product.preorderRevenue = preorderUnits * design.price * (1 - channelCut(state));
   state.products.push(product);
   const lineId = state.factory.size > 0 ? autoAssign(state, product.id) : null;
   state.dev = null;

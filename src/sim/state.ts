@@ -90,6 +90,10 @@ export interface Product {
   defectRate?: number;
   /** Cached regional taste fit (region id → 0.7–1.3). */
   fit?: Record<string, number>;
+  /** Launch-day revenue (for the rewarded "double it" bonus). */
+  preorderRevenue?: number;
+  /** The launch revenue was already doubled by a rewarded ad. */
+  adDoubled?: boolean;
 }
 
 export interface Development {
@@ -97,6 +101,8 @@ export interface Development {
   required: { design: number; tech: number; software: number };
   progress: { design: number; tech: number; software: number };
   done: boolean;
+  /** A rewarded ad already halved the remaining work. */
+  adBoosted?: boolean;
 }
 
 export interface Employee {
@@ -358,6 +364,8 @@ export interface GameState {
   tutorial: TutorialStep;
   /** Guided tours the player finished or skipped (e.g. 'panels'). */
   tours?: string[];
+  /** Cash earned during the last absence (rewarded "double it" bonus). */
+  lastOffline?: { cash: number; claimed: boolean };
   draft: PhoneDesign;
   dev: Development | null;
   products: Product[];
@@ -366,7 +374,7 @@ export interface GameState {
   completedGoals: string[];
   research: {
     done: string[];
-    current: { id: string; progress: number } | null;
+    current: { id: string; progress: number; adBoosted?: boolean } | null;
     /** Weekly lab budget in today's $ (buys extra research points). */
     budget: number;
     /** Completed frontier research levels (+2 % tech each). */

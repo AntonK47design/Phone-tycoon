@@ -25,6 +25,10 @@ function safeStorage() {
         /* ignore */
       }
     },
+    candidates(key: string): string[] {
+      const v = this.get(key);
+      return v ? [v] : [];
+    },
   };
 }
 
@@ -36,9 +40,18 @@ export function createStubPlatform(): Platform {
     gameplayStart: () => log('gameplayStart'),
     gameplayStop: () => log('gameplayStop'),
     happytime: () => log('happytime'),
-    requestAd: async (type) => {
+    requestAd: async (type, hooks) => {
       log('requestAd', type);
-      return 'unavailable';
+      if (!import.meta.env.DEV) return 'unavailable';
+      // Dev only: a fake 1.5 s ad so the ad flow (pause, mute, reward) can be tested.
+      hooks?.onStart?.();
+      const el = document.createElement('div');
+      el.className = 'fake-ad';
+      el.textContent = `${type} ad (dev)`;
+      document.body.appendChild(el);
+      await new Promise((r) => setTimeout(r, 1500));
+      el.remove();
+      return 'finished';
     },
     hasAdblock: async () => false,
     data: safeStorage(),

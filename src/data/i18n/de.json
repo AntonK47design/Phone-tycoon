@@ -1096,5 +1096,21 @@
       "l2": "Wer am meisten verkauft und wie groß dein Anteil ist.",
       "l3": "„Was Käufer erwarten“ zeigt Technikstand und Pflicht-Extras für dein nächstes Telefon."
     }
+  },
+  "ads": {
+    "offer": {
+      "launchDouble": "Launch-Einnahmen verdoppeln",
+      "devBoost": "Restarbeit halbieren",
+      "researchBoost": "+20 % Forschung sofort",
+      "offlineDouble": "Verdoppeln"
+    },
+    "done": {
+      "launchDouble": "Launch-Einnahmen verdoppelt!",
+      "devBoost": "Nachtschicht im Team: Die Hälfte der Arbeit ist erledigt.",
+      "researchBoost": "Labor-Boost: +20 % Forschung.",
+      "offlineDouble": "Offline-Ertrag verdoppelt!"
+    },
+    "wait": "Nächster Bonus in {m}:{s}",
+    "unavailable": "Gerade keine Werbung verfügbar. Versuch es später."
   }
 }

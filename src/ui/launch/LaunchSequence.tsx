@@ -17,6 +17,8 @@ import { researchName } from '../labels';
 import { flushDeferred, flyCoins } from '../juice';
 import { useRolling } from '../hud/Hud';
 import { scoreClass } from '../hud/Panels';
+import { maybeMidgame, noteLaunch } from '../ads';
+import { RewardedButton } from '../hud/Rewarded';
 
 type Phase = 'overnight' | 'show' | 'preorders' | 'reviews' | 'result';
 
@@ -125,6 +127,9 @@ export function LaunchSequence() {
     if (speed.value === 0) speed.value = 1;
     flushDeferred();
     save();
+    noteLaunch();
+    // Midgame only after the result screen, once the camera has settled (rules in adPolicy).
+    setTimeout(() => void maybeMidgame('launch'), 1600);
   };
 
   const unlocks = events.filter((e): e is Extract<SimEvent, { type: 'colorUnlocked' }> => e.type === 'colorUnlocked');
@@ -189,6 +194,7 @@ export function LaunchSequence() {
               profit={store.getState().company.cash - startCash.current}
               brandDelta={launched.brandDelta}
               unlocks={unlocks.map((u) => u.colorId)}
+              productId={launched.productId}
               onContinue={finish}
             />
           )}
@@ -204,6 +210,7 @@ function ResultSummary(props: {
   profit: number;
   brandDelta: number;
   unlocks: string[];
+  productId: number;
   onContinue: () => void;
 }) {
   const state = useGameState();
@@ -237,6 +244,7 @@ function ResultSummary(props: {
           {t('launch.next')}: <b>{teaser}</b>
         </div>
       )}
+      <RewardedButton kind="launchDouble" productId={props.productId} />
       <button class="btn-primary" onClick={props.onContinue}>
         {t('launch.continue')}
       </button>

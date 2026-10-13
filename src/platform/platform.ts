@@ -16,6 +16,8 @@ export interface Platform {
     get(key: string): string | null;
     set(key: string, value: string): void;
     remove(key: string): void;
+    /** Every stored copy of a key (cloud and local), for conflict resolution. */
+    candidates(key: string): string[];
   };
 }
 

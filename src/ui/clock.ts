@@ -2,7 +2,7 @@
 
 import { effect } from '@preact/signals';
 import { SECONDS_PER_DAY } from '../sim/time';
-import { dailyOpen, dayFraction, game, launchData, launchSetupOpen, mode, settingsOpen, speed, tourStep, welcomeReport } from './game';
+import { adPlaying, dailyOpen, dayFraction, game, launchData, launchSetupOpen, mode, settingsOpen, speed, tourStep, welcomeReport } from './game';
 
 let acc = 0;
 let last = 0;
@@ -26,6 +26,7 @@ export function isClockRunning(): boolean {
     welcomeReport.value === null &&
     mode.value !== 'intro' &&
     !adPaused &&
+    !adPlaying.value &&
     !document.hidden
   );
 }
@@ -55,7 +56,7 @@ export function startClock() {
 
   // Platform gameplay start/stop follows whether the player is actively playing.
   effect(() => {
-    const paused = settingsOpen.value || speed.value === 0;
+    const paused = settingsOpen.value || speed.value === 0 || adPlaying.value;
     const { gameplay } = game();
     if (mode.value === 'intro') return;
     if (paused) gameplay.stop();

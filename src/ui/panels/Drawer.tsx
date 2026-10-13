@@ -28,6 +28,7 @@ import { newsText } from '../labels';
 import { lang, t } from '../i18n';
 import { IconClose } from '../icons';
 import { researchEffect, researchName, researchNameById } from '../labels';
+import { RewardedButton } from '../hud/Rewarded';
 
 /** Opens a side panel; the team and factory panels also move the camera to their room. */
 export function openTab(tab: DrawerTab | null) {
@@ -279,6 +280,7 @@ function ResearchPanel() {
             <b>{researchName(cur.node)}</b>
             <div class="bar light"><i style={{ width: `${(cur.progress / cur.need) * 100}%`, background: 'var(--orange)' }} /></div>
             <span class="muted">{t('research.daysLeft', { days: cur.daysLeft })} · {researchEffect(cur.node, r)}</span>
+            <RewardedButton kind="researchBoost" small />
           </>
         ) : (
           <span>{t('research.none')}</span>

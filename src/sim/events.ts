@@ -19,6 +19,7 @@ export type SimEvent =
       lineId?: number | null;
     }
   | { type: 'goalCompleted'; goalId: string; reward: GoalReward }
+  | { type: 'adReward'; kind: 'launchDouble' | 'devBoost' | 'researchBoost' | 'offlineDouble'; amount: number }
   | { type: 'colorUnlocked'; colorId: string }
   | { type: 'devStarted'; days: number; cost: number }
   | { type: 'devDone' }

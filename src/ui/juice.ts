@@ -8,6 +8,7 @@ import { money } from './format';
 import { game, hubView, launchData, sayBark, toast } from './game';
 import { lang, t, tList } from './i18n';
 import { researchNameById, rivalName } from './labels';
+import { maybeMidgame } from './ads';
 
 let lastCoin = 0;
 const deferred: (() => void)[] = [];
@@ -165,6 +166,7 @@ export function installJuice() {
           toast(t('toast.warehouseUpgraded'), 'box');
           break;
         case 'phase4Ready':
+          setTimeout(() => void maybeMidgame('phase'), 6000);
           later(() => {
             toast(t('toast.phase4'), 'trophy', true);
             sfx.fanfare();
@@ -230,6 +232,7 @@ export function installJuice() {
           sfx.fanfare();
           break;
         case 'phase5Ready':
+          setTimeout(() => void maybeMidgame('phase'), 6000);
           later(() => {
             toast(t('toast.phase5'), 'trophy', true);
             sfx.fanfare();
@@ -237,6 +240,7 @@ export function installJuice() {
           });
           break;
         case 'phase6Ready':
+          setTimeout(() => void maybeMidgame('phase'), 6000);
           later(() => {
             toast(t('toast.phase6'), 'trophy', true);
             sfx.fanfare();
@@ -256,6 +260,7 @@ export function installJuice() {
           toast(t('toast.loan', { amount: money(e.amount, lang.value) }), 'warn');
           break;
         case 'phase3Ready':
+          setTimeout(() => void maybeMidgame('phase'), 6000);
           later(() => {
             toast(t('toast.phase3'), 'trophy', true);
             sfx.fanfare();

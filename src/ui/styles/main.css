@@ -618,3 +618,11 @@ svg { flex: none; }
 @keyframes tourPulse { 50% { transform: translateY(-3px); } }
 @media (max-width: 900px) { .tour { right: 16px; left: 16px; width: auto; top: auto; bottom: 140px; } }
 @media (prefers-reduced-motion: reduce) { .tab.tour-focus { animation: none; } }
+
+/* Rewarded ads (opt-in) */
+.btn-rewarded { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: var(--border); border-radius: 10px; background: var(--tape); color: var(--ink); font-family: var(--display); font-size: 13px; box-shadow: var(--shadow-sm); cursor: pointer; }
+.btn-rewarded.small { min-height: 32px; padding: 0 10px; font-size: 11px; margin-top: 6px; }
+.btn-rewarded:disabled { opacity: .55; cursor: default; box-shadow: none; }
+.btn-rewarded .ad-badge { font-style: normal; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--tape); font-size: 9px; }
+.result .btn-rewarded, .welcome .btn-rewarded { margin: 0 auto 10px; }
+.fake-ad { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: rgba(0, 0, 0, .85); color: #fff; font: 700 24px var(--mono); }

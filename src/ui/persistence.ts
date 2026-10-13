@@ -7,16 +7,22 @@ import type { GameState } from '../sim/state';
 export const SAVE_KEY = 'phone-empire-save';
 const AUTOSAVE_MS = 30_000;
 
+/** Loads the newest readable copy (cloud vs. local); broken copies are skipped. */
 export function loadSave(platform: Platform): { state: GameState; savedAt: number } | null {
-  const raw = platform.data.get(SAVE_KEY);
-  if (!raw) return null;
-  try {
-    const file = deserialize(raw);
-    return { state: file.state, savedAt: file.savedAt };
-  } catch (e) {
-    console.warn('Save could not be loaded, starting fresh.', e);
-    return null;
+  return pickNewest(platform.data.candidates(SAVE_KEY));
+}
+
+export function pickNewest(raws: string[]): { state: GameState; savedAt: number } | null {
+  let best: { state: GameState; savedAt: number } | null = null;
+  for (const raw of raws) {
+    try {
+      const file = deserialize(raw);
+      if (!best || file.savedAt > best.savedAt) best = { state: file.state, savedAt: file.savedAt };
+    } catch (e) {
+      console.warn('A save copy could not be loaded, skipping it.', e);
+    }
   }
+  return best;
 }
 
 export function writeSave(platform: Platform, state: GameState) {

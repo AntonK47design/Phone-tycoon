@@ -10,6 +10,7 @@ import { IconBuilding, IconPencil, IconRocket, IconWrench, ToastIconView } from 
 import { OFFICE_PRICE } from '../../data/components';
 import { inflation } from '../../data/eras';
 import { calendar } from '../../sim/time';
+import { RewardedButton } from './Rewarded';
 
 export function scoreClass(score: number) {
   return score >= 8 ? 'good' : score >= 6.5 ? 'ok' : 'bad';
@@ -93,6 +94,7 @@ export function ActionBar() {
             <div><i style={{ width: `${(p.tech / r.tech) * 100}%`, background: 'var(--tech)' }} /></div>
             <div><i style={{ width: `${(p.software / r.software) * 100}%`, background: 'var(--software)' }} /></div>
           </div>
+          <RewardedButton kind="devBoost" small />
         </div>
       </div>
     );

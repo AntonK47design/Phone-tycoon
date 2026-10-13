@@ -62,6 +62,8 @@ export const hubView = signal<Room>('garage');
 export function hubCamera(): 'overview' | 'office' | 'factory' | 'store' | 'hall' {
   return hubView.value === 'garage' ? 'overview' : hubView.value;
 }
+/** An ad is playing: sim paused, audio muted, gameplay stopped. */
+export const adPlaying = signal(false);
 /** Step of the guided panel tour (null = not running). */
 export const tourStep = signal<number | null>(null);
 /** Daily calendar & orders dialog. */

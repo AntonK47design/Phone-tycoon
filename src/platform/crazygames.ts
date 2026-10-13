@@ -89,6 +89,16 @@ export async function createPlatform(): Promise<Platform> {
           }
           local.remove(k);
         },
+        // Cloud copy and the local mirror can differ (guest play, then login on another device).
+        candidates: (k: string) => {
+          let cloud: string | null = null;
+          try {
+            cloud = sdk.data!.getItem(k);
+          } catch {
+            /* ignore */
+          }
+          return [cloud, local.get(k)].filter((v): v is string => !!v);
+        },
       }
     : local;
 

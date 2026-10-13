@@ -4,6 +4,7 @@ import { welcomeReport } from '../game';
 import { lang, t } from '../i18n';
 import { researchNameById } from '../labels';
 import { useRolling } from './Hud';
+import { RewardedButton } from './Rewarded';
 
 export function WelcomeBack() {
   const r = welcomeReport.value;
@@ -31,6 +32,7 @@ export function WelcomeBack() {
         )}
         {r.devDone && <div class="welcome-line good-line">{t('welcome.dev')}</div>}
         {r.ordersArrived > 0 && <div class="welcome-line"><span class="label">{t('welcome.orders')}</span> {r.ordersArrived}</div>}
+        <RewardedButton kind="offlineDouble" />
         <button class="btn-primary" onClick={close}>{t('welcome.go')}</button>
       </div>
     </div>
