@@ -11,8 +11,10 @@ export const DAYS_PER_WEEK = 7;
 export function expectedTech(year: number): number {
   const a = Math.min(year, 2024) - START_YEAR;
   const b = Math.max(0, Math.min(year, 2040) - 2024);
-  const c = Math.max(0, year - 2040);
-  return 100 * Math.pow(1.3, a) * Math.pow(1.18, b) * Math.pow(1.06, c);
+  const c = Math.max(0, Math.min(year, 2050) - 2040);
+  // After the last part generation (2050) only frontier research (+2 %/level) moves tech on.
+  const d = Math.max(0, year - 2050);
+  return 100 * Math.pow(1.3, a) * Math.pow(1.18, b) * Math.pow(1.06, c) * Math.pow(1.02, d);
 }
 
 /** Expected flagship display diagonal in inches. */

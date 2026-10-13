@@ -137,6 +137,22 @@ describe('regions, stores, contracts (GDD §14)', () => {
     expect(s.contracts.done).toBe(1);
   });
 
+  it('contracts ask for what the best phone of the segment can meet', () => {
+    const s = lateGame();
+    s.phase4Ready = true;
+    applyAction(s, { type: 'enterRegion', region: 'latam' });
+    // An old cheap phone plus a newer, better and pricier one in the same segment.
+    const best = s.products[s.products.length - 1];
+    const old = { ...best, id: 999, review: { ...best.review, score: best.review.score - 2 }, unitCost: best.unitCost * 0.5, active: true };
+    s.products.push(old);
+    tickContracts(s);
+    const c = s.contracts.offers[0];
+    expect(c.segment).toBe(best.design.segment);
+    expect(c.maxCost).toBeGreaterThanOrEqual(best.unitCost);
+    best.stock = c.units;
+    expect(contractProblem(s, c, best, currentReview(best, yearOf(s.day)))).toBeNull();
+  });
+
   it('senior and gaming segments open with the expansion', () => {
     const s = lateGame();
     applyAction(s, { type: 'setDraft', patch: { segment: 'gaming' } });

@@ -171,3 +171,10 @@ describe('pacing (GDD §24.1)', () => {
     expect(r.phase4Min!).toBeLessThan(120);
   }, 180_000);
 });
+
+describe('late expectations', () => {
+  it('after the last part generation only grow at the frontier pace (2 %/year)', () => {
+    expect(expectedTech(2060) / expectedTech(2059)).toBeCloseTo(1.02, 5);
+    expect(expectedTech(2045) / expectedTech(2044)).toBeCloseTo(1.06, 5);
+  });
+});

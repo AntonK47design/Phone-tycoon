@@ -57,7 +57,9 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
   );
 
   const osScoreOf = (o: string) => (o === 'own' ? osScore(state) : LICENSED_OS[o as keyof typeof LICENSED_OS]?.score ?? 5);
-  const partRating = (p: PartDef) => ratingFromRatio(p.ti / (sigma * expectedTech(year)));
+  // Frontier research lifts every part by 2 % per level.
+  const boost = Math.pow(1.02, state.research.frontier ?? 0);
+  const partRating = (p: PartDef) => ratingFromRatio((p.ti * boost) / (sigma * expectedTech(year)));
 
   const PartPicker = ({ category }: { category: TechCategory }) => {
     const all = availableParts(state, category);

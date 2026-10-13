@@ -166,9 +166,13 @@ export function tickContracts(state: GameState): SimEvent[] {
   const segment = segs.length ? rng.pick(segs) : rng.pick(ALL_SEGMENTS.slice(0, 3));
   const mine = state.products.filter((p) => p.active && p.design.segment === segment);
   const weekly = mine.reduce((a, p) => a + p.lastWeekDemand, 0);
-  const typicalCost = mine.length ? Math.min(...mine.map((p) => p.unitCost)) : priceAnchor({ segment }, year) * 0.45;
-  const currentBest = mine.length ? Math.max(...mine.map((p) => p.review.score - (p.review.p - overallRating(p.design, year).p))) : 6.5;
-  const units = nice(clamp(Math.max(weekly, 500) * rng.range(2, 5), 1000, 200_000));
+  // Review and cost are both taken from the same phone (the best one today), so one model can meet both.
+  const nowScore = (p: Product) => p.review.score - (p.review.p - overallRating(p.design, year).p);
+  const best = mine.length ? mine.reduce((a, p) => (nowScore(p) > nowScore(a) ? p : a)) : null;
+  const typicalCost = best ? best.unitCost : priceAnchor({ segment }, year) * 0.45;
+  const currentBest = best ? nowScore(best) : 6.5;
+  // One phone delivers the order, so it is sized on that phone's demand (with a floor from the segment).
+  const units = nice(clamp(Math.max(best?.lastWeekDemand ?? 0, weekly * 0.3, 500) * rng.range(2, 5), 1000, 200_000));
   const maxCost = Math.round(typicalCost * rng.range(1.05, 1.25));
   const offer: Contract = {
     id: c.nextId++,

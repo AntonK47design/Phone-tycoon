@@ -412,12 +412,12 @@ function manageWorld(state: GameState, profile: BotProfile): void {
   const next = REGIONS.filter((r) => !state.regions.entered.includes(r.id)).sort((a, b) => a.entry - b.entry)[0];
   if (next && state.company.cash > entryCost(state, next) * care) applyAction(state, { type: 'enterRegion', region: next.id });
   // Stores where they pay off most: the biggest entered region with the fewest stores.
-  if (profile !== 'weak') {
-    const target = state.regions.entered
-      .map((id) => REGIONS.find((r) => r.id === id)!)
-      .sort((a, b) => b.share / (1 + (state.regions.stores[b.id] ?? 0)) - a.share / (1 + (state.regions.stores[a.id] ?? 0)))[0];
-    if (target && state.company.cash > storeCost(state, target.id) * care * 2) applyAction(state, { type: 'openStore', region: target.id });
-  }
+  // The weak player opens a few stores late (at most 2 per region), the others keep expanding.
+  const target = state.regions.entered
+    .map((id) => REGIONS.find((r) => r.id === id)!)
+    .filter((r) => profile !== 'weak' || (state.regions.stores[r.id] ?? 0) < 2)
+    .sort((a, b) => b.share / (1 + (state.regions.stores[b.id] ?? 0)) - a.share / (1 + (state.regions.stores[a.id] ?? 0)))[0];
+  if (target && state.company.cash > storeCost(state, target.id) * care * 2) applyAction(state, { type: 'openStore', region: target.id });
   // Contracts: deliver whenever a product qualifies.
   for (const c of [...state.contracts.offers]) {
     const p = state.products.find((x) => x.active && !contractProblem(state, c, x, currentReview(x, year)));
