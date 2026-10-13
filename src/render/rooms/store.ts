@@ -2,6 +2,7 @@
 // and shoppers strolling between the tables. Everything moving is instanced.
 
 import {
+  BoxGeometry,
   CanvasTexture,
   CapsuleGeometry,
   Color,
@@ -16,6 +17,7 @@ import {
   Quaternion,
   SphereGeometry,
   SRGBColorSpace,
+  TorusGeometry,
   Vector3,
   type BufferGeometry,
   type Material,
@@ -25,6 +27,7 @@ import { woodTexture } from '../textures';
 import { StaticBatcher } from './batch';
 import { pendantLamp, plant, type Kit } from './props';
 import { neonTexture } from './officeCorner';
+import { at, parts } from '../characters/Crowd';
 
 export const STORE_ORIGIN = new Vector3(0, 0, -15);
 
@@ -85,6 +88,8 @@ export class Store {
   private phones: InstancedMesh;
   private bodies: InstancedMesh;
   private heads: InstancedMesh;
+  private hair: InstancedMesh;
+  private legs: InstancedMesh;
   private signMat = new MeshBasicMaterial({ transparent: true, depthWrite: false });
   private screenMat: MeshBasicMaterial;
   private mats: Material[] = [];
@@ -113,18 +118,46 @@ export class Store {
       return im;
     };
     this.phones = inst(new RoundedBoxGeometry(0.14, 0.27, 0.02, 2, 0.01), mat('#ffffff', 0.2, 0.2), TABLES * PHONES_PER_TABLE);
-    const body = new CapsuleGeometry(0.14, 0.5, 4, 10);
-    body.translate(0, 0.62, 0);
-    this.bodies = inst(body, mat('#ffffff', 0.8), SHOPPERS);
-    this.heads = inst(new SphereGeometry(0.11, 14, 10), mat('#ffffff', 0.7), SHOPPERS);
+    // Shoppers face +z. Body: shirt, sleeves, trousers, shoes (all tinted by the shirt colour,
+    // dark parts stay dark). Head: face details tinted by skin. Hair: its own colour.
+    const vc = (roughness: number) => {
+      const x = new MeshStandardMaterial({ color: '#ffffff', roughness, vertexColors: true });
+      this.mats.push(x);
+      return x;
+    };
+    const legParts: [BufferGeometry, number][] = [];
+    const bodyParts: [BufferGeometry, number][] = [[at(new CapsuleGeometry(0.14, 0.26, 6, 12).scale(1, 1, 0.8), 0, 0.74, 0), 1]];
+    for (const side of [-1, 1]) {
+      legParts.push([at(new CapsuleGeometry(0.06, 0.38, 4, 10), side * 0.075, 0.3, 0), 1]);
+      legParts.push([at(new CapsuleGeometry(0.05, 0.1, 4, 8).rotateX(Math.PI / 2), side * 0.075, 0.05, 0.04), 0.12]);
+      bodyParts.push([at(new CapsuleGeometry(0.045, 0.3, 4, 8).rotateZ(side * 0.12), side * 0.19, 0.72, 0), 1]);
+      bodyParts.push([at(new SphereGeometry(0.04, 8, 6), side * 0.21, 0.52, 0), 0.75]);
+    }
+    bodyParts.push([at(new TorusGeometry(0.065, 0.02, 6, 16).rotateX(Math.PI / 2), 0, 0.96, 0), 0.8]);
+    this.bodies = inst(parts(bodyParts), vc(0.8), SHOPPERS);
+    this.legs = inst(parts(legParts), vc(0.85), SHOPPERS);
+    const headParts: [BufferGeometry, number][] = [[new SphereGeometry(0.11, 16, 12), 1]];
+    for (const side of [-1, 1]) {
+      headParts.push([at(new SphereGeometry(0.025, 8, 6).scale(0.5, 1, 0.8), side * 0.108, 0, 0), 0.95]);
+      headParts.push([at(new SphereGeometry(0.013, 8, 6).scale(1, 1.2, 0.6), side * 0.04, 0.02, 0.102), 0.08]);
+      headParts.push([at(new BoxGeometry(0.036, 0.01, 0.01), side * 0.042, 0.055, 0.102), 0.3]);
+    }
+    headParts.push([at(new SphereGeometry(0.016, 8, 6), 0, -0.012, 0.112), 0.97]);
+    headParts.push([at(new TorusGeometry(0.022, 0.005, 6, 10, Math.PI).rotateX(Math.PI), 0, -0.035, 0.1), 0.5]);
+    this.heads = inst(parts(headParts), vc(0.7), SHOPPERS);
+    const hairGeo = new SphereGeometry(0.118, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.55).rotateX(-0.3);
+    this.hair = inst(hairGeo, mat('#ffffff', 0.9), SHOPPERS);
     this.signMat.color.setScalar(2.4);
     this.screenMat = new MeshBasicMaterial({ map: screenWall() });
     this.screenMat.color.setScalar(1.4);
     this.build();
     for (let i = 0; i < SHOPPERS; i++) {
-      this.shoppers.push({ angle: (i / SHOPPERS) * Math.PI * 2 * 3, radius: 0.85 + (i % 3) * 0.12, table: i % TABLES, speed: 0.25 + (i % 4) * 0.08, pause: 0 });
+      // Spread start angles (people at the same table must not overlap).
+      this.shoppers.push({ angle: i * 2.4 + Math.floor(i / TABLES) * 1.3, radius: 0.85 + (i % 3) * 0.12, table: i % TABLES, speed: 0.25 + (i % 4) * 0.08, pause: 0 });
       this.bodies.setColorAt(i, SHIRTS[i % SHIRTS.length]);
       this.heads.setColorAt(i, new Color(['#f1c9a5', '#e0ac7e', '#c68b5b', '#9a6440', '#6b4428'][i % 5]));
+      this.legs.setColorAt(i, new Color(['#2b2f3f', '#3b4a63', '#4a3d34', '#22252e', '#8a8f9a', '#c9b48a'][(i * 7) % 6]));
+      this.hair.setColorAt(i, new Color(['#2b1d16', '#4a3020', '#d8b26a', '#1a1a1f', '#b0443a', '#7a4b26'][(i * 5) % 6]));
     }
     this.root.visible = false;
   }
@@ -296,9 +329,16 @@ export class Store {
       const p = new Vector3(c.x + Math.cos(s.angle) * s.radius * 1.1, Math.abs(Math.sin(t * 7 + i)) * (s.pause > 0 ? 0 : 0.03), c.z + Math.sin(s.angle) * s.radius * 0.75);
       q.setFromAxisAngle(new Vector3(0, 1, 0), -s.angle);
       this.bodies.setMatrixAt(i, m.compose(p, q, one));
-      this.heads.setMatrixAt(i, m.compose(p.clone().setY(p.y + 1.15), q, one));
+      this.legs.setMatrixAt(i, m);
+      const hp = p.clone().setY(p.y + 1.15);
+      this.heads.setMatrixAt(i, m.compose(hp, q, one));
+      this.hair.setMatrixAt(i, m.compose(hp.setY(hp.y + 0.012), q, one));
     }
-    this.bodies.count = this.heads.count = crowd;
+    this.bodies.count = this.heads.count = this.hair.count = this.legs.count = crowd;
+    this.legs.instanceMatrix.needsUpdate = true;
+    if (this.legs.instanceColor) this.legs.instanceColor.needsUpdate = true;
+    this.hair.instanceMatrix.needsUpdate = true;
+    if (this.hair.instanceColor) this.hair.instanceColor.needsUpdate = true;
     this.bodies.instanceMatrix.needsUpdate = true;
     this.heads.instanceMatrix.needsUpdate = true;
     if (this.bodies.instanceColor) this.bodies.instanceColor.needsUpdate = true;
@@ -310,7 +350,7 @@ export class Store {
   dispose() {
     this.statics.traverse((o) => (o as Mesh).geometry?.dispose());
     this.disposables.forEach((d) => d.dispose());
-    for (const im of [this.phones, this.bodies, this.heads]) {
+    for (const im of [this.phones, this.bodies, this.heads, this.hair, this.legs]) {
       im.geometry.dispose();
       im.dispose();
     }

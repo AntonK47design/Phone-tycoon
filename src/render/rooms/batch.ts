@@ -4,11 +4,10 @@
 
 import { BufferAttribute, BufferGeometry, Mesh, MeshStandardMaterial, type Material, type Object3D } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { plainSurfaceKey } from '../mergeChildren';
 
 function plainKey(mat: Material): string | null {
-  if (!(mat instanceof MeshStandardMaterial) || (mat as { isMeshPhysicalMaterial?: boolean }).isMeshPhysicalMaterial) return null;
-  if (mat.map || mat.transparent || mat.emissive.getHex() !== 0) return null;
-  return `${mat.roughness.toFixed(1)}|${mat.metalness.toFixed(1)}|${mat.envMapIntensity.toFixed(2)}|${mat.side}`;
+  return plainSurfaceKey(mat);
 }
 
 export class StaticBatcher {
@@ -40,10 +39,8 @@ export class StaticBatcher {
       }
       g.setAttribute('color', new BufferAttribute(colors, 3));
       if (!this.shared.has(key)) {
-        this.shared.set(
-          key,
-          new MeshStandardMaterial({ vertexColors: true, roughness: src.roughness, metalness: src.metalness, envMapIntensity: src.envMapIntensity, side: src.side }),
-        );
+        const [r, m, e] = base!.split('|');
+        this.shared.set(key, new MeshStandardMaterial({ vertexColors: true, roughness: +r, metalness: +m, envMapIntensity: +e, side: src.side }));
       }
       mat = this.shared.get(key)!;
     }

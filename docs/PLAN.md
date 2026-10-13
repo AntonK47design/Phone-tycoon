@@ -336,6 +336,16 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
   Wandpaneelen, rotem Teppich, Absperrkordeln, Plaketten und Lichtkegeln. Draw Calls (Medium):
   Büro 66, Fabrik 71, Store 53, Halle 56, Garage 149. Tabs als Icon-Leiste am rechten Rand
   (bricht nie um; Panels öffnen daneben), Hochformat: wischbare Icon-Reihe unten.
+- **Nachtrag Performance & Figuren:** Garage von 149 auf Ø 91 Draw Calls (Medium; Low 134 → 77,
+  High 308 → 158): Teile pro starrer Gruppe als *ein* vertex-gefärbtes Mesh (`mergeChildren`
+  mit `colored`), gröbere Oberflächen-Klassen im StaticBatcher (glänzend/satin/matt × Metall),
+  Physical-Deko-Teile mitgebatcht, Schatten-Map nur bei Kamerafahrt jedes Bild, sonst mit 20 Hz.
+  Figuren detailreicher bei gleich vielen bzw. weniger Draw Calls: Gründer mit Hoodie, Gesicht,
+  Kopfhörern, Sneakern; Büro-Team mit zwei Frisuren, Gesicht, Händen, Schuhen (7 Draws für bis
+  zu 24 Personen); Store-Kunden mit Beinen, Gesicht, Haaren. Dazu Garage-Details (Mini-Kühlschrank,
+  Dartscheibe, Pizzakartons, Skateboard), Snack-Ecke ab Bürostufe 3 (Server-Rack, Snackautomat)
+  und ein fahrender Gabelstapler in der Fabrik. Ø Draw Calls (Medium): Garage 91, Büro 58,
+  Fabrik 46, Store 40, Halle 44.
 - **Abweichung:** Kein eigener Profiling-Umbau der Garage – sie liegt mit 149 Draw Calls
   (Medium) knapp im Budget; die übrigen Räume sind deutlich darunter.
 

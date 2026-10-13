@@ -417,11 +417,12 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
   const led = new Mesh(keep(new TorusGeometry(0.61, 0.012, 8, 96)), ledMaterial);
   led.rotation.x = Math.PI / 2;
   led.position.set(tt.x, 0.19, tt.z);
-  root.add(led);
+  batch.add(led, { castShadow: false });
   const led2 = new Mesh(keep(new TorusGeometry(0.715, 0.008, 8, 96)), ledMaterial);
   led2.rotation.x = Math.PI / 2;
   led2.position.set(tt.x, 0.02, tt.z);
-  root.add(led2);
+  // Both rings share one glowing material: merged into one draw call.
+  batch.add(led2, { castShadow: false });
   const heroAnchor = new Group();
   heroAnchor.position.set(tt.x, 0.21, tt.z);
   root.add(heroAnchor);
@@ -488,6 +489,39 @@ export function buildGarage(quality: 'low' | 'medium' | 'high'): GarageRoom {
     fairy.setColorAt(i, warm);
   });
   root.add(fairy);
+
+  // ── Little life details (all static, merged into the batches) ────────
+  // Mini fridge with magnets and a couple of cans, between bench and shelf.
+  const fz = 0.3;
+  const fx = x0 + 0.33;
+  box(0.5, 0.82, 0.52, M.white, fx, 0.41, fz, 0.04);
+  box(0.02, 0.6, 0.03, M.metalDark, fx + 0.26, 0.48, fz + 0.18, 0.01);
+  for (const [mx, my, col] of [[0.1, 0.62, '#ff6b6b'], [-0.08, 0.5, '#4dc3ff'], [0.05, 0.36, '#ffe066']] as const) {
+    box(0.02, 0.06, 0.06, std(col, 0.5), fx + 0.255, my, fz + mx, 0.01);
+  }
+  for (let i = 0; i < 2; i++) cyl(0.033, 0.033, 0.12, i ? M.yellow : std('#e5383b', 0.4, 0.3), fx - 0.05 + i * 0.1, 0.88, fz - 0.1, 14);
+  // Dartboard above it.
+  cyl(0.24, 0.24, 0.04, M.black, x0 + 0.03, 1.75, fz, 28, [0, 0, Math.PI / 2]);
+  cyl(0.2, 0.2, 0.045, std('#f2e6c8', 0.7), x0 + 0.035, 1.75, fz, 28, [0, 0, Math.PI / 2]);
+  cyl(0.13, 0.13, 0.05, std('#e5383b', 0.7), x0 + 0.04, 1.75, fz, 24, [0, 0, Math.PI / 2]);
+  cyl(0.06, 0.06, 0.055, std('#1fbf86', 0.7), x0 + 0.045, 1.75, fz, 20, [0, 0, Math.PI / 2]);
+  cyl(0.02, 0.02, 0.06, M.black, x0 + 0.05, 1.75, fz, 12, [0, 0, Math.PI / 2]);
+  for (const [dy, dz] of [[0.04, 0.05], [-0.07, -0.02]]) cyl(0.006, 0.004, 0.12, M.yellow, x0 + 0.1, 1.75 + dy, fz + dz, 6, [0, 0, Math.PI / 2]);
+  // Pizza boxes and a soda can in the front-right corner, a skateboard on the floor.
+  const pzX = 2.75;
+  const pzZ = 2.45;
+  for (let i = 0; i < 4; i++) box(0.46, 0.05, 0.46, i === 3 ? std('#f2e2c4', 0.85) : std('#d9b98a', 0.85), pzX + (i % 2) * 0.03, 0.025 + i * 0.052, pzZ - (i % 2) * 0.02, 0.008);
+  box(0.2, 0.012, 0.05, std('#e5383b', 0.7), pzX, 0.215, pzZ, 0.004);
+  cyl(0.033, 0.033, 0.12, std('#4f7cff', 0.4, 0.3), pzX + 0.36, 0.06, pzZ - 0.1, 14);
+  const skX = 0.15;
+  const skZ = 2.55;
+  box(0.78, 0.025, 0.2, std('#ff5a1f', 0.6), skX, 0.085, skZ, 0.05, [0, 0.35, 0]);
+  for (const sx of [-0.25, 0.25]) {
+    const ox = Math.cos(0.35) * sx;
+    const oz = -Math.sin(0.35) * sx;
+    box(0.05, 0.03, 0.16, M.metalDark, skX + ox, 0.06, skZ + oz, 0.01, [0, 0.35, 0]);
+    for (const w2 of [-0.07, 0.07]) cyl(0.03, 0.03, 0.03, std('#f4f4f4', 0.5), skX + ox + Math.sin(0.35) * w2, 0.03, skZ + oz + Math.cos(0.35) * w2, 12, [Math.PI / 2, 0.35, 0]);
+  }
 
   batch.flush(root);
 

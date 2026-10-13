@@ -25,6 +25,7 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import { concreteTexture, skyTexture } from '../textures';
 import { StaticBatcher } from './batch';
 import { forklift, machine, pallet, pendantLamp, type Kit } from './props';
+import { mergeChildren } from '../mergeChildren';
 
 export const FACTORY_ORIGIN = new Vector3(-14, 0, 0);
 
@@ -101,6 +102,9 @@ export class Factory {
   private offsets = new Float32Array(MAX_LINES);
   private flash = new Float32Array(MAX_LINES);
   private rejectAt = new Float32Array(MAX_LINES).fill(-1);
+  private lift: Group | null = null;
+  private liftLoad: Mesh | null = null;
+  private liftPath: { from: number; to: number; z: number } | null = null;
 
   constructor() {
     this.root.position.copy(FACTORY_ORIGIN);
@@ -171,6 +175,9 @@ export class Factory {
     this.statics.clear();
     this.disposables.forEach((d) => d.dispose());
     this.disposables = [];
+    this.lift = null;
+    this.liftLoad = null;
+    this.liftPath = null;
     const keep = <T extends { dispose(): void }>(x: T) => (this.disposables.push(x), x);
     const std = (color: string, roughness = 0.7, metalness = 0, extra: Partial<MeshStandardMaterial> = {}) =>
       keep(new MeshStandardMaterial({ color, roughness, metalness, envMapIntensity: 0.45, ...extra }));
@@ -337,7 +344,36 @@ export class Factory {
       pallet(kit, palletMats, w / 2 - 0.6, pz, 2);
       pallet(kit, palletMats, w / 2 - 1.5, pz, 1);
       pallet(kit, palletMats, w / 2 - 2.4, pz, 3);
-      forklift(kit, { body: M.forklift, dark: M.frame, steel: M.pipe, seat: M.seat }, w / 2 - 4.0, pz);
+      // The forklift is its own little group: it shuttles between the pallets and the racks.
+      this.lift = new Group();
+      const liftKit: Kit = {
+        box: (bw, bh, bd, m, x, y, z, r = 0.02) => {
+          const mesh = new Mesh(new RoundedBoxGeometry(bw, bh, bd, 2, Math.min(r, bw / 2, bh / 2, bd / 2)), m);
+          mesh.position.set(x, y, z);
+          mesh.castShadow = true;
+          this.lift!.add(mesh);
+        },
+        cyl: (rt, rb, h, m, x, y, z, seg = 12) => {
+          const mesh = new Mesh(new CylinderGeometry(rt, rb, h, seg), m);
+          mesh.position.set(x, y, z);
+          this.lift!.add(mesh);
+        },
+        sphere: (r, m, x, y, z) => {
+          const mesh = new Mesh(new SphereGeometry(r, 10, 8), m);
+          mesh.position.set(x, y, z);
+          this.lift!.add(mesh);
+        },
+      };
+      forklift(liftKit, { body: M.forklift, dark: M.frame, steel: M.pipe, seat: M.seat }, 0, 0);
+      // A crate on the forks (shown while carrying).
+      this.liftLoad = new Mesh(keep(new RoundedBoxGeometry(0.42, 0.32, 0.42, 2, 0.015)), M.cardboard);
+      this.liftLoad.position.set(-0.72, 0.29, 0);
+      this.liftLoad.castShadow = true;
+      mergeChildren(this.lift, { colored: 'single' });
+      this.lift.add(this.liftLoad);
+      this.lift.position.set(w / 2 - 4.0, 0, pz);
+      this.liftPath = { from: x0 + whW + 0.9, to: w / 2 - 3.4, z: pz };
+      this.statics.add(this.lift);
       box(4.2, 0.006, 0.05, M.walkway, w / 2 - 2.2, 0.004, pz - 0.6, 0);
     }
     batch.flush(this.statics);
@@ -406,6 +442,7 @@ export class Factory {
         robots++;
       }
     });
+    this.driveLift(t);
     this.phones.count = phones;
     this.phones.instanceMatrix.needsUpdate = true;
     for (const part of this.robotParts) {
@@ -416,6 +453,33 @@ export class Factory {
     this.lights.instanceMatrix.needsUpdate = true;
     if (this.lights.instanceColor) this.lights.instanceColor.needsUpdate = true;
     return v.lines.some((l) => l.running && l.colorHex);
+  }
+
+  /**
+   * Forklift loop (period 16 s): wait at the pallets, drive to the racks with a crate
+   * (forks up), unload, drive back empty. Turns on the spot at both ends.
+   */
+  private driveLift(t: number) {
+    const lift = this.lift;
+    const path = this.liftPath;
+    if (!lift || !path || !this.liftLoad) return;
+    const k = (t % 16) / 16;
+    const ease = (u: number) => u * u * (3 - 2 * u);
+    const span = (a: number, b: number) => Math.min(1, Math.max(0, (k - a) / (b - a)));
+    // Built with the forks pointing to −x (the racks); rotated by π they point at the pallets.
+    let x = path.to;
+    let facing = Math.PI;
+    let carrying = false;
+    if (k < 0.1) carrying = k > 0.05; // pick up a crate at the pallets
+    else if (k < 0.15) [carrying, facing] = [true, Math.PI * (1 - ease(span(0.1, 0.15)))];
+    else if (k < 0.45) [carrying, facing, x] = [true, 0, path.to + (path.from - path.to) * ease(span(0.15, 0.45))];
+    else if (k < 0.55) [carrying, facing, x] = [k < 0.5, 0, path.from]; // unload at the racks
+    else if (k < 0.6) [facing, x] = [Math.PI * ease(span(0.55, 0.6)), path.from];
+    else if (k < 0.9) x = path.from + (path.to - path.from) * ease(span(0.6, 0.9));
+    lift.position.set(x, 0, path.z);
+    lift.rotation.y = facing;
+    this.liftLoad.visible = carrying;
+    this.liftLoad.position.y = carrying ? 0.3 : 0.29;
   }
 
   dispose() {

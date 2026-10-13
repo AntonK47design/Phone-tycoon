@@ -61,7 +61,7 @@ export class Cat {
 
     // The ear that twitches stays separate; the rest of the head is merged.
     this.head.remove(this.earL);
-    mergeChildren(this.head);
+    mergeChildren(this.head, { colored: 'single' });
     this.head.add(this.earL);
 
     // Tail: one instanced chain of spheres (white base colour, tinted per instance).

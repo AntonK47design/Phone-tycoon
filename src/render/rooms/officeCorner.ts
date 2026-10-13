@@ -134,7 +134,7 @@ export class OfficeCorner {
     const sign = new Mesh(new PlaneGeometry(1.6, 0.5), this.signMat);
     sign.position.set(1.95, 2.72, -2.92);
     this.group.add(sign);
-    mergeChildren(this.group);
+    mergeChildren(this.group, { colored: 'single' });
     this.group.visible = false;
   }
 

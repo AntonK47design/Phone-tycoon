@@ -163,6 +163,7 @@ export class Office {
   private shown = false;
   private level = 0;
   private labGlow: MeshStandardMaterial;
+  private rackLed = new MeshStandardMaterial({ color: '#000000', emissive: '#3cff8a', emissiveIntensity: 2 });
 
   constructor() {
     this.root.position.copy(OFFICE_ORIGIN);
@@ -270,6 +271,8 @@ export class Office {
       artC: std('#ffd23f', 0.8),
       artD: std('#2bb3a8', 0.8),
       cabinet: std('#8f97a3', 0.45, 0.5),
+      vending: std('#e5383b', 0.45, 0.1),
+      vendGlass: std('#e8f4ff', 0.2, 0, { emissive: new Color('#bfe2ff'), emissiveIntensity: 0.9 }),
       clockFace: std('#fbf8f2', 0.6),
     };
     const kit: Kit = {
@@ -463,7 +466,7 @@ export class Office {
     const rugZ0 = Math.max(z0 + 0.25, Math.min(...pzs) - 1.35);
     const rugZ1 = Math.min(d / 2 - 0.85, Math.max(...pzs) + 1.35);
     box(rugX1 - rugX0, 0.012, rugZ1 - rugZ0, M.areaRug, (rugX0 + rugX1) / 2, 0.006, (rugZ0 + rugZ1) / 2, 0.005);
-    for (const p of pods) pendantLamp(kit, { cable: M.cable, shade: M.shade, bulb: M.bulb }, p.x, p.z, wallH + 0.2, 2.25, 0.26);
+    for (const p of pods) pendantLamp(kit, { cable: M.cable, shade: M.shade, bulb: M.bulb }, p.x, p.z, wallH + 0.2, 2.6, 0.2);
     // Skirting on the left wall.
     box(0.03, 0.09, d, M.cap, x0 + 0.015, 0.045, 0, 0);
     // Framed pictures and a clock on the left wall (above the stripe).
@@ -488,10 +491,28 @@ export class Office {
     });
     // Filing cabinet with a printer in the back-right corner, a big plant front-right.
     const cabX = w / 2 - 0.32;
-    box(0.46, 0.95, 0.5, M.cabinet, cabX, 0.475, z0 + 0.35, 0.02);
-    for (let i = 0; i < 3; i++) box(0.4, 0.02, 0.02, M.leg, cabX, 0.22 + i * 0.3, z0 + 0.61, 0.005);
-    box(0.4, 0.2, 0.36, M.white, cabX, 1.05, z0 + 0.35, 0.03);
-    box(0.3, 0.02, 0.2, M.monitor, cabX, 1.16, z0 + 0.35, 0.005);
+    const cabZ = level >= 3 ? z0 + 1.95 : z0 + 0.35;
+    box(0.46, 0.95, 0.5, M.cabinet, cabX, 0.475, cabZ, 0.02);
+    for (let i = 0; i < 3; i++) box(0.4, 0.02, 0.02, M.leg, cabX, 0.22 + i * 0.3, cabZ + 0.26, 0.005);
+    box(0.4, 0.2, 0.36, M.white, cabX, 1.05, cabZ, 0.03);
+    box(0.3, 0.02, 0.2, M.monitor, cabX, 1.16, cabZ, 0.005);
+    if (level >= 3) {
+      // Snack corner: a server rack with blinking lights and a glowing vending machine.
+      const rx = w / 2 - 0.36;
+      const rz = z0 + 0.42;
+      box(0.62, 2.0, 0.66, M.monitor, rx, 1.0, rz, 0.02);
+      for (let u = 0; u < 7; u++) {
+        box(0.5, 0.18, 0.02, M.leg, rx, 0.35 + u * 0.24, rz + 0.33, 0.01);
+        for (let k = 0; k < 3; k++) box(0.025, 0.025, 0.01, this.rackLed, rx - 0.18 + k * 0.05, 0.35 + u * 0.24, rz + 0.345, 0.004);
+      }
+      const vz = z0 + 1.2;
+      box(0.62, 1.8, 0.72, M.vending, rx, 0.9, vz, 0.04);
+      box(0.02, 1.2, 0.5, M.vendGlass, rx - 0.32, 1.05, vz - 0.05, 0.01);
+      for (let r = 0; r < 4; r++) {
+        for (let k = 0; k < 3; k++) box(0.06, 0.12, 0.1, [M.artA, M.artC, M.artD, M.yellow][(r + k) % 4], rx - 0.26, 0.6 + r * 0.28, vz - 0.2 + k * 0.15, 0.01);
+      }
+      box(0.03, 0.2, 0.12, M.monitor, rx - 0.32, 1.0, vz + 0.27, 0.01);
+    }
     if (level < 3) plant(kit, plantMats, w / 2 - 0.4, d / 2 - 0.4, 1.1);
 
     // Neon company sign above the pods.
@@ -519,6 +540,7 @@ export class Office {
     if (this.screens.instanceColor) this.screens.instanceColor.needsUpdate = true;
     this.signMat.color.setScalar((Math.sin(t * 37) > 0.995 ? 0.5 : 2.2) + Math.sin(t * 3) * 0.1);
     this.labGlow.emissiveIntensity = 1.8 + Math.sin(t * 2.2) * 0.5;
+    this.rackLed.emissiveIntensity = Math.sin(t * 9) > 0.2 ? 2.4 : 0.6;
     return this.crowd.update(t, dt, this.busy);
   }
 
@@ -538,6 +560,7 @@ export class Office {
     this.signMat.map?.dispose();
     this.signMat.dispose();
     this.labGlow.dispose();
+    this.rackLed.dispose();
     this.crowd.dispose();
   }
 }

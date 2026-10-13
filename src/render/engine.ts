@@ -98,6 +98,8 @@ export class Engine {
   private lastInput = 0;
   private idleAcc = 0;
   private fpsAcc = { frames: 0, time: 0, fps: 0 };
+  private shadowFrame = 0;
+  private rigMoving = true;
   private firstFrame: (() => void) | null = null;
 
   private phoneMode: PhoneMode = 'spin';
@@ -122,6 +124,8 @@ export class Engine {
     this.renderer.toneMappingExposure = 0.85;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFShadowMap;
+    // Shadows are refreshed by the frame loop (see shadowFrame), not on every render.
+    this.renderer.shadowMap.autoUpdate = false;
     this.renderer.info.autoReset = false;
     container.appendChild(this.renderer.domElement);
     this.renderer.domElement.className = 'scene-canvas';
@@ -238,6 +242,10 @@ export class Engine {
       this.idleAcc = 0;
     }
     this.renderer.info.reset();
+    // Shadow map: every frame while the camera moves, otherwise at 20 Hz. Only small things
+    // (typing hands, a cat's tail, the floating phone) move, and they look the same.
+    this.shadowFrame = (this.shadowFrame + 1) % 3;
+    this.renderer.shadowMap.needsUpdate = this.rigMoving || idle || this.shadowFrame === 0;
     this.composer.render(dt);
 
     this.fpsAcc.frames++;
@@ -266,6 +274,7 @@ export class Engine {
     this.time += dt;
     const t = this.time;
     let animating = this.rig.update(dt);
+    this.rigMoving = animating;
     animating = this.phone.update(dt) || animating;
     animating = this.confetti.update(dt) || animating;
 
@@ -310,6 +319,7 @@ export class Engine {
 
   private applyQuality() {
     const p = PROFILES[this.quality];
+    this.rigMoving = true; // redraw the (possibly resized) shadow map on the next frame
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, p.pixelRatioCap));
     if (this.key.shadow.mapSize.x !== p.shadowMap) {
       this.key.shadow.mapSize.set(p.shadowMap, p.shadowMap);
@@ -402,6 +412,7 @@ export class Engine {
 
   /** Moves the shadow frustum to the room the camera looks at. */
   private aimShadows(room: 'garage' | 'office' | 'factory' | 'store' | 'hall') {
+    this.rigMoving = true;
     const origins = { garage: new Vector3(), office: OFFICE_ORIGIN, factory: FACTORY_ORIGIN, store: STORE_ORIGIN, hall: HALL_ORIGIN };
     const off = origins[room];
     this.key.position.set(5.5, 9, 6.5).add(off);

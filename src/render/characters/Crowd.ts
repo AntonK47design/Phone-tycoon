@@ -2,7 +2,10 @@
 // legs). Seated typing, idle sway and little walks to the coffee machine and back.
 
 import {
+  BufferAttribute,
+  BoxGeometry,
   CapsuleGeometry,
+  CylinderGeometry,
   Color,
   Group,
   InstancedMesh,
@@ -10,9 +13,11 @@ import {
   MeshStandardMaterial,
   Quaternion,
   SphereGeometry,
+  TorusGeometry,
   Vector3,
   type BufferGeometry,
 } from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { ROLE_COLORS, type Role } from '../../data/team';
 
 export interface StaffVisual {
@@ -67,6 +72,27 @@ function limb(radius: number, length: number): BufferGeometry {
   return g;
 }
 
+/**
+ * Merges parts into one geometry with a grey vertex colour per part. The instance colour
+ * multiplies it: white parts take the person's colour (shirt, skin …), dark parts stay dark
+ * (eyes, belt, shoes). Many details, one draw call per body part for the whole crowd.
+ */
+export function parts(list: [BufferGeometry, number][]): BufferGeometry {
+  const geos = list.map(([g, grey]) => {
+    let x = g.index ? g.toNonIndexed() : g;
+    if (x !== g) g.dispose();
+    x.deleteAttribute('uv');
+    const n = x.attributes.position.count;
+    const c = new Float32Array(n * 3).fill(grey);
+    x.setAttribute('color', new BufferAttribute(c, 3));
+    return x;
+  });
+  const merged = mergeGeometries(geos, false)!;
+  geos.forEach((g) => g.dispose());
+  return merged;
+}
+export const at = <T extends BufferGeometry>(g: T, x: number, y: number, z: number): T => g.translate(x, y, z) as T;
+
 function yawOf(dir: Vector3): number {
   return Math.atan2(-dir.z, dir.x);
 }
@@ -76,8 +102,12 @@ export class Crowd {
   private torso: InstancedMesh;
   private head: InstancedMesh;
   private hair: InstancedMesh;
+  private hairLong: InstancedMesh;
   private arms: InstancedMesh;
+  private hands: InstancedMesh;
   private legs: InstancedMesh;
+  /** Index of each person in the short / long hair mesh (−1 = other style). */
+  private hairSlot: [number, number][] = [];
   private mats: MeshStandardMaterial[] = [];
   private people: Person[] = [];
   private waypoints: Vector3[] = [];
@@ -85,7 +115,7 @@ export class Crowd {
 
   constructor() {
     const mat = (roughness: number) => {
-      const m = new MeshStandardMaterial({ color: '#ffffff', roughness });
+      const m = new MeshStandardMaterial({ color: '#ffffff', roughness, vertexColors: true });
       this.mats.push(m);
       return m;
     };
@@ -98,15 +128,60 @@ export class Crowd {
       this.group.add(m);
       return m;
     };
-    const torsoGeo = new CapsuleGeometry(0.15, 0.24, 6, 12);
-    torsoGeo.scale(1, 1, 0.82);
-    this.torso = inst(torsoGeo, MAX, 0.8);
-    this.head = inst(new SphereGeometry(0.125, 18, 12), MAX, 0.7);
-    const hairGeo = new SphereGeometry(0.133, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.55);
-    hairGeo.rotateZ(0.3);
-    this.hair = inst(hairGeo, MAX, 0.9);
-    this.arms = inst(limb(0.045, 0.34), MAX * 2, 0.8);
-    this.legs = inst(limb(0.06, 0.38), MAX * 2, 0.85);
+    // Torso: shirt, collar, belt with buckle, a few buttons.
+    const torsoCore = new CapsuleGeometry(0.15, 0.24, 6, 14);
+    torsoCore.scale(1, 1, 0.82);
+    const collar = new TorusGeometry(0.07, 0.022, 8, 18).rotateX(Math.PI / 2);
+    const belt = new CylinderGeometry(0.152, 0.152, 0.045, 18).scale(1, 1, 0.82);
+    this.torso = inst(
+      parts([
+        [torsoCore, 1],
+        [at(collar, 0, 0.255, 0), 0.82],
+        [at(belt, 0, -0.17, 0), 0.22],
+        [at(new BoxGeometry(0.02, 0.035, 0.05), -0.125, -0.17, 0), 0.9],
+        [at(new SphereGeometry(0.011, 6, 4), -0.135, 0.12, 0), 0.6],
+        [at(new SphereGeometry(0.011, 6, 4), -0.142, 0.03, 0), 0.6],
+      ]),
+      MAX,
+      0.8,
+    );
+    // Head (faces −x): face, ears, nose, eyes, brows, mouth – all tinted with the skin colour.
+    const headParts: [BufferGeometry, number][] = [[new SphereGeometry(0.125, 18, 12), 1]];
+    for (const side of [-1, 1]) {
+      headParts.push([at(new SphereGeometry(0.028, 8, 6).scale(0.8, 1, 0.5), 0, 0, side * 0.124), 0.95]);
+      headParts.push([at(new SphereGeometry(0.014, 8, 6).scale(0.6, 1.2, 1), -0.118, 0.02, side * 0.045), 0.08]);
+      headParts.push([at(new BoxGeometry(0.01, 0.011, 0.04).rotateX(side * -0.15), -0.118, 0.06, side * 0.047), 0.3]);
+    }
+    headParts.push([at(new SphereGeometry(0.018, 8, 6), -0.13, -0.012, 0), 0.97]);
+    headParts.push([at(new TorusGeometry(0.026, 0.006, 6, 10, Math.PI).rotateY(Math.PI / 2).rotateX(Math.PI), -0.116, -0.04, 0), 0.5]);
+    this.head = inst(parts(headParts), MAX, 0.7);
+    // Two hairstyles: short with a fringe, and long with a fall at the back and a bun.
+    const cap = () => new SphereGeometry(0.133, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.55).rotateZ(0.3);
+    this.hair = inst(parts([[cap(), 1], [at(new SphereGeometry(0.06, 10, 8).scale(0.7, 0.45, 1.4), -0.085, 0.095, 0.02), 1]]), MAX, 0.9);
+    this.hairLong = inst(
+      parts([
+        [cap(), 1],
+        [at(new CapsuleGeometry(0.1, 0.12, 4, 12).scale(0.55, 1, 1.2), 0.07, -0.06, 0), 1],
+        [at(new SphereGeometry(0.055, 10, 8), 0.1, 0.11, 0), 0.92],
+      ]),
+      MAX,
+      0.9,
+    );
+    // Arms: sleeve with a cuff; hands are their own (skin-tinted) mesh.
+    const armLen = 0.34;
+    this.arms = inst(parts([[limb(0.048, armLen - 0.08), 1], [at(new CylinderGeometry(0.05, 0.05, 0.035, 10), 0, -(armLen - 0.08) - 0.02, 0), 0.8]]), MAX * 2, 0.8);
+    this.hands = inst(at(new SphereGeometry(0.042, 10, 8).scale(0.8, 1.1, 1), 0, -armLen - 0.01, 0), MAX * 2, 0.7);
+    // Legs: trousers ending in a shoe with a light sole.
+    const legLen = 0.38;
+    this.legs = inst(
+      parts([
+        [limb(0.06, legLen), 1],
+        [at(new CapsuleGeometry(0.05, 0.1, 4, 8).rotateZ(Math.PI / 2), -0.04, -legLen - 0.06, 0), 0.12],
+        [at(new BoxGeometry(0.17, 0.02, 0.09), -0.045, -legLen - 0.105, 0), 0.85],
+      ]),
+      MAX * 2,
+      0.85,
+    );
   }
 
   setWaypoints(points: Vector3[]) {
@@ -150,18 +225,34 @@ export class Crowd {
       this.torso.setColorAt(i, p.shirt);
       this.arms.setColorAt(i * 2, p.shirt);
       this.arms.setColorAt(i * 2 + 1, p.shirt);
-      this.head.setColorAt(i, SKIN[p.v.look % SKIN.length]);
-      this.hair.setColorAt(i, HAIR[Math.floor(p.v.look / 7) % HAIR.length]);
+      const skin = SKIN[p.v.look % SKIN.length];
+      this.head.setColorAt(i, skin);
+      this.hands.setColorAt(i * 2, skin);
+      this.hands.setColorAt(i * 2 + 1, skin);
       const pants = PANTS[Math.floor(p.v.look / 3) % PANTS.length];
       this.legs.setColorAt(i * 2, pants);
       this.legs.setColorAt(i * 2 + 1, pants);
     });
-    for (const m of [this.torso, this.head, this.hair, this.arms, this.legs]) {
+    // Hairstyle from the look: about half short, half long.
+    let short = 0;
+    let long = 0;
+    this.hairSlot = this.people.map((p) => {
+      const col = HAIR[Math.floor(p.v.look / 7) % HAIR.length];
+      if ((p.v.look >> 2) % 2 === 0) {
+        this.hair.setColorAt(short, col);
+        return [short++, -1];
+      }
+      this.hairLong.setColorAt(long, col);
+      return [-1, long++];
+    });
+    for (const m of this.meshes()) {
       if (m.instanceColor) m.instanceColor.needsUpdate = true;
     }
     const n = this.people.length;
-    this.torso.count = this.head.count = this.hair.count = n;
-    this.arms.count = this.legs.count = n * 2;
+    this.torso.count = this.head.count = n;
+    this.hair.count = short;
+    this.hairLong.count = long;
+    this.arms.count = this.legs.count = this.hands.count = n * 2;
   }
 
   /** Who is sitting at a desk right now (for monitor glow). */
@@ -226,7 +317,7 @@ export class Crowd {
       }
       this.pose(p, i, t);
     });
-    for (const m of [this.torso, this.head, this.hair, this.arms, this.legs]) m.instanceMatrix.needsUpdate = true;
+    for (const m of this.meshes()) m.instanceMatrix.needsUpdate = true;
     return animating || this.people.length > 0;
   }
 
@@ -270,10 +361,15 @@ export class Crowd {
     const hm = local(lean * 0.6, headY, 0, headTilt);
     if (headTurn) hm.multiply(new Matrix4().makeRotationY(headTurn));
     this.head.setMatrixAt(i, hm);
-    this.hair.setMatrixAt(i, hm.clone().multiply(new Matrix4().makeTranslation(-0.01, 0.012, 0)));
+    const hairM = hm.clone().multiply(new Matrix4().makeTranslation(-0.01, 0.012, 0));
+    const [hs, hl] = this.hairSlot[i] ?? [-1, -1];
+    if (hs >= 0) this.hair.setMatrixAt(hs, hairM);
+    if (hl >= 0) this.hairLong.setMatrixAt(hl, hairM);
     for (const side of [0, 1]) {
       const z = side ? 0.19 : -0.19;
-      this.arms.setMatrixAt(i * 2 + side, local(lean * 0.4, hip + 0.47, z, armA[side]));
+      const armM = local(lean * 0.4, hip + 0.47, z, armA[side]);
+      this.arms.setMatrixAt(i * 2 + side, armM);
+      this.hands.setMatrixAt(i * 2 + side, armM);
       this.legs.setMatrixAt(i * 2 + side, local(0, hip, side ? 0.09 : -0.09, legA[side]));
     }
   }
@@ -289,8 +385,12 @@ export class Crowd {
     return true;
   }
 
+  private meshes(): InstancedMesh[] {
+    return [this.torso, this.head, this.hair, this.hairLong, this.arms, this.hands, this.legs];
+  }
+
   dispose() {
-    for (const m of [this.torso, this.head, this.hair, this.arms, this.legs]) {
+    for (const m of this.meshes()) {
       m.geometry.dispose();
       m.dispose();
     }

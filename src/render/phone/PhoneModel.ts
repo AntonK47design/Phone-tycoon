@@ -460,7 +460,8 @@ export class PhoneModel {
     const port = new Mesh(new RoundedBoxGeometry(8, 1.4, 2.4, 2, 0.6), m.slot);
     port.position.set(0, -d.height / 2 + 0.2, 0);
     this.details.add(port);
-    for (const g of [this.island, this.buttons, this.details]) mergeChildren(g);
+    // Small parts: one vertex-coloured mesh per group (plus any glowing/textured bits).
+    for (const g of [this.island, this.buttons, this.details]) mergeChildren(g, { colored: true });
   }
 
   /** Height of the phone in scene units. */
