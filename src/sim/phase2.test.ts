@@ -4,7 +4,7 @@ import { RESEARCH } from '../data/research';
 import { advanceDay, applyAction, creditAvailable, forecast, newGame } from './game';
 import { applyOffline, OFFLINE_MAX_DAYS } from './offline';
 import { availableParts, researchCost, researchStatus, rpPerDay } from './research';
-import { deserialize } from './save/save';
+import { deserialize, serialize } from './save/save';
 import { SAVE_VERSION, type GameState } from './state';
 
 /** A company that has launched once and rented the office. */
@@ -153,5 +153,15 @@ describe('saves & offline', () => {
     applyAction(s, { type: 'startResearch', id: 'marketing' });
     const report = applyOffline(s, 8 * 3600)!;
     expect(report.researchDone).toContain('marketing');
+  });
+});
+
+describe('guided tours', () => {
+  it('a finished tour is remembered once and survives a save', () => {
+    const s = newGame(4);
+    applyAction(s, { type: 'tourDone', id: 'panels' });
+    applyAction(s, { type: 'tourDone', id: 'panels' });
+    expect(s.tours).toEqual(['panels']);
+    expect(deserialize(serialize(s, 0)).state.tours).toEqual(['panels']);
   });
 });

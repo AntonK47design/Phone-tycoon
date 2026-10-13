@@ -17,6 +17,7 @@ import { isWorking } from '../sim/team';
 import { lineScrapRate, stockTotal } from '../sim/factory';
 import { TEMPOS, warehouseCapacity } from '../data/factory';
 import { colorById } from '../data/design';
+import { Tour } from './hud/Tour';
 
 const DevPanel = import.meta.env.DEV ? lazy(() => import('./debug/DevPanel').then((m) => ({ default: m.DevPanel }))) : null;
 
@@ -85,6 +86,7 @@ export function App() {
       {m === 'free' && <NewsTicker />}
       {m === 'free' && <DrawerTabs />}
       {m === 'free' && <Drawer />}
+      {m === 'free' && <Tour />}
       <FounderBark />
       {(m === 'tutorial' || m === 'editor') && <Editor />}
       {launchData.value && <LaunchSequence />}

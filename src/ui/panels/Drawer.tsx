@@ -15,7 +15,8 @@ import { availableSegments, channelCut, reach, researchCost, researchProgress, r
 import { priceAnchor } from '../../sim/scoring/score';
 import { calendar, yearOf } from '../../sim/time';
 import { decimal, money, shortNum } from '../format';
-import { drawer, game, hubView, toast, useGameState, type DrawerTab } from '../game';
+import { drawer, game, hubView, toast, tourStep, useGameState, type DrawerTab } from '../game';
+import { TOUR_STEPS } from '../hud/Tour';
 import { seats } from '../../sim/team';
 import { TeamPanel } from './TeamPanel';
 import { FactoryPanel } from './FactoryPanel';
@@ -28,6 +29,20 @@ import { lang, t } from '../i18n';
 import { IconClose } from '../icons';
 import { researchEffect, researchName, researchNameById } from '../labels';
 
+/** Opens a side panel; the team and factory panels also move the camera to their room. */
+export function openTab(tab: DrawerTab | null) {
+  drawer.value = tab;
+  const state = game().store.getState();
+  if (tab === 'team' && hubView.value !== 'office') {
+    hubView.value = 'office';
+    game().engine.goToView('office', 1.2);
+  }
+  if (tab === 'factory' && state.factory.size > 0 && hubView.value !== 'factory') {
+    hubView.value = 'factory';
+    game().engine.goToView('factory', 1.2);
+  }
+}
+
 export function DrawerTabs() {
   const state = useGameState();
   if (state.phase < 2) return null;
@@ -38,24 +53,19 @@ export function DrawerTabs() {
   if (state.phase5Ready) tabs.push('empire');
   if (state.phase5Ready || state.legacy.runs > 0) tabs.push('legacy');
   const busy = researchProgress(state);
+  const focus = tourStep.value !== null ? TOUR_STEPS[tourStep.value]?.tab : null;
   return (
     <div class="tabs">
+      <button class="tab tab-help" aria-label={t('tour.replay')} title={t('tour.replay')} onClick={() => (sfx.click(), (tourStep.value = 0))}>
+        ?
+      </button>
       {tabs.map((tab) => (
         <button
           key={tab}
-          class={`tab ${drawer.value === tab ? 'on' : ''}`}
+          class={`tab ${drawer.value === tab ? 'on' : ''} ${focus === tab ? 'tour-focus' : ''}`}
           onClick={() => {
             sfx.click();
-            drawer.value = drawer.value === tab ? null : tab;
-            // The team lives in the office: show it.
-            if (drawer.value === 'team' && hubView.value !== 'office') {
-              hubView.value = 'office';
-              game().engine.goToView('office', 1.2);
-            }
-            if (drawer.value === 'factory' && state.factory.size > 0 && hubView.value !== 'factory') {
-              hubView.value = 'factory';
-              game().engine.goToView('factory', 1.2);
-            }
+            openTab(drawer.value === tab ? null : tab);
           }}
         >
           {t(`tabs.${tab}`)}

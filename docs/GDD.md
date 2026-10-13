@@ -921,6 +921,11 @@ Regeln:
 - Hinweise: Pfeil + ein Satz, „Überspringen" immer sichtbar, Zeit bis Launch wird im
   Dev-Overlay gemessen (Funnel-Timer: `t_firstFrame`, `t_firstInput`, `t_launch`,
   `t_reward`).
+- **Panel-Tour (Phase 2):** Sobald die Tabs erscheinen (Büro gemietet), führt eine Tour in
+  4 Schritten durch Firma, Team, Forschung und Markt: Tab wird hervorgehoben und geöffnet,
+  Sprechblase mit 3 Sätzen, Mitmach-Aufgaben (erste Person einstellen, erste Forschung starten)
+  haken sich selbst ab. Uhr pausiert währenddessen. Einmal pro Spielstand (`tours`), jederzeit
+  über den „?"-Tab wiederholbar.
 - Keine Werbung in den ersten 5 Minuten Gesamtspielzeit.
 - Kein Hauptmenü; Einstellungen über Zahnrad oben rechts.
 

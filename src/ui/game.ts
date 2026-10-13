@@ -62,6 +62,8 @@ export const hubView = signal<Room>('garage');
 export function hubCamera(): 'overview' | 'office' | 'factory' | 'store' | 'hall' {
   return hubView.value === 'garage' ? 'overview' : hubView.value;
 }
+/** Step of the guided panel tour (null = not running). */
+export const tourStep = signal<number | null>(null);
 /** Daily calendar & orders dialog. */
 export const dailyOpen = signal(false);
 /** Today's real-world date (YYYY-MM-DD, local time) for the daily calendar. */

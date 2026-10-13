@@ -2,7 +2,7 @@
 
 import { effect } from '@preact/signals';
 import { SECONDS_PER_DAY } from '../sim/time';
-import { dailyOpen, dayFraction, game, launchData, launchSetupOpen, mode, settingsOpen, speed, welcomeReport } from './game';
+import { dailyOpen, dayFraction, game, launchData, launchSetupOpen, mode, settingsOpen, speed, tourStep, welcomeReport } from './game';
 
 let acc = 0;
 let last = 0;
@@ -19,6 +19,7 @@ export function isClockRunning(): boolean {
     speed.value > 0 &&
     !settingsOpen.value &&
     !dailyOpen.value &&
+    tourStep.value === null &&
     !store.getState().events.pending &&
     launchData.value === null &&
     !launchSetupOpen.value &&

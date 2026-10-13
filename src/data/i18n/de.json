@@ -1060,5 +1060,39 @@
     "warning": "Dieser Lauf endet. Rekorde, Erfolge und Vermächtnispunkte bleiben.",
     "cancel": "Noch nicht",
     "found": "Gründen!"
+  },
+  "tour": {
+    "replay": "Tour durch die Panels",
+    "count": "{n}/{total}",
+    "skip": "Tour überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "done": "Los geht's",
+    "company": {
+      "title": "Deine Firma",
+      "l1": "Kasse, Umsatz und Gewinn pro Woche: deine Anzeigetafel.",
+      "l2": "Knapp bei Kasse? Der Bankkredit springt ein, und überschüssiges Geld zahlt ihn von selbst zurück.",
+      "l3": "Telefone im Verkauf: hier nachbestellen oder alte Modelle auslaufen lassen."
+    },
+    "team": {
+      "title": "Dein Team",
+      "l1": "Designer, Ingenieure und Programmierer bauen Telefone schneller und besser.",
+      "l2": "Forscher liefern Forschungspunkte, Marketing pusht den Hype, Produktioner helfen der Fabrik.",
+      "l3": "Behalte Gehälter und Bauqualität im Blick; Schulungen halten alle auf dem neuesten Stand.",
+      "task": "Stelle deine erste Person ein"
+    },
+    "research": {
+      "title": "Das Forschungslabor",
+      "l1": "Forschung schaltet neue Teile, Materialien, Extras und größere Bildschirme frei.",
+      "l2": "Ein Projekt gleichzeitig. Es läuft weiter, während du weg bist.",
+      "l3": "Ein roter Punkt am Tab heißt: Das Labor steht still.",
+      "task": "Starte ein Forschungsprojekt"
+    },
+    "market": {
+      "title": "Der Markt",
+      "l1": "Deine Rivalen, ihre neuesten Telefone und die Schlagzeilen.",
+      "l2": "Wer am meisten verkauft und wie groß dein Anteil ist.",
+      "l3": "„Was Käufer erwarten“ zeigt Technikstand und Pflicht-Extras für dein nächstes Telefon."
+    }
   }
 }

@@ -196,6 +196,7 @@ export interface LaunchOptions {
 export type Action =
   | { type: 'setDraft'; patch: DraftPatch }
   | { type: 'setTutorial'; step: GameState['tutorial'] }
+  | { type: 'tourDone'; id: string }
   | { type: 'startDev' }
   | { type: 'launch'; options?: LaunchOptions }
   | { type: 'renameCompany'; name: string }
@@ -296,6 +297,9 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
     }
     case 'setTutorial':
       state.tutorial = action.step;
+      return [];
+    case 'tourDone':
+      state.tours = [...new Set([...(state.tours ?? []), action.id])];
       return [];
     case 'renameCompany': {
       const name = action.name.trim().slice(0, 28);

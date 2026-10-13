@@ -1060,5 +1060,39 @@
     "warning": "This run ends. Records, achievements and legacy points stay.",
     "cancel": "Not yet",
     "found": "Found it!"
+  },
+  "tour": {
+    "replay": "Tour of the panels",
+    "count": "{n}/{total}",
+    "skip": "Skip tour",
+    "back": "Back",
+    "next": "Next",
+    "done": "Let's go",
+    "company": {
+      "title": "Your company",
+      "l1": "Cash, revenue and profit per week: your scoreboard.",
+      "l2": "Short on cash? The bank loan covers you, and spare cash pays it back on its own.",
+      "l3": "Phones on sale: reorder stock or stop selling old models here."
+    },
+    "team": {
+      "title": "Your team",
+      "l1": "Designers, engineers and programmers build phones faster and better.",
+      "l2": "Researchers make research points, marketers boost hype, producers help the factory.",
+      "l3": "Watch payroll and build quality; training keeps people up to date.",
+      "task": "Hire your first person"
+    },
+    "research": {
+      "title": "The research lab",
+      "l1": "Research unlocks new parts, materials, extras and bigger screens.",
+      "l2": "One project at a time. It keeps running while you're away.",
+      "l3": "A red dot on the tab means the lab is idle.",
+      "task": "Start a research project"
+    },
+    "market": {
+      "title": "The market",
+      "l1": "Your rivals, their latest phones and the headlines.",
+      "l2": "Who sells the most, and how big your share is.",
+      "l3": "“What buyers expect” shows the tech level and must-haves for your next phone."
+    }
   }
 }

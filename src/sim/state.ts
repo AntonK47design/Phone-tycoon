@@ -356,6 +356,8 @@ export interface GameState {
   /** Phase-3 gate reached (studio & factory – next update). */
   phase3Ready: boolean;
   tutorial: TutorialStep;
+  /** Guided tours the player finished or skipped (e.g. 'panels'). */
+  tours?: string[];
   draft: PhoneDesign;
   dev: Development | null;
   products: Product[];
