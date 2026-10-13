@@ -9,16 +9,28 @@ const PREFS_KEY = 'phone-empire-prefs';
 interface Prefs {
   quality: QualitySetting;
   sound: boolean;
+  /** Colour-blind-safe score colours. */
+  colorblind: boolean;
+  text: 'normal' | 'large';
+}
+
+const DEFAULT_PREFS: Prefs = { quality: 'auto', sound: true, colorblind: false, text: 'normal' };
+
+/** Applies the accessibility prefs to the page (CSS reads the data attributes). */
+export function applyA11y(p: Prefs) {
+  const root = document.documentElement;
+  root.dataset.cb = p.colorblind ? '1' : '0';
+  root.dataset.text = p.text;
 }
 
 export function loadPrefs(): Prefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
-    if (raw) return { quality: 'auto', sound: true, ...JSON.parse(raw) };
+    if (raw) return { ...DEFAULT_PREFS, ...JSON.parse(raw) };
   } catch {
     /* ignore */
   }
-  return { quality: 'auto', sound: true };
+  return { ...DEFAULT_PREFS };
 }
 
 function savePrefs(p: Prefs) {
@@ -39,6 +51,7 @@ export function Settings() {
     savePrefs(next);
     if (p.quality) engine.setQuality(p.quality);
     if (p.sound !== undefined) sfx.setEnabled(p.sound);
+    applyA11y(next);
     sfx.click();
   };
   const close = () => {
@@ -76,6 +89,20 @@ export function Settings() {
           <div class="seg">
             <button class={prefs.sound ? 'on' : ''} onClick={() => update({ sound: true })}>{t('settings.on')}</button>
             <button class={!prefs.sound ? 'on' : ''} onClick={() => update({ sound: false })}>{t('settings.off')}</button>
+          </div>
+        </div>
+        <div class="field">
+          {t('settings.colorblind')}
+          <div class="seg">
+            <button class={!prefs.colorblind ? 'on' : ''} onClick={() => update({ colorblind: false })}>{t('settings.off')}</button>
+            <button class={prefs.colorblind ? 'on' : ''} onClick={() => update({ colorblind: true })}>{t('settings.on')}</button>
+          </div>
+        </div>
+        <div class="field">
+          {t('settings.textSize')}
+          <div class="seg">
+            <button class={prefs.text === 'normal' ? 'on' : ''} onClick={() => update({ text: 'normal' })}>{t('settings.textNormal')}</button>
+            <button class={prefs.text === 'large' ? 'on' : ''} onClick={() => update({ text: 'large' })}>{t('settings.textLarge')}</button>
           </div>
         </div>
         {confirm ? (

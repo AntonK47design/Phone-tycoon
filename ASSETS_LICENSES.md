@@ -19,7 +19,15 @@ Phone Empire 3D ships **no third-party art or audio**. Apart from three open-lic
 | Preact, @preact/signals | MIT |
 | @fontsource/bungee, @fontsource/barlow-semi-condensed, @fontsource/space-mono | OFL-1.1 (fonts), MIT (packaging) |
 
-## Planned (later milestones)
+## Platform SDK (not bundled)
 
-Optional CC0 packs (e.g. Kenney, Quaternius) may be added for office/factory props. Each
-pack will be listed here with its source URL and license before it is committed.
+| Component | Source | License |
+|---|---|---|
+| CrazyGames HTML5 SDK v3 | Loaded at runtime from `sdk.crazygames.com` (only on CrazyGames; the game falls back to a local stub elsewhere) | CrazyGames terms of service; not redistributed with the build |
+
+## Status (M7, final)
+
+No third-party art, models, textures or audio packs were added. The CC0 packs considered
+earlier (Kenney, Quaternius) were not needed: all rooms (garage, office, factory, store, hall)
+are procedural. Build output: one game chunk ≈ 1.1 MB (≈ 320 KB gzip) plus CSS and fonts,
+far below the 10 MB initial target (checked by `scripts/check-size.mjs` on every build).

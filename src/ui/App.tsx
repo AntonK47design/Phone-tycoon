@@ -18,6 +18,7 @@ import { lineScrapRate, stockTotal } from '../sim/factory';
 import { TEMPOS, warehouseCapacity } from '../data/factory';
 import { colorById } from '../data/design';
 import { Tour } from './hud/Tour';
+import { RotateHint } from './hud/RotateHint';
 
 const DevPanel = import.meta.env.DEV ? lazy(() => import('./debug/DevPanel').then((m) => ({ default: m.DevPanel }))) : null;
 
@@ -96,6 +97,7 @@ export function App() {
       <DailyModal />
       <EventCard />
       {settingsOpen.value && <Settings />}
+      <RotateHint />
       <div id="fx-layer" class="passthrough" />
       {DevPanel && (
         <Suspense fallback={null}>

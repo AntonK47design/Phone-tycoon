@@ -325,7 +325,11 @@
     "off": "Aus",
     "reset": "Alles abfackeln (neues Spiel)",
     "resetConfirm": "Wirklich? Deine Firma ist dann weg.",
-    "close": "Fertig"
+    "close": "Fertig",
+    "colorblind": "Farbenblind-freundliche Farben",
+    "textSize": "Textgröße",
+    "textNormal": "Normal",
+    "textLarge": "Groß"
   },
   "tabs": {
     "company": "Firma",
@@ -1112,5 +1116,10 @@
     },
     "wait": "Nächster Bonus in {m}:{s}",
     "unavailable": "Gerade keine Werbung verfügbar. Versuch es später."
+  },
+  "rotate": {
+    "title": "Dreh dein Handy quer",
+    "text": "Im Querformat sieht dein Imperium am besten aus.",
+    "anyway": "Trotzdem hochkant spielen"
   }
 }

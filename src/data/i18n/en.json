@@ -325,7 +325,11 @@
     "off": "Off",
     "reset": "Burn it all down (new game)",
     "resetConfirm": "Really? Your company will be gone.",
-    "close": "Done"
+    "close": "Done",
+    "colorblind": "Colour-blind friendly colours",
+    "textSize": "Text size",
+    "textNormal": "Normal",
+    "textLarge": "Large"
   },
   "tabs": {
     "company": "Company",
@@ -1112,5 +1116,10 @@
     },
     "wait": "Next bonus in {m}:{s}",
     "unavailable": "No ad available right now. Try again later."
+  },
+  "rotate": {
+    "title": "Turn your phone sideways",
+    "text": "The empire looks best in landscape.",
+    "anyway": "Play upright anyway"
   }
 }

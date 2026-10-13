@@ -318,6 +318,18 @@ Was ist fertig? · Wie teste ich es? · Bekannte Probleme · Bot-Report (`docs/b
   Auto-Qualität verfeinern, Mobile-Test (Touch, Querformat-Hinweis bei Hochformat).
 - Größencheck final, Asset-Kompression, `ASSETS_LICENSES.md` vollständig.
 - Accessibility-Basics (Farbenblind-sichere Score-Farben, Textgröße).
+- **Stand:** fertig. Werbe-Regeln als reine, getestete Funktionen (`platform/adPolicy.ts`,
+  gemessen in aktiver Spielzeit): Midgame nach dem Launch-Ergebnis und nach Phasenwechseln;
+  Rewarded (freiwillig, von der Sim geprüft, je einmal): Launch-Einnahmen ×2, Restentwicklung
+  −50 %, +20 % Forschung, Offline-Ertrag ×2. Während einer Ad: Sim pausiert, Ton stumm,
+  `gameplayStop`. Mit Adblocker oder ohne Ad-Plattform sind Rewarded-Knöpfe unsichtbar
+  (Dev-Build zeigt Fake-Ads). Cloud-Save: geladen wird die neueste lesbare Kopie (Cloud vs.
+  lokal). Mobile: Dreh-Hinweis im Hochformat (abschaltbar), HUD bricht um, Tabs als eine
+  wischbare Reihe, Dialoge passen in niedrige Querformate. Barrierefreiheit: farbenblind-
+  sichere Palette (Okabe–Ito) und große Schrift in den Einstellungen. Draw Calls (Medium):
+  Garage 149, Büro 58, Fabrik 53, Store 22, Halle 49 – alle im Budget (≤ 150).
+- **Abweichung:** Kein eigener Profiling-Umbau der Garage – sie liegt mit 149 Draw Calls
+  (Medium) knapp im Budget; die übrigen Räume sind deutlich darunter.
 
 ---
 

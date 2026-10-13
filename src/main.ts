@@ -16,7 +16,7 @@ import { applyOffline } from './sim/offline';
 import { setLang, lang } from './ui/i18n';
 import { installJuice } from './ui/juice';
 import { installAutosave, loadSave, SAVE_KEY, writeSave } from './ui/persistence';
-import { loadPrefs } from './ui/hud/Settings';
+import { applyA11y, loadPrefs } from './ui/hud/Settings';
 import { installTooltips } from './ui/tooltip';
 import '@fontsource/bungee/latin-400.css';
 import '@fontsource/barlow-semi-condensed/latin-600.css';
@@ -33,6 +33,7 @@ async function boot() {
   const prefs = loadPrefs();
   if (prefs.quality !== 'auto') engine.setQuality(prefs.quality);
   sfx.setEnabled(prefs.sound);
+  applyA11y(prefs);
 
   const platform = await platformPromise;
   platform.loadingStart();
