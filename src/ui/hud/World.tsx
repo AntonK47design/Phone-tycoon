@@ -1,5 +1,6 @@
 // M5 UI: news ticker, event cards, and the World tab (regions, stores, contracts).
 
+import { signal } from '@preact/signals';
 import { sfx } from '../../audio/sfx';
 import { MAX_STORES, REGIONS } from '../../data/regions';
 import { currentReview } from '../../sim/game';
@@ -10,15 +11,55 @@ import { dailyOpen, game, launchSetupOpen, mode, settingsOpen, toast, useGameSta
 import { lang, t } from '../i18n';
 import { newsText } from '../labels';
 
-/** Scrolling headline strip (newest first). */
+/** Ticker visibility and the newest headline seen, remembered per browser. */
+const NEWS_KEY = 'phone-empire-news';
+function loadNewsPref(): { hidden: boolean; seen: number } {
+  try {
+    const raw = localStorage.getItem(NEWS_KEY);
+    if (raw) return { hidden: false, seen: -1, ...JSON.parse(raw) };
+  } catch {
+    /* ignore */
+  }
+  return { hidden: false, seen: -1 };
+}
+const newsPref = signal(loadNewsPref());
+function setNewsPref(p: { hidden: boolean; seen: number }) {
+  newsPref.value = p;
+  try {
+    localStorage.setItem(NEWS_KEY, JSON.stringify(p));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Scrolling headline strip (newest first). Can be folded into a small pill. */
 export function NewsTicker() {
   const state = useGameState();
   if (state.phase < 2 || mode.value !== 'free' || !state.news.length) return null;
   const items = [...state.news].reverse().slice(0, 6);
+  const latest = items[0].day;
+  const pref = newsPref.value;
+  if (pref.hidden) {
+    const unread = latest > pref.seen;
+    return (
+      <button
+        class="ticker-pill"
+        aria-label={t('news.show')}
+        title={t('news.show')}
+        onClick={() => (sfx.click(), setNewsPref({ hidden: false, seen: latest }))}
+      >
+        {t('news.tag')}
+        {unread && <i class="dot-alert" />}
+      </button>
+    );
+  }
   return (
-    <div class="ticker passthrough" aria-live="polite">
+    <div class="ticker" aria-live="polite">
+      <button class="ticker-close" aria-label={t('news.hide')} title={t('news.hide')} onClick={() => (sfx.click(), setNewsPref({ hidden: true, seen: latest }))}>
+        ×
+      </button>
       <span class="ticker-tag">{t('news.tag')}</span>
-      <div class="ticker-track">
+      <div class="ticker-track passthrough">
         <div class="ticker-run" key={items[0].day + items[0].kind}>
           {items.map((n, i) => (
             <span key={i} class="ticker-item">{newsText(n)}</span>

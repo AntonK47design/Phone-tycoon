@@ -777,7 +777,9 @@
     },
     "acquired": "{rival} wurde aufgekauft",
     "ownChip": "Gerücht: Ein Eigen-Chip, Generation {score}, kommt",
-    "ownOs": "Ein neues Handy-OS (Version {score}) startet"
+    "ownOs": "Ein neues Handy-OS (Version {score}) startet",
+    "show": "Schlagzeilen zeigen",
+    "hide": "Schlagzeilen ausblenden"
   },
   "event": {
     "kicker": "Eilmeldung",

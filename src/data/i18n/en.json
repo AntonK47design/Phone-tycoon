@@ -777,7 +777,9 @@
     },
     "acquired": "{rival} has been bought up",
     "ownChip": "Rumour: an in-house chip, generation {score}, is coming",
-    "ownOs": "A new phone OS (version {score}) launches"
+    "ownOs": "A new phone OS (version {score}) launches",
+    "show": "Show headlines",
+    "hide": "Hide headlines"
   },
   "event": {
     "kicker": "Breaking",

@@ -536,10 +536,15 @@ svg { flex: none; }
 .ticker-track { flex: 1; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
 .ticker-run { display: inline-block; padding-left: 100%; animation: ticker 38s linear infinite; }
 .ticker-item { margin-right: 48px; }
+.ticker-close { flex: none; width: 30px; height: 100%; border: 0; background: rgba(255, 255, 255, 0.08); color: var(--paper); font-size: 18px; line-height: 1; cursor: pointer; }
+.ticker-close:hover { background: var(--red); }
+.ticker-pill { position: absolute; left: 50%; transform: translateX(-50%); top: 126px; height: 26px; padding: 0 12px; border: 0; border-radius: 6px; background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; opacity: .75; box-shadow: var(--shadow-sm); z-index: 4; cursor: pointer; }
+.ticker-pill:hover { opacity: 1; }
+.ticker-pill .dot-alert { animation: none; width: 10px; height: 10px; top: -4px; right: -4px; }
 .ticker-item::before { content: '◆ '; color: var(--tape); }
 @keyframes ticker { to { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { .ticker-run { padding-left: 8px; } }
-@media (max-width: 900px) { .ticker { width: calc(100vw - 32px); top: auto; bottom: 136px; } }
+@media (max-width: 900px) { .ticker { width: calc(100vw - 32px); top: auto; bottom: 136px; } .ticker-pill { top: auto; bottom: 136px; } }
 .event-card { width: min(440px, calc(100vw - 24px)); gap: 10px; transform: rotate(-.8deg); }
 .event-kicker { align-self: flex-start; background: var(--red); color: #fff; font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .1em; }
 .event-options { display: flex; flex-direction: column; gap: 8px; }
