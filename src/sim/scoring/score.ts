@@ -11,7 +11,7 @@ import {
 import { LICENSED_OS, TECH_CATEGORIES, TECH_WEIGHTS, type TechCategory } from '../../data/components';
 import { FEATURES, featureById, featureExpected, partById } from '../../data/parts';
 import { finishById, materialById, PACKAGING } from '../../data/design';
-import { SEGMENTS } from '../../data/market';
+import { PRICE_LADDER, SEGMENTS, type Segment } from '../../data/market';
 import { phoneDims } from '../phoneSpec';
 import type { PhoneDesign } from '../state';
 
@@ -43,15 +43,29 @@ export function partTi(design: PhoneDesign, category: TechCategory): number {
   return (partById(design.parts[category])?.ti ?? 0) * boost;
 }
 
+/**
+ * How buyers of a segment rate a part (GDD §5.2, revised). Parts are graded against the
+ * year's top hardware (ratio 1 = flagship level); each segment needs a certain level
+ * (σ_s). Meeting it gives 7, falling short costs 1 point per step, and going beyond only
+ * pays up to the segment's headroom: budget buyers don't pay for flagship chips.
+ */
+export function segmentTechRating(ratio: number, segment: Segment): number {
+  const seg = SEGMENTS[segment];
+  const absolute = ratingFromRatio(ratio);
+  const need = 7 + 3 * Math.log2(seg.sigma);
+  const d = absolute - need;
+  if (d <= 0 || seg.headroom === Infinity) return clamp(7 + d, 0, 10);
+  return clamp(7 + seg.headroom * (1 - Math.exp(-d / seg.headroom)), 0, 10);
+}
+
 export function techScore(design: PhoneDesign, year: number): TechBreakdown {
-  const seg = SEGMENTS[design.segment];
-  const expected = seg.sigma * expectedTech(year);
+  const expected = expectedTech(year);
   const categories = {} as Record<TechCategory, number>;
   let score = 0;
   for (const k of TECH_CATEGORIES) {
     let ti = partTi(design, k);
     if (k === 'battery') ti /= batteryDrain(design);
-    const s = ratingFromRatio(ti / expected);
+    const s = segmentTechRating(ti / expected, design.segment);
     categories[k] = s;
     score += TECH_WEIGHTS[k] * s;
   }
@@ -166,16 +180,52 @@ export function overallRating(design: PhoneDesign, year: number): Rating {
   return { p, design: d, tech: t, features: f };
 }
 
-/** Segment price anchor including inflation. */
-export function priceAnchor(design: Pick<PhoneDesign, 'segment'>, year: number): number {
-  // Inflation plus real growth from 2010: phones became pricier as they did more (max ×2).
+/** Price level of a year relative to 2007: inflation plus real growth from 2010 (max ×2). */
+export function priceScale(year: number): number {
   const real = Math.min(2, Math.pow(1.03, Math.max(0, year - 2010)));
-  return SEGMENTS[design.segment].anchor * Math.pow(1.02, year - 2007) * real;
+  return Math.pow(1.02, year - 2007) * real;
 }
 
-/** Fair price for a phone with rating p (GDD §5.9). */
+/** Segment price anchor including inflation. */
+export function priceAnchor(design: Pick<PhoneDesign, 'segment'>, year: number): number {
+  return SEGMENTS[design.segment].anchor * priceScale(year);
+}
+
+/**
+ * Price band of a segment [low, high) in today's $. The ladder segments split at the
+ * geometric midpoints between their anchors; niche segments use their own band.
+ */
+export function segmentBand(segment: Segment, year: number): [number, number] {
+  const k = priceScale(year);
+  const seg = SEGMENTS[segment];
+  if (seg.nicheBand) return [seg.anchor * seg.nicheBand[0] * k, seg.anchor * seg.nicheBand[1] * k];
+  const i = PRICE_LADDER.indexOf(segment);
+  const mid = (a: Segment, b: Segment) => Math.sqrt(SEGMENTS[a].anchor * SEGMENTS[b].anchor) * k;
+  const lo = i > 0 ? mid(PRICE_LADDER[i - 1], segment) : 0;
+  const hi = i < PRICE_LADDER.length - 1 ? mid(segment, PRICE_LADDER[i + 1]) : Infinity;
+  return [lo, hi];
+}
+
+/**
+ * The segment a phone actually competes in: decided by its shelf price. A niche target
+ * (senior, gaming) keeps its audience while the price stays in the niche's band.
+ * `available` limits the result (scenario rules, locked segments): nearest rung wins.
+ */
+export function segmentForPrice(price: number, year: number, target: Segment, available: Segment[] = PRICE_LADDER): Segment {
+  if (SEGMENTS[target].nicheBand && available.includes(target)) {
+    const [lo, hi] = segmentBand(target, year);
+    if (price >= lo && price < hi) return target;
+  }
+  const ladder = PRICE_LADDER.filter((s) => available.includes(s));
+  if (!ladder.length) return target;
+  let best = ladder[0];
+  for (const s of ladder) if (price >= segmentBand(s, year)[0]) best = s;
+  return best;
+}
+
+/** Fair price for a phone with rating p (GDD §5.9): steeper in pricier segments. */
 export function fairPrice(design: PhoneDesign, p: number, year: number): number {
-  return priceAnchor(design, year) * Math.pow(Math.max(p, 0.5) / 7, 1.6);
+  return priceAnchor(design, year) * Math.pow(Math.max(p, 0.5) / 7, SEGMENTS[design.segment].valueSlope);
 }
 
 export function valueAdjustment(design: PhoneDesign, p: number, year: number): number {
@@ -184,13 +234,26 @@ export function valueAdjustment(design: PhoneDesign, p: number, year: number): n
 
 /** Rounds a price to a typical "…9" price point. */
 export function roundPrice(x: number): number {
-  if (x < 100) return Math.max(9, Math.round(x / 10) * 10 - 1);
-  return Math.max(99, Math.round(x / 50) * 50 - 1);
+  if (x < 1000) return Math.max(9, Math.round(x / 10) * 10 - 1);
+  return Math.round(x / 50) * 50 - 1;
 }
 
-export function suggestedPrice(design: PhoneDesign, year: number): number {
+/** Keeps a price inside [lo, hi), on a "…9" price point. */
+export function priceInBand(x: number, [lo, hi]: [number, number]): number {
+  let p = roundPrice(x);
+  if (p >= hi) p = Math.floor(hi / 10) * 10 - 1;
+  if (p < lo) p = Math.ceil((lo + 1) / 10) * 10 - 1;
+  return p;
+}
+
+/**
+ * Suggested price: 85 % of the fair price, kept inside the target segment's price band
+ * (`banded` = false in the garage, where the segment is fixed and prices are free).
+ */
+export function suggestedPrice(design: PhoneDesign, year: number, banded = true): number {
   const { p } = overallRating(design, year);
-  return roundPrice(0.85 * fairPrice(design, p, year));
+  const x = 0.85 * fairPrice(design, p, year);
+  return banded ? priceInBand(x, segmentBand(design.segment, year)) : roundPrice(x);
 }
 
 /** Effective shelf price: the player's own price if set, otherwise the suggestion. */

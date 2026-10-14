@@ -4,7 +4,7 @@ import { useState } from 'preact/hooks';
 import { LICENSED_OS, TECH_CATEGORIES, type TechCategory } from '../../data/components';
 import { COLORS } from '../../data/design';
 import { expectedTech } from '../../data/eras';
-import { SEGMENTS, type Segment } from '../../data/market';
+import type { Segment } from '../../data/market';
 import { FEATURES, partById, type PartDef } from '../../data/parts';
 import type { DraftPatch } from '../../sim/game';
 import { osEcosystem, osQuality, osScore } from '../../sim/giant';
@@ -18,7 +18,7 @@ import {
   availableShapes,
   availableSizes,
 } from '../../sim/research';
-import { isTrendColor, priceAnchor, ratingFromRatio } from '../../sim/scoring/score';
+import { isTrendColor, segmentBand, segmentTechRating } from '../../sim/scoring/score';
 import type { GameState } from '../../sim/state';
 import { yearOf } from '../../sim/time';
 import { decimal, money } from '../format';
@@ -46,7 +46,6 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
   const d = state.draft;
   const l = lang.value;
   const year = yearOf(state.day);
-  const sigma = SEGMENTS[d.segment].sigma;
 
   const Head = ({ id, title, summary }: { id: Section; title: string; summary: string }) => (
     <button class={`acc-head ${open === id ? 'open' : ''}`} onClick={() => setOpen(open === id ? ('' as Section) : id)}>
@@ -59,7 +58,8 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
   const osScoreOf = (o: string) => (o === 'own' ? osScore(state) : LICENSED_OS[o as keyof typeof LICENSED_OS]?.score ?? 5);
   // Frontier research lifts every part by 2 % per level.
   const boost = Math.pow(1.02, state.research.frontier ?? 0);
-  const partRating = (p: PartDef) => ratingFromRatio((p.ti * boost) / (sigma * expectedTech(year)));
+  // How buyers of the phone's segment would rate this part.
+  const partRating = (p: PartDef) => segmentTechRating((p.ti * boost) / expectedTech(year), d.segment);
 
   const PartPicker = ({ category }: { category: TechCategory }) => {
     const all = availableParts(state, category);
@@ -96,6 +96,12 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
   const segs: Segment[] = availableSegments(state);
   const custom = d.customPrice !== null;
   const fair = suggestedPrice;
+  const target = d.target ?? d.segment;
+  const band = (s: Segment) => {
+    const [lo, hi] = segmentBand(s, year);
+    if (hi === Infinity) return t('segment.bandFrom', { lo: money(lo, l) });
+    return lo <= 0 ? t('segment.bandTo', { hi: money(hi, l) }) : t('segment.band', { lo: money(lo, l), hi: money(hi, l) });
+  };
 
   return (
     <div class="acc">
@@ -104,12 +110,17 @@ export function AdvancedEditor({ suggestedPrice, missing, onChange }: Props) {
         <div class="acc-body">
           <div class="seg-pick">
             {segs.map((s) => (
-              <button key={s} class={d.segment === s ? 'on' : ''} onClick={() => onChange('segment', { segment: s })}>
+              <button key={s} class={target === s ? 'on' : ''} onClick={() => onChange('segment', { segment: s })}>
                 {t(`segment.${s}`)}
-                <small>{t('segment.anchor', { price: money(priceAnchor({ segment: s }, year), l) })}</small>
+                <small>{band(s)}</small>
               </button>
             ))}
           </div>
+          {d.segment !== target ? (
+            <div class="warn-line">{t('segment.sellsAs', { seg: t(`segment.${d.segment}`), target: t(`segment.${target}`) })}</div>
+          ) : (
+            <div class="hint-line">{t('segment.priceDecides')}</div>
+          )}
           <div class="price-row">
             <span class="label">{t('price.title')}</span>
             <div class="seg mini">

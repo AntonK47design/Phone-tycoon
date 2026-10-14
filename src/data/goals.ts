@@ -81,7 +81,7 @@ export const GOALS: GoalDef[] = [
   { id: 'regions5', kind: 'regions', target: 5, reward: { cash: 5_000_000 } },
   { id: 'stores10', kind: 'stores', target: 10, reward: { cash: 10_000_000 } },
   { id: 'valuation1b', kind: 'valuation', target: 1_000_000_000, reward: { cash: 20_000_000 } },
-  { id: 'valuation5b', kind: 'valuation', target: 15_000_000_000, reward: {}, gate: 'phase5' },
+  { id: 'valuation5b', kind: 'valuation', target: 25_000_000_000, reward: {}, gate: 'phase5' },
   // Phase 5 – tech giant.
   { id: 'campus', kind: 'campus', target: 1, reward: { cash: 200_000_000 } },
   { id: 'ownChip', kind: 'chipLevel', target: 1, reward: { cash: 300_000_000 } },
@@ -89,7 +89,7 @@ export const GOALS: GoalDef[] = [
   { id: 'side3', kind: 'sideProducts', target: 3, reward: { cash: 500_000_000 } },
   { id: 'acquire1', kind: 'acquired', target: 1, reward: { cash: 500_000_000 } },
   { id: 'valuation20b', kind: 'valuation', target: 50_000_000_000, reward: {} },
-  // Phase 6 – endgame: 20 % market share, or from 2045 a $100B company.
+  // Phase 6 – endgame: 20 % market share, or from 2045 a $120B company.
   { id: 'endgame', kind: 'endgame', target: 1, reward: {}, gate: 'phase6' },
 ];
 

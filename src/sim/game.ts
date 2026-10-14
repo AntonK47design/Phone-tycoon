@@ -65,6 +65,7 @@ import {
   overallRating,
   reviewAspects,
   roundPrice,
+  segmentForPrice,
   OWN_CHIP_ID,
   reviewEstimate,
   suggestedPrice,
@@ -118,7 +119,7 @@ export function newGame(seed: number, legacy: Legacy = newLegacy()): GameState {
     parts: garageParts(2007),
     features: ['wifi'],
   };
-  draft.price = suggestedPrice(draft, 2007);
+  draft.price = suggestedPrice(draft, 2007, false);
   const state: GameState = {
     version: SAVE_VERSION,
     seed,
@@ -175,7 +176,7 @@ function applyLegacy(state: GameState): void {
       state.draft.kitYear = 2016;
       state.draft.parts = garageParts(2016);
       state.draft.displaySize = 4.0;
-      state.draft.price = suggestedPrice(state.draft, 2016);
+      state.draft.price = suggestedPrice(state.draft, 2016, false);
       break;
     case 'recession':
       state.events.active.push({ id: 'recession', start: 0, until: Number.MAX_SAFE_INTEGER });
@@ -250,7 +251,10 @@ export function normalizeDraft(state: GameState, d: PhoneDesign): void {
     if (!availableMaterials(state).includes(d.materialId)) d.materialId = 'plastic';
     if (!availableFinishes(state).includes(d.finishId)) d.finishId = 'gloss';
     if (!availableOs(state).includes(d.osId)) d.osId = 'leafline';
-    if (!availableSegments(state).includes(d.segment)) d.segment = defaultSegment(state);
+    // The player picks a target (positioning); the shelf price decides the real segment.
+    const segs = availableSegments(state);
+    d.target = d.target && segs.includes(d.target) ? d.target : segs.includes(d.segment) ? d.segment : defaultSegment(state);
+    d.segment = d.target;
   }
   // Frontier research, own chip and own OS are snapshotted into the design.
   d.techBoost = Math.pow(1.02, state.research.frontier ?? 0);
@@ -264,6 +268,7 @@ export function normalizeDraft(state: GameState, d: PhoneDesign): void {
   if (!availableSizes(state).includes(d.displaySize)) d.displaySize = 3.5;
   if (d.customPrice !== null) d.customPrice = clamp(Math.round(d.customPrice), 29, 4999);
   d.price = d.customPrice ?? autoPrice(state, d);
+  if (state.phase >= 2) d.segment = segmentForPrice(d.price, year, d.target ?? d.segment, availableSegments(state));
 }
 
 function defaultSegment(state: GameState): Segment {
@@ -280,7 +285,7 @@ export const AUTO_MARGIN = 1.3;
  */
 export function autoPrice(state: GameState, d: PhoneDesign): number {
   const year = yearOf(state.day);
-  const fair = suggestedPrice(d, year);
+  const fair = suggestedPrice(d, year, state.phase >= 2);
   if (state.phase < 2) return fair;
   const cost = unitCost(d, year, 'oem');
   const floor = roundPrice((cost / (1 - channelCut(state))) * AUTO_MARGIN);
@@ -292,6 +297,11 @@ export function applyAction(state: GameState, action: Action): SimEvent[] {
   switch (action.type) {
     case 'setDraft': {
       const { part, ...rest } = action.patch;
+      // Choosing a positioning resets a custom price (it would decide the segment otherwise).
+      if (rest.segment) {
+        state.draft.target = rest.segment;
+        if (rest.customPrice === undefined) rest.customPrice = null;
+      }
       Object.assign(state.draft, rest);
       if (part) state.draft.parts = { ...state.draft.parts, [part.category]: part.id };
       normalizeDraft(state, state.draft);

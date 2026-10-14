@@ -210,14 +210,14 @@
     "regions5": "Verkaufe auf jedem Kontinent",
     "stores10": "Betreibe 10 Stores",
     "valuation1b": "Werde eine Milliarden-Firma",
-    "valuation5b": "Erreiche 15 Mrd. $ Firmenwert",
+    "valuation5b": "Erreiche 25 Mrd. $ Firmenwert",
     "valuation20b": "Erreiche 50 Mrd. $ Firmenwert",
     "campus": "Bau den Campus",
     "ownChip": "Entwickle deinen eigenen Chip",
     "ownOs": "Bring dein eigenes OS raus",
     "side3": "Verkaufe Uhr, Earbuds und Tablet",
     "acquire1": "Übernimm einen Rivalen",
-    "endgame": "20 % Marktanteil oder ab 2045 eine 100-Mrd.-$-Firma"
+    "endgame": "20 % Marktanteil oder ab 2045 eine 120-Mrd.-$-Firma"
   },
   "teaser": {
     "office": "Noch {amount}, dann ist Schluss mit Garage.",
@@ -366,7 +366,12 @@
     "flagship": "Flaggschiff",
     "anchor": "Üblicher Preis {price}",
     "senior": "Senioren",
-    "gaming": "Gaming"
+    "gaming": "Gaming",
+    "band": "{lo}–{hi}",
+    "bandFrom": "ab {lo}",
+    "sellsAs": "Zu diesem Preis kaufen {seg}-Kunden, nicht {target}. Sie erwarten mehr fürs Geld.",
+    "priceDecides": "Der Preis entscheidet, wer kauft: Jedes Segment hat eigene Preisspanne und Erwartungen.",
+    "bandTo": "bis {hi}"
   },
   "price": {
     "title": "Preis",
@@ -977,7 +982,7 @@
   },
   "empire": {
     "title": "Imperium",
-    "locked": "Werde eine 15-Mrd.-$-Firma, um dein Tech-Imperium zu bauen.",
+    "locked": "Werde eine 25-Mrd.-$-Firma, um dein Tech-Imperium zu bauen.",
     "notNow": "Gerade nicht möglich.",
     "campusLevel": "Campus {n}/3",
     "campus": "Campus bauen",

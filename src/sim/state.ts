@@ -9,7 +9,10 @@ export const SAVE_VERSION = 7;
 
 export interface PhoneDesign {
   name: string;
+  /** Effective segment: decided by the shelf price (phase 2+). */
   segment: Segment;
+  /** The positioning the player picked; the automatic price stays in its band. */
+  target?: Segment;
   price: number;
   /** Player-set price (Phase 2+). null = use the suggested fair price. */
   customPrice: number | null;

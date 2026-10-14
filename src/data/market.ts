@@ -18,17 +18,29 @@ export interface SegmentDef {
   alphaMul: number;
   /** Sweet-spot display size offset vs. flagship expectation. */
   sizeOffset: number;
+  /**
+   * How far buyers reward tech above what they need (rating points). Budget buyers stop
+   * caring soon; flagship and gaming buyers reward every step (Infinity = no cap).
+   */
+  headroom: number;
+  /** How steeply the fair price rises with the rating: (P/7)^slope. */
+  valueSlope: number;
+  /** Niche audiences (senior, gaming) only buy within this price range around the anchor. */
+  nicheBand?: [number, number];
 }
 
 export const SEGMENTS: Record<Segment, SegmentDef> = {
-  budget: { id: 'budget', sigma: 0.35, anchor: 149, elasticity: 2.2, alphaMul: 0.75, sizeOffset: -0.3 },
-  mid: { id: 'mid', sigma: 0.6, anchor: 299, elasticity: 1.6, alphaMul: 1.0, sizeOffset: -0.15 },
-  flagship: { id: 'flagship', sigma: 1.0, anchor: 599, elasticity: 1.1, alphaMul: 1.125, sizeOffset: 0 },
+  budget: { id: 'budget', sigma: 0.35, anchor: 149, elasticity: 2.2, alphaMul: 0.75, sizeOffset: -0.3, headroom: 1.2, valueSlope: 1.2 },
+  mid: { id: 'mid', sigma: 0.6, anchor: 299, elasticity: 1.6, alphaMul: 1.0, sizeOffset: -0.15, headroom: 1.5, valueSlope: 1.7 },
+  flagship: { id: 'flagship', sigma: 0.9, anchor: 599, elasticity: 1.1, alphaMul: 1.125, sizeOffset: 0, headroom: Infinity, valueSlope: 2.0 },
   // Big, simple, long battery; price-aware.
-  senior: { id: 'senior', sigma: 0.35, anchor: 199, elasticity: 1.8, alphaMul: 0.8, sizeOffset: 0.2 },
+  senior: { id: 'senior', sigma: 0.35, anchor: 199, elasticity: 1.8, alphaMul: 0.8, sizeOffset: 0.2, headroom: 1.2, valueSlope: 1.2, nicheBand: [0.65, 1.5] },
   // Fast chips, big screens, design matters less.
-  gaming: { id: 'gaming', sigma: 1.05, anchor: 699, elasticity: 1.2, alphaMul: 0.8, sizeOffset: 0.1 },
+  gaming: { id: 'gaming', sigma: 0.95, anchor: 699, elasticity: 1.2, alphaMul: 0.8, sizeOffset: 0.1, headroom: Infinity, valueSlope: 2.0, nicheBand: [0.7, 3] },
 };
+
+/** The price ladder: a phone's shelf price decides which of these it competes in. */
+export const PRICE_LADDER: Segment[] = ['budget', 'mid', 'flagship'];
 
 /** Segment share of total market by year (linear interpolation between rows). */
 export const SEGMENT_SHARES: ({ year: number } & Record<Segment, number>)[] = [

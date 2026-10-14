@@ -109,6 +109,7 @@ function designFor(state: GameState, segment: Segment, pick: number, profile: Bo
   const year = yearOf(state.day);
   const d: PhoneDesign = structuredClone(state.draft);
   d.segment = segment;
+  d.target = segment;
   d.customPrice = null;
   const colors = state.unlockedColors;
   d.colorId = profile === 'weak' ? colors[pick % colors.length] : colors.find((c) => isTrendColor(c, year)) ?? colors[0];

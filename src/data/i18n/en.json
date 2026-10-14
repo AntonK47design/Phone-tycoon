@@ -210,14 +210,14 @@
     "regions5": "Sell on every continent",
     "stores10": "Run 10 stores",
     "valuation1b": "Become a $1B company",
-    "valuation5b": "Reach a $15B valuation",
+    "valuation5b": "Reach a $25B valuation",
     "valuation20b": "Reach a $50B valuation",
     "campus": "Build the campus",
     "ownChip": "Design your own chip",
     "ownOs": "Ship your own OS",
     "side3": "Sell watch, earbuds and tablet",
     "acquire1": "Take over a rival",
-    "endgame": "20% market share, or a $100B company from 2045"
+    "endgame": "20% market share, or a $120B company from 2045"
   },
   "teaser": {
     "office": "{amount} more and you can stop working in a garage.",
@@ -366,7 +366,12 @@
     "flagship": "Flagship",
     "anchor": "Typical price {price}",
     "senior": "Senior",
-    "gaming": "Gaming"
+    "gaming": "Gaming",
+    "band": "{lo}–{hi}",
+    "bandFrom": "from {lo}",
+    "sellsAs": "At this price you sell to {seg} buyers, not {target}. They expect more for the money.",
+    "priceDecides": "The price decides who buys: each segment has its own price range and expectations.",
+    "bandTo": "up to {hi}"
   },
   "price": {
     "title": "Price",
@@ -977,7 +982,7 @@
   },
   "empire": {
     "title": "Empire",
-    "locked": "Become a $15B company to start building your tech empire.",
+    "locked": "Become a $25B company to start building your tech empire.",
     "notNow": "Not possible right now.",
     "campusLevel": "campus {n}/3",
     "campus": "Build the campus",
